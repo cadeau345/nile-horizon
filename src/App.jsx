@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 
@@ -22,7 +22,7 @@ function App() {
 
   return (
 
-    <BrowserRouter>
+   <Router>
 
       <Navbar />
 
@@ -46,7 +46,7 @@ function App() {
       </Routes>
 <FloatingWhatsApp />
 <Footer />
-    </BrowserRouter>
+  </Router>
 
   );
 
