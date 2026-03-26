@@ -126,7 +126,11 @@ return heroImage;
 
 <div className="relative min-h-[60vh] flex items-center justify-center px-4">
 
-
+<img
+src={heroImage}
+className="absolute w-full h-full object-cover object-center transition-all duration-500"
+/>
+alt="Aswan Nile"
 
 
 <div className="absolute inset-0 bg-black/40"></div>
