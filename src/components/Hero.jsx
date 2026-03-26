@@ -11,21 +11,19 @@ function Hero() {
         alt="Aswan Nile"
       />
 
-      {/* Overlay */}
+      {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* Content Box */}
-      <div className="relative bg-white/85 md:bg-white/95 backdrop-blur-md px-4 py-4 md:px-6 md:py-8 rounded-2xl shadow-xl text-center w-[85%] max-w-sm md:max-w-3xl">
 
-        {/* Title */}
-        <h1 className="text-lg sm:text-2xl md:text-5xl font-bold text-blue-900">
+      <div className="relative text-center px-4">
+
+        <h1 className="text-white text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-lg">
 
           Discover Aswan with Nile Horizon
 
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-2 text-gray-600 text-sm sm:text-base md:text-lg">
+        <p className="text-gray-200 mt-2 text-sm sm:text-base md:text-lg">
 
           Hotels • Transport • Private Cars
 
