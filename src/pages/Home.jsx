@@ -124,11 +124,11 @@ return heroImage;
 
 {/* Hero Section */}
 
-<div className="relative min-h-[60vh] flex items-center justify-center px-4">
+<div className="relative h-[50vh] md:h-[90vh] flex items-center justify-center">
 
 <img
 src={heroImage}
-className="absolute w-full h-full object-cover object-center transition-all duration-500"
+className="absolute w-full h-full object-cover object-center"
 />
 alt="Aswan Nile"
 
@@ -136,15 +136,15 @@ alt="Aswan Nile"
 <div className="absolute inset-0 bg-black/40"></div>
 
 
-<div className="relative text-center px-4">
+<div className="relative text-center px-4 mt-10 md:mt-0">
 
-<h1 className="text-white text-xl md:text-5xl font-bold">
+<h1 className="text-white text-lg sm:text-2xl md:text-5xl font-bold leading-snug">
 
 Discover Aswan with Nile Horizon
 
 </h1>
 
-<p className="text-gray-200 mt-2 text-sm md:text-lg">
+<p className="text-gray-200 mt-1 text-xs sm:text-sm md:text-lg">
 
 Hotels • Transport • Private Cars
 
