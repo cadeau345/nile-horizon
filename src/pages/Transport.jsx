@@ -20,7 +20,7 @@ function Transport() {
 
   const [passengers, setPassengers] = useState("");
 
-  const [searchClicked, setSearchClicked] = useState(false);
+  const [searchClicked, setSearchClicked] = useState(true);
 
   const [tripType, setTripType] = useState("oneway");
 
