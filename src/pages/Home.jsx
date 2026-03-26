@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 
 import { db } from "../firebase";
+
 import { Helmet } from "react-helmet-async";
+
+import heroImage from "../assets/hero.jpg";
+
 
 function Home() {
 
@@ -25,7 +29,7 @@ function Home() {
         ...doc.data()
       }));
 
-      setHotels(data.slice(0, 3)); // يعرض أول 3 فنادق فقط
+      setHotels(data.slice(0, 3));
 
     };
 
@@ -37,22 +41,27 @@ function Home() {
   return (
 
     <div>
- 
- <Helmet>
-  <title>Nile Horizon | Best Hotels & Trips in Aswan</title>
 
-  <meta
-    name="description"
-    content="Book hotels, trips, transport and travel packages in Aswan with Nile Horizon. Discover Abu Simbel, Nubian Village and more."
-  />
-</Helmet>
+      <Helmet>
+
+        <title>
+          Nile Horizon | Best Hotels & Trips in Aswan
+        </title>
+
+        <meta
+          name="description"
+          content="Book hotels, trips, transport and travel packages in Aswan with Nile Horizon. Discover Abu Simbel, Nubian Village and more."
+        />
+
+      </Helmet>
+
 
       {/* Hero Section */}
 
       <div className="relative h-[90vh] flex items-center justify-center">
 
         <img
-          src="https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?q=80&w=2070&auto=format&fit=crop"
+          src={heroImage}
           className="absolute w-full h-full object-cover"
           alt="Aswan Nile"
         />
@@ -63,11 +72,16 @@ function Home() {
         <div className="relative bg-white/90 backdrop-blur-md p-10 rounded-2xl shadow-xl text-center">
 
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900">
+
             Discover Aswan with Nile Horizon
+
           </h1>
 
+
           <p className="mt-3 text-gray-600 text-lg">
+
             Hotels • Transport • Trips • Packages
+
           </p>
 
 
@@ -111,11 +125,15 @@ function Home() {
           <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
             <h2 className="text-xl font-bold">
+
               Hotels
+
             </h2>
 
             <p className="text-gray-500">
+
               Best hotels in Aswan
+
             </p>
 
           </div>
@@ -128,11 +146,15 @@ function Home() {
           <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
             <h2 className="text-xl font-bold">
+
               Transport
+
             </h2>
 
             <p className="text-gray-500">
+
               Cairo ⇄ Aswan transport
+
             </p>
 
           </div>
@@ -145,11 +167,15 @@ function Home() {
           <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
             <h2 className="text-xl font-bold">
+
               Packages
+
             </h2>
 
             <p className="text-gray-500">
+
               All-inclusive travel deals
+
             </p>
 
           </div>
@@ -162,11 +188,15 @@ function Home() {
           <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
             <h2 className="text-xl font-bold">
+
               Trips
+
             </h2>
 
             <p className="text-gray-500">
+
               Abu Simbel • Nubian Village • Felucca
+
             </p>
 
           </div>
@@ -296,11 +326,15 @@ function Home() {
         <div className="shadow-md rounded-xl p-6">
 
           <h3 className="text-xl font-bold">
+
             Best Prices
+
           </h3>
 
           <p className="text-gray-500">
+
             Local deals with competitive rates
+
           </p>
 
         </div>
@@ -309,11 +343,15 @@ function Home() {
         <div className="shadow-md rounded-xl p-6">
 
           <h3 className="text-xl font-bold">
+
             Local Experts
+
           </h3>
 
           <p className="text-gray-500">
+
             Real experience in Aswan tourism
+
           </p>
 
         </div>
@@ -322,11 +360,15 @@ function Home() {
         <div className="shadow-md rounded-xl p-6">
 
           <h3 className="text-xl font-bold">
+
             Easy Booking
+
           </h3>
 
           <p className="text-gray-500">
+
             Simple reservation process
+
           </p>
 
         </div>
