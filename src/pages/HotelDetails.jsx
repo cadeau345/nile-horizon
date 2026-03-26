@@ -31,6 +31,7 @@ function HotelDetails() {
 
   const [nights, setNights] = useState(0);
   const { addToCart } = useContext(CartContext);
+  
 
 
   useEffect(() => {
@@ -77,6 +78,7 @@ function HotelDetails() {
     }
 
   }, [checkIn, checkOut, hotel]);
+  
 
 
   const handleBooking = async () => {
@@ -145,6 +147,15 @@ function HotelDetails() {
       <p className="text-orange-500 text-xl mt-4">
 
         ${hotel.price} / night
+        {totalPrice > 0 && (
+
+<p className="text-green-600 font-bold mt-2">
+
+Total: ${totalPrice}
+
+</p>
+
+)}
 
       </p>
 

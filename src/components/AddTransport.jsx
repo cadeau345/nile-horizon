@@ -99,17 +99,14 @@ const [isOffer,setIsOffer]=useState(false);
 
     } else {
 
-   await addDoc(collection(db,"transport"),{
-
-name,
-from,
-to,
-price,
-type,
-image,
-isBestSeller,
-isOffer
-
+ await addDoc(collection(db, "transport"), {
+  company,
+  price,
+  image,
+  from,
+  to,
+  type,
+  isBestSeller: true
 });
 
     }
