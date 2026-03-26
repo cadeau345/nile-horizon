@@ -22,6 +22,7 @@ function Home() {
   const [bestTrips, setBestTrips] = useState([]);
 
   const [bestTransport, setBestTransport] = useState([]);
+  const [serviceType, setServiceType] = useState("hotels");
 
 
   useEffect(() => {
@@ -108,7 +109,7 @@ function Home() {
 
 {/* Hero Section */}
 
-<div className="relative h-[90vh] flex items-center justify-center">
+<div className="relative min-h-[90vh] flex items-center justify-center px-4">
 
 <img
 src={heroImage}
@@ -119,9 +120,9 @@ alt="Aswan Nile"
 <div className="absolute inset-0 bg-black/40"></div>
 
 
-<div className="relative bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center w-[95%] max-w-4xl">
+<div className="relative bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl text-center w-full max-w-4xl">
 
-<h1 className="text-4xl md:text-5xl font-bold text-blue-900">
+<h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-blue-900">
 
 Discover Aswan with Nile Horizon
 
@@ -135,60 +136,98 @@ Hotels • Transport • Private Cars
 </p>
 
 
-<div className="flex justify-center gap-4 mt-6">
+{/* Tabs */}
 
-<button className="px-4 py-2 bg-blue-900 text-white rounded-lg">
+<div className="flex flex-wrap justify-center gap-3 mt-6">
 
+<button
+onClick={()=>setServiceType("hotels")}
+className={`px-4 py-2 rounded-lg transition ${
+serviceType==="hotels"
+? "bg-blue-900 text-white"
+: "bg-gray-200 hover:bg-gray-300"
+}`}
+>
 Hotels
-
 </button>
 
 
-<button className="px-4 py-2 bg-gray-200 rounded-lg">
-
+<button
+onClick={()=>setServiceType("transport")}
+className={`px-4 py-2 rounded-lg transition ${
+serviceType==="transport"
+? "bg-blue-900 text-white"
+: "bg-gray-200 hover:bg-gray-300"
+}`}
+>
 Transport
-
 </button>
 
 
-<button className="px-4 py-2 bg-gray-200 rounded-lg">
-
+<button
+onClick={()=>setServiceType("cars")}
+className={`px-4 py-2 rounded-lg transition ${
+serviceType==="cars"
+? "bg-blue-900 text-white"
+: "bg-gray-200 hover:bg-gray-300"
+}`}
+>
 Private Cars
-
 </button>
 
 </div>
 
 
-<div className="grid md:grid-cols-4 gap-3 mt-6">
+{/* Search Form */}
+
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-6">
 
 <input
 placeholder="Destination or hotel name"
-className="border p-3 rounded-lg"
+className="border p-3 rounded-lg w-full"
 />
 
 
 <input
 type="date"
-className="border p-3 rounded-lg"
+className="border p-3 rounded-lg w-full"
 />
 
 
 <input
 type="date"
-className="border p-3 rounded-lg"
+className="border p-3 rounded-lg w-full"
 />
 
 
 <input
 placeholder="Guests"
-className="border p-3 rounded-lg"
+className="border p-3 rounded-lg w-full"
 />
 
 </div>
 
 
-<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 py-3 rounded-xl">
+<button
+onClick={()=>{
+
+if(serviceType==="hotels")
+
+window.location.href="/hotels";
+
+
+if(serviceType==="transport")
+
+window.location.href="/transport";
+
+
+if(serviceType==="cars")
+
+window.location.href="/transport";
+
+}}
+className="mt-6 bg-orange-500 hover:bg-orange-600 transition text-white px-10 py-3 rounded-xl"
+>
 
 Search
 
@@ -197,7 +236,6 @@ Search
 </div>
 
 </div>
-
 
 
 {/* Services Section */}
