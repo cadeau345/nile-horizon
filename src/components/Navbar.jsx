@@ -51,16 +51,23 @@ Cart
 </div>
 
 
-{/* Hamburger Button */}
+<div className="flex items-center gap-3 md:hidden">
+
+<Link
+to="/cart"
+className="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm"
+>
+Cart
+</Link>
 
 <button
 onClick={()=>setMenuOpen(!menuOpen)}
-className="md:hidden text-3xl text-blue-900"
+className="text-3xl text-blue-900"
 >
-
 {menuOpen ? "✕" : "☰"}
-
 </button>
+
+</div>
 
 
 {/* Mobile Menu */}

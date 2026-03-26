@@ -9,6 +9,9 @@ import { db } from "../firebase";
 import { Helmet } from "react-helmet-async";
 
 import heroImage from "../assets/hero.jpg";
+import hotelsHero from "../assets/hotelsHero.jpg";
+import tripsHero from "../assets/tripsHero.jpg";
+import transportHero from "../assets/transportHero.jpg";
 
 
 function Home() {
@@ -26,6 +29,17 @@ function Home() {
 
 
   useEffect(() => {
+    const getHeroImage = () => {
+
+if(serviceType === "hotels") return hotelsHero;
+
+if(serviceType === "transport") return transportHero;
+
+if(serviceType === "cars") return transportHero;
+
+return heroImage;
+
+};
 
     const fetchData = async () => {
 
@@ -109,20 +123,21 @@ function Home() {
 
 {/* Hero Section */}
 
-<div className="relative min-h-[70vh] flex items-center justify-center px-4">
+<div className="relative min-h-[60vh] flex items-center justify-center px-4">
 
 <img
 src={heroImage}
-className="absolute w-full h-full object-cover"
-alt="Aswan Nile"
+className="absolute w-full h-full object-cover object-center transition-all duration-500"
 />
+alt="Aswan Nile"
+
 
 <div className="absolute inset-0 bg-black/40"></div>
 
 
-<div className="relative bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl text-center w-full max-w-4xl">
+<div className="relative bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl text-center w-full max-w-[90%] md:max-w-3xl">
 
-<h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-blue-900">
+<h1 className="text-xl sm:text-3xl md:text-5xl font-bold text-blue-900">
 
 Discover Aswan with Nile Horizon
 
