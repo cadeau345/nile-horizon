@@ -31,6 +31,7 @@ function AddHotel() {
   const [isBestSeller, setIsBestSeller] = useState(false);
 
   const [isOffer, setIsOffer] = useState(false);
+  const [discountPrice,setDiscountPrice]=useState("");
 
 
   const fetchHotels = async () => {
@@ -77,33 +78,31 @@ function AddHotel() {
 
     if (editingId) {
 
-      await updateDoc(doc(db, "hotels", editingId), {
-
-        name,
-        location,
-        price,
-        description,
-        image,
-        isBestSeller,
-        isOffer
-
-      });
+     await updateDoc(doc(db,"hotels",editingId),{
+name,
+location,
+price,
+discountPrice,
+description,
+image,
+isBestSeller,
+isOffer
+});
 
       setEditingId(null);
 
     } else {
 
-      await addDoc(collection(db, "hotels"), {
-
-        name,
-        location,
-        price,
-        description,
-        image,
-        isBestSeller,
-        isOffer
-
-      });
+    await addDoc(collection(db,"hotels"),{
+name,
+location,
+price,
+discountPrice,
+description,
+image,
+isBestSeller,
+isOffer
+});
 
     }
 
@@ -186,6 +185,12 @@ function AddHotel() {
           className="border p-2 w-full mb-3"
           onChange={(e) => setPrice(e.target.value)}
         />
+        <input
+value={discountPrice}
+placeholder="Discount Price (optional)"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setDiscountPrice(e.target.value)}
+/>
 
 
         <input

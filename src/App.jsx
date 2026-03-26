@@ -19,6 +19,7 @@ import Footer from "./components/Footer";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Cart from "./pages/cart";
+import MobileBottomNav from "./components/MobileBottomNav";
 function App() {
 
   return (
@@ -48,7 +49,9 @@ function App() {
       </Routes>
 <FloatingWhatsApp />
 <Footer />
+<MobileBottomNav />
   </Router>
+  
 
   );
 

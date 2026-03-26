@@ -109,7 +109,7 @@ function Home() {
 
 {/* Hero Section */}
 
-<div className="relative min-h-[90vh] flex items-center justify-center px-4">
+<div className="relative min-h-[70vh] flex items-center justify-center px-4">
 
 <img
 src={heroImage}
@@ -345,13 +345,26 @@ Featured Hotels
 
 <Link to={`/hotel/${hotel.id}`} key={hotel.id}>
 
-<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300">
+
+<div className="relative">
+
+{hotel.discountPrice && (
+
+<span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
+
+SALE
+
+</span>
+
+)}
 
 <img
 src={hotel.image}
-className="h-52 w-full object-cover"
+className="h-40 md:h-52 w-full object-cover"
 />
 
+</div>
 <div className="p-4">
 
 <h3 className="text-xl font-bold">
@@ -367,8 +380,35 @@ className="h-52 w-full object-cover"
 </p>
 
 <p className="text-orange-500 font-bold mt-2">
+{
+hotel.discountPrice ? (
 
-${hotel.price} / night
+<div>
+
+<span className="line-through text-gray-400 mr-2">
+
+${hotel.price}
+
+</span>
+
+<span className="text-orange-500 font-bold">
+
+${hotel.discountPrice}
+
+</span>
+
+</div>
+
+) : (
+
+<span className="text-orange-500 font-bold">
+
+${hotel.price}
+
+</span>
+
+)
+}
 
 </p>
 
@@ -408,7 +448,7 @@ Best Sellers
 
 <img
 src={item.image}
-className="h-52 w-full object-cover"
+className="h-40 md:h-52 w-full object-cover"
 />
 
 <div className="p-4">
@@ -463,7 +503,7 @@ Special Offers
 
 <img
 src={item.image}
-className="h-52 w-full object-cover"
+className="h-40 md:h-52 w-full object-cover"
 />
 
 <div className="p-4">
@@ -514,11 +554,11 @@ Popular Trips
 
 <Link to={`/trip/${trip.id}`} key={trip.id}>
 
-<div className="shadow-lg rounded-xl overflow-hidden">
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300">
 
 <img
 src={trip.image}
-className="h-52 w-full object-cover"
+className="h-40 md:h-52 w-full object-cover"
 />
 
 <div className="p-4">
@@ -569,11 +609,11 @@ Top Transport Deals
 
 <Link to={`/transport/${item.id}`} key={item.id}>
 
-<div className="shadow-lg rounded-xl overflow-hidden">
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300">
 
 <img
 src={item.image}
-className="h-52 w-full object-cover"
+className="h-40 md:h-52 w-full object-cover"
 />
 
 <div className="p-4">
