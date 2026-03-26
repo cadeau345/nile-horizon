@@ -1,60 +1,111 @@
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
+import { useState } from "react";
 
 function Navbar() {
 
-  const { cartItems } = useContext(CartContext);
+const [menuOpen,setMenuOpen]=useState(false);
 
-  return (
+return (
 
-    <nav className="bg-white shadow-md px-8 py-4 flex justify-between items-center">
+<nav className="bg-white shadow-md px-4 md:px-10 py-4 flex items-center justify-between">
 
-      <h1 className="text-2xl font-bold text-blue-900">
-        Nile Horizon
-      </h1>
+{/* Logo */}
 
-      <div className="space-x-6 flex items-center">
+<Link
+to="/"
+className="text-blue-900 font-bold text-xl"
+>
 
-        <Link to="/">Home</Link>
+Nile Horizon
 
-        <Link to="/hotels">Hotels</Link>
-
-        <Link to="/transport">Transport</Link>
-
-        <Link to="/trips">Trips</Link>
-
-        <Link to="/offers">Offers</Link>
-
-        <Link to="/about">About Aswan</Link>
-
-        <Link to="/contact">Contact</Link>
+</Link>
 
 
-        <Link
-          to="/cart"
-          className="relative bg-blue-900 text-white px-4 py-2 rounded-lg"
-        >
+{/* Desktop Menu */}
 
-          🛒 Cart
+<div className="hidden md:flex gap-6 items-center">
 
-          {cartItems?.length > 0 && (
+<Link to="/">Home</Link>
 
-            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 rounded-full">
+<Link to="/hotels">Hotels</Link>
 
-              {cartItems.length}
+<Link to="/transport">Transport</Link>
 
-            </span>
+<Link to="/trips">Trips</Link>
 
-          )}
+<Link to="/offers">Offers</Link>
 
-        </Link>
+<Link to="/about">About Aswan</Link>
 
-      </div>
+<Link to="/contact">Contact</Link>
 
-    </nav>
+<Link
+to="/cart"
+className="bg-blue-900 text-white px-4 py-2 rounded-lg"
+>
 
-  );
+Cart
+
+</Link>
+
+</div>
+
+
+{/* Mobile Button */}
+
+<button
+
+onClick={()=>setMenuOpen(!menuOpen)}
+
+className="md:hidden text-2xl"
+
+>
+
+☰
+
+</button>
+
+
+{/* Mobile Menu */}
+
+{
+
+menuOpen && (
+
+<div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center gap-4 py-6 md:hidden">
+
+<Link to="/">Home</Link>
+
+<Link to="/hotels">Hotels</Link>
+
+<Link to="/transport">Transport</Link>
+
+<Link to="/trips">Trips</Link>
+
+<Link to="/offers">Offers</Link>
+
+<Link to="/about">About Aswan</Link>
+
+<Link to="/contact">Contact</Link>
+
+<Link
+to="/cart"
+className="bg-blue-900 text-white px-6 py-2 rounded-lg"
+>
+
+Cart
+
+</Link>
+
+</div>
+
+)
+
+}
+
+</nav>
+
+);
 
 }
 
