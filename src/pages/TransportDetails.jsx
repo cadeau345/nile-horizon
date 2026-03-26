@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 
@@ -6,32 +6,45 @@ import { useParams } from "react-router-dom";
 
 import { db } from "../firebase";
 
+import WhatsAppButton from "../components/WhatsAppButton";
+
+import { CartContext } from "../context/CartContext";
+
+
 function TransportDetails() {
 
 const { id } = useParams();
 
-const [transport,setTransport] = useState(null);
+const [transport, setTransport] = useState(null);
 
-const [name,setName] = useState("");
+const [name, setName] = useState("");
 
-const [phone,setPhone] = useState("");
+const [phone, setPhone] = useState("");
 
-const [date,setDate] = useState("");
+const [date, setDate] = useState("");
 
-const [passengers,setPassengers] = useState("");
+const [guests, setGuests] = useState("");
+
+const [loading, setLoading] = useState(false);
+
+const { addToCart } = useContext(CartContext);
 
 
-useEffect(()=>{
+useEffect(() => {
 
-const fetchTransport = async ()=>{
+const fetchTransport = async () => {
 
-const docRef = doc(db,"transport",id);
+const docRef = doc(db, "transport", id);
 
 const docSnap = await getDoc(docRef);
 
-if(docSnap.exists()){
+if (docSnap.exists()) {
 
 setTransport(docSnap.data());
+
+} else {
+
+alert("Transport not found");
 
 }
 
@@ -39,26 +52,44 @@ setTransport(docSnap.data());
 
 fetchTransport();
 
-},[id]);
+}, [id]);
 
 
-const handleBooking = async ()=>{
+const handleBooking = async () => {
 
-if(!name || !phone || !date || !passengers){
+if (!transport) {
 
-alert("Please fill all fields");
+alert("Transport data not loaded yet");
 
 return;
 
 }
 
-await addDoc(collection(db,"transportBookings"),{
 
-transportCompany: transport.company,
+if (!name || !phone || !date || !guests) {
+
+alert("Please fill all booking fields");
+
+return;
+
+}
+
+
+try {
+
+setLoading(true);
+
+await addDoc(collection(db, "bookings"), {
+
+serviceType: "transport",
+
+serviceName: transport.company,
 
 from: transport.from,
 
 to: transport.to,
+
+price: transport.price,
 
 name,
 
@@ -66,23 +97,44 @@ phone,
 
 date,
 
-passengers,
+guests,
 
 createdAt: new Date()
 
 });
 
+
 alert("Transport booking request sent successfully");
+
+setName("");
+
+setPhone("");
+
+setDate("");
+
+setGuests("");
+
+} catch (error) {
+
+console.error(error);
+
+alert("Booking failed — please try again");
+
+} finally {
+
+setLoading(false);
+
+}
 
 };
 
 
-if(!transport) return <p>Loading...</p>;
+if (!transport) return <p>Loading...</p>;
 
 
-return(
+return (
 
-<div className="p-10 max-w-4xl mx-auto">
+<div className="p-10 max-w-5xl mx-auto">
 
 <img
 
@@ -107,12 +159,46 @@ className="w-full h-[400px] object-cover rounded-xl"
 </p>
 
 
+<p className="mt-3">
+
+Type: {transport.type}
+
+</p>
+
+
 <p className="text-orange-500 text-xl mt-4">
 
 ${transport.price} / seat
 
 </p>
 
+
+<button
+
+onClick={() =>
+
+addToCart({
+
+name: transport.company,
+
+price: transport.price,
+
+type: "transport"
+
+})
+
+}
+
+className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+
+>
+
+Add to Cart
+
+</button>
+
+
+{/* Booking Form */}
 
 <div className="mt-10 bg-gray-100 p-6 rounded-xl">
 
@@ -127,9 +213,11 @@ Book this transport
 
 placeholder="Your name"
 
+value={name}
+
 className="border p-2 rounded w-full mb-3"
 
-onChange={(e)=>setName(e.target.value)}
+onChange={(e) => setName(e.target.value)}
 
 />
 
@@ -138,9 +226,11 @@ onChange={(e)=>setName(e.target.value)}
 
 placeholder="Phone number"
 
+value={phone}
+
 className="border p-2 rounded w-full mb-3"
 
-onChange={(e)=>setPhone(e.target.value)}
+onChange={(e) => setPhone(e.target.value)}
 
 />
 
@@ -149,22 +239,26 @@ onChange={(e)=>setPhone(e.target.value)}
 
 type="date"
 
+lang="en"
+
+value={date}
+
 className="border p-2 rounded w-full mb-3"
 
-onChange={(e)=>setDate(e.target.value)}
+onChange={(e) => setDate(e.target.value)}
 
 />
 
 
 <input
 
-type="number"
+placeholder="Passengers number"
 
-placeholder="Passengers"
+value={guests}
 
 className="border p-2 rounded w-full mb-3"
 
-onChange={(e)=>setPassengers(e.target.value)}
+onChange={(e) => setGuests(e.target.value)}
 
 />
 
@@ -173,13 +267,18 @@ onChange={(e)=>setPassengers(e.target.value)}
 
 onClick={handleBooking}
 
+disabled={loading}
+
 className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
 
 >
 
-Send booking request
+{loading ? "Sending..." : "Send booking request"}
 
 </button>
+
+
+<WhatsAppButton serviceName={transport.company} />
 
 </div>
 
