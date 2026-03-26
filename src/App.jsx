@@ -18,6 +18,7 @@ import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Footer from "./components/Footer";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Cart from "./pages/cart";
 function App() {
 
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/transport/:id" element={<TransportDetails />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/cart" element={<Cart />} />
 
       </Routes>
 <FloatingWhatsApp />

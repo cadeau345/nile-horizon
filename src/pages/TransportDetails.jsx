@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 
 import WhatsAppButton from "../components/WhatsAppButton";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 
 function TransportDetails() {
@@ -22,6 +24,7 @@ function TransportDetails() {
   const [date, setDate] = useState("");
 
   const [guests, setGuests] = useState("");
+  const { addToCart } = useContext(CartContext);
 
 
   useEffect(() => {
@@ -117,6 +120,17 @@ function TransportDetails() {
         ${transport.price} / seat
 
       </p>
+      <button
+  onClick={() =>
+    addToCart({
+      name: transport.company,
+      price: transport.price
+    })
+  }
+  className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+>
+  Add to Cart
+</button>
 
 
       {/* Booking Form */}

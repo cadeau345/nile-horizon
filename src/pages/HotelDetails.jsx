@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 
 import WhatsAppButton from "../components/WhatsAppButton";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 
 function HotelDetails() {
@@ -24,6 +26,11 @@ function HotelDetails() {
   const [checkOut, setCheckOut] = useState("");
 
   const [guests, setGuests] = useState("");
+
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  const [nights, setNights] = useState(0);
+  const { addToCart } = useContext(CartContext);
 
 
   useEffect(() => {
@@ -47,6 +54,31 @@ function HotelDetails() {
   }, [id]);
 
 
+  useEffect(() => {
+
+    if (checkIn && checkOut && hotel) {
+
+      const start = new Date(checkIn);
+
+      const end = new Date(checkOut);
+
+      const diffTime = end - start;
+
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 0) {
+
+        setNights(diffDays);
+
+        setTotalPrice(diffDays * hotel.price);
+
+      }
+
+    }
+
+  }, [checkIn, checkOut, hotel]);
+
+
   const handleBooking = async () => {
 
     await addDoc(collection(db, "bookings"), {
@@ -62,6 +94,10 @@ function HotelDetails() {
       checkOut,
 
       guests,
+
+      nights,
+
+      totalPrice,
 
       createdAt: new Date()
 
@@ -138,19 +174,57 @@ function HotelDetails() {
 
         <input
           type="date"
-            lang="en"
+          lang="en"
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setCheckIn(e.target.value)}
         />
 
 
-       
+        <input
+          type="date"
+          lang="en"
+          className="border p-2 rounded w-full mb-3"
+          onChange={(e) => setCheckOut(e.target.value)}
+        />
+
 
         <input
           placeholder="Guests number"
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setGuests(e.target.value)}
         />
+
+
+        {nights > 0 && (
+
+          <div className="bg-white p-4 rounded-lg mb-3">
+
+            <p className="text-gray-600">
+
+              Nights: {nights}
+
+            </p>
+            <button
+  onClick={() =>
+    addToCart({
+      name: hotel.name,
+      price: totalPrice || hotel.price
+    })
+  }
+  className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+>
+  Add to Cart
+</button>
+
+            <p className="text-green-600 font-bold text-xl">
+
+              Total Price: ${totalPrice}
+
+            </p>
+
+          </div>
+
+        )}
 
 
         <button

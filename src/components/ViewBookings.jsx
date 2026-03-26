@@ -86,6 +86,8 @@ function ViewBookings() {
               <th className="p-2">Status</th>
 
               <th className="p-2">Update</th>
+              <th className="p-2">Nights</th>
+<th className="p-2">Total</th>
 
             </tr>
 
@@ -122,6 +124,13 @@ function ViewBookings() {
                    item.serviceName ||
 
                    "-"}
+                   <td className="p-2">
+  {item.nights || "-"}
+</td>
+
+<td className="p-2 text-green-600 font-bold">
+  ${item.totalPrice || "-"}
+</td>
 
                 </td>
 

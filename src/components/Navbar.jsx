@@ -25,6 +25,24 @@ function Navbar() {
           <Link to="/trips">Trips</Link>
           <Link to="/about">About Aswan</Link>
           <Link to="/contact">Contact</Link>
+           <Link
+          to="/cart"
+          className="relative bg-blue-900 text-white px-4 py-2 rounded-lg"
+        >
+
+          🛒 Cart
+
+          {cartItems.length > 0 && (
+
+            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 rounded-full">
+
+              {cartItems.length}
+
+            </span>
+
+          )}
+
+        </Link>
 
       </div>
 
