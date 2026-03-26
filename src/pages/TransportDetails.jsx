@@ -83,16 +83,15 @@ await addDoc(collection(db, "bookings"), {
 
 serviceType: "transport",
 
-serviceName:
-transport.company ||
-transport.name ||
-"Transport Service",
+serviceName: transport.company,
 
-from: transport.from || "",
+transportType: transport.type,
 
-to: transport.to || "",
+from: transport.from,
 
-price: transport.price || 0,
+to: transport.to,
+
+price: transport.price,
 
 name,
 
@@ -102,7 +101,9 @@ date,
 
 guests,
 
-createdAt: new Date()
+createdAt: new Date(),
+
+status: "New"
 
 });
 
