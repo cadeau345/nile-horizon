@@ -14,6 +14,7 @@ import tripsHero from "../assets/tripsHero.jpg";
 import transportHero from "../assets/transportHero.jpg";
 
 
+
 function Home() {
 
   const [hotels, setHotels] = useState([]);
@@ -125,34 +126,25 @@ return heroImage;
 
 <div className="relative min-h-[60vh] flex items-center justify-center px-4">
 
-<img
-src={heroImage}
-className="absolute w-full h-full object-cover object-center transition-all duration-500"
-/>
-alt="Aswan Nile"
+
 
 
 <div className="absolute inset-0 bg-black/40"></div>
 
 
-<div className="relative bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl text-center w-full max-w-[90%] md:max-w-3xl">
+<div className="relative text-center px-4">
 
-<h1 className="text-xl sm:text-3xl md:text-5xl font-bold text-blue-900">
+<h1 className="text-white text-xl md:text-5xl font-bold">
 
 Discover Aswan with Nile Horizon
 
 </h1>
 
-
-<p className="mt-3 text-gray-600 text-lg">
+<p className="text-gray-200 mt-2 text-sm md:text-lg">
 
 Hotels • Transport • Private Cars
 
 </p>
-
-
-
-
 
 </div>
 
