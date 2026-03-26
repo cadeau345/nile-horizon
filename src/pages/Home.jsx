@@ -178,61 +178,6 @@ Private Cars
 </div>
 
 
-{/* Search Form */}
-
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-
-<input
-placeholder="Destination or hotel name"
-className="border p-3 rounded-lg w-full"
-/>
-
-
-<input
-type="date"
-className="border p-3 rounded-lg w-full"
-/>
-
-
-<input
-type="date"
-className="border p-3 rounded-lg w-full"
-/>
-
-
-<input
-placeholder="Guests"
-className="border p-3 rounded-lg w-full"
-/>
-
-</div>
-
-
-<button
-onClick={()=>{
-
-if(serviceType==="hotels")
-
-window.location.href="/hotels";
-
-
-if(serviceType==="transport")
-
-window.location.href="/transport";
-
-
-if(serviceType==="cars")
-
-window.location.href="/transport";
-
-}}
-className="mt-6 bg-orange-500 hover:bg-orange-600 transition text-white px-10 py-3 rounded-xl"
->
-
-Search
-
-</button>
-
 </div>
 
 </div>
