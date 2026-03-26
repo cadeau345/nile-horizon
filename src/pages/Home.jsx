@@ -8,7 +8,7 @@ import { db } from "../firebase";
 
 import { Helmet } from "react-helmet-async";
 
-import heroImage from "../assets/trips.jpg";
+import heroImage from "../assets/tripsHero.jpg";
 import hotelsHero from "../assets/hotelsHero.jpg";
 import tripsHero from "../assets/tripsHero.jpg";
 import transportHero from "../assets/transportHero.jpg";
