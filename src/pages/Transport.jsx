@@ -16,9 +16,15 @@ function Transport() {
 
   const [date, setDate] = useState("");
 
+  const [returnDate, setReturnDate] = useState("");
+
   const [passengers, setPassengers] = useState("");
 
   const [searchClicked, setSearchClicked] = useState(false);
+
+  const [tripType, setTripType] = useState("oneway");
+
+  const [direction, setDirection] = useState("aswan-cairo");
 
 
   useEffect(() => {
@@ -59,24 +65,131 @@ function Transport() {
   return (
 
     <div className="p-10">
-        <Helmet>
+
+      <Helmet>
 
         <title>
-          Cairo to Aswan Transport | Bus Train Private Car
+
+          Transport Booking | Aswan ⇄ Cairo Bus Train Private Car
+
         </title>
 
         <meta
+
           name="description"
-          content="Book transport from Cairo to Aswan by bus, train or private car with comfortable travel options."
+
+          content="Book transport between Aswan and Cairo by bus, train or private car with flexible one-way or round-trip options."
+
         />
 
       </Helmet>
 
+
       <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-        Cairo → Aswan Transport
+        {direction === "aswan-cairo"
+
+          ? "Aswan → Cairo Transport"
+
+          : "Cairo → Aswan Transport"}
 
       </h1>
+
+
+      {/* Direction Buttons */}
+
+      <div className="flex gap-3 mb-6 flex-wrap">
+
+        <button
+
+          onClick={() => setDirection("aswan-cairo")}
+
+          className={`px-4 py-2 rounded ${
+
+            direction === "aswan-cairo"
+
+              ? "bg-blue-900 text-white"
+
+              : "bg-gray-200"
+
+          }`}
+
+        >
+
+          Aswan → Cairo
+
+        </button>
+
+
+        <button
+
+          onClick={() => setDirection("cairo-aswan")}
+
+          className={`px-4 py-2 rounded ${
+
+            direction === "cairo-aswan"
+
+              ? "bg-blue-900 text-white"
+
+              : "bg-gray-200"
+
+          }`}
+
+        >
+
+          Cairo → Aswan
+
+        </button>
+
+      </div>
+
+
+      {/* Trip Type Buttons */}
+
+      <div className="flex gap-3 mb-6 flex-wrap">
+
+        <button
+
+          onClick={() => setTripType("oneway")}
+
+          className={`px-4 py-2 rounded ${
+
+            tripType === "oneway"
+
+              ? "bg-orange-500 text-white"
+
+              : "bg-gray-200"
+
+          }`}
+
+        >
+
+          One Way
+
+        </button>
+
+
+        <button
+
+          onClick={() => setTripType("roundtrip")}
+
+          className={`px-4 py-2 rounded ${
+
+            tripType === "roundtrip"
+
+              ? "bg-orange-500 text-white"
+
+              : "bg-gray-200"
+
+          }`}
+
+        >
+
+          Round Trip
+
+        </button>
+
+      </div>
 
 
       {/* Search Bar */}
@@ -84,26 +197,60 @@ function Transport() {
       <div className="bg-gray-100 p-6 rounded-xl mb-8 flex flex-wrap gap-4">
 
         <input
-  type="date"
-  lang="en"
-  className="border p-2 rounded"
-  onChange={(e) => setDate(e.target.value)}
-/>
+
+          type="date"
+
+          lang="en"
+
+          className="border p-2 rounded"
+
+          onChange={(e) => setDate(e.target.value)}
+
+        />
+
+
+        {tripType === "roundtrip" && (
+
+          <input
+
+            type="date"
+
+            lang="en"
+
+            className="border p-2 rounded"
+
+            placeholder="Return date"
+
+            onChange={(e) => setReturnDate(e.target.value)}
+
+          />
+
+        )}
 
 
         <input
+
           type="number"
+
           placeholder="Passengers"
+
           className="border p-2 rounded"
+
           onChange={(e) => setPassengers(e.target.value)}
+
         />
 
 
         <button
+
           onClick={() => setSearchClicked(true)}
+
           className="bg-blue-900 text-white px-6 py-2 rounded"
+
         >
+
           Search
+
         </button>
 
       </div>
@@ -114,50 +261,86 @@ function Transport() {
       <div className="flex gap-3 mb-8 flex-wrap">
 
         <button
+
           onClick={() => setFilter("All")}
+
           className={`px-4 py-2 rounded ${
+
             filter === "All"
+
               ? "bg-blue-900 text-white"
+
               : "bg-gray-200"
+
           }`}
+
         >
+
           All
+
         </button>
 
 
         <button
+
           onClick={() => setFilter("Bus")}
+
           className={`px-4 py-2 rounded ${
+
             filter === "Bus"
+
               ? "bg-blue-900 text-white"
+
               : "bg-gray-200"
+
           }`}
+
         >
+
           Bus
+
         </button>
 
 
         <button
+
           onClick={() => setFilter("Train")}
+
           className={`px-4 py-2 rounded ${
+
             filter === "Train"
+
               ? "bg-blue-900 text-white"
+
               : "bg-gray-200"
+
           }`}
+
         >
+
           Train
+
         </button>
 
 
         <button
+
           onClick={() => setFilter("Car")}
+
           className={`px-4 py-2 rounded ${
+
             filter === "Car"
+
               ? "bg-blue-900 text-white"
+
               : "bg-gray-200"
+
           }`}
+
         >
+
           Private Car
+
         </button>
 
       </div>
@@ -169,7 +352,7 @@ function Transport() {
 
         <p className="text-gray-500 mb-6">
 
-          Please select date and passengers then click search
+          Please select trip type, direction, date and passengers then click search
 
         </p>
 
@@ -180,15 +363,21 @@ function Transport() {
           {filteredTransport.map(item => (
 
             <Link
+
               key={item.id}
+
               to={`/transport/${item.id}`}
+
             >
 
               <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
                 <img
+
                   src={item.image}
+
                   className="h-52 w-full object-cover"
+
                 />
 
 
@@ -203,7 +392,11 @@ function Transport() {
 
                   <p className="text-gray-500">
 
-                    {item.from} → {item.to}
+                    {direction === "aswan-cairo"
+
+                      ? "Aswan → Cairo"
+
+                      : "Cairo → Aswan"}
 
                   </p>
 
