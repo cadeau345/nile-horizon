@@ -136,46 +136,7 @@ Hotels • Transport • Private Cars
 </p>
 
 
-{/* Tabs */}
 
-<div className="flex flex-wrap justify-center gap-3 mt-6">
-
-<button
-onClick={()=>setServiceType("hotels")}
-className={`px-4 py-2 rounded-lg transition ${
-serviceType==="hotels"
-? "bg-blue-900 text-white"
-: "bg-gray-200 hover:bg-gray-300"
-}`}
->
-Hotels
-</button>
-
-
-<button
-onClick={()=>setServiceType("transport")}
-className={`px-4 py-2 rounded-lg transition ${
-serviceType==="transport"
-? "bg-blue-900 text-white"
-: "bg-gray-200 hover:bg-gray-300"
-}`}
->
-Transport
-</button>
-
-
-<button
-onClick={()=>setServiceType("cars")}
-className={`px-4 py-2 rounded-lg transition ${
-serviceType==="cars"
-? "bg-blue-900 text-white"
-: "bg-gray-200 hover:bg-gray-300"
-}`}
->
-Private Cars
-</button>
-
-</div>
 
 
 </div>
