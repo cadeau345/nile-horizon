@@ -27,6 +27,8 @@ function AddTrip() {
   const [description, setDescription] = useState("");
 
   const [image, setImage] = useState("");
+  const [isBestSeller, setIsBestSeller] = useState(false);
+const [isOffer, setIsOffer] = useState(false);
 
 
   const fetchTrips = async () => {
@@ -92,20 +94,16 @@ function AddTrip() {
       setEditingId(null);
 
     } else {
+await addDoc(collection(db,"trips"),{
 
-      await addDoc(collection(db, "trips"), {
+name,
+price,
+description,
+image,
+isBestSeller,
+isOffer
 
-        name,
-
-        duration,
-
-        price,
-
-        description,
-
-        image
-
-      });
+});
 
     }
 
@@ -176,6 +174,7 @@ function AddTrip() {
           className="border p-2 w-full mb-3"
           onChange={(e) => setPrice(e.target.value)}
         />
+        
 
 
         <input
@@ -201,6 +200,30 @@ function AddTrip() {
         </button>
 
       </div>
+      <label className="flex gap-2 mb-2">
+
+<input
+type="checkbox"
+checked={isBestSeller}
+onChange={(e)=>setIsBestSeller(e.target.checked)}
+/>
+
+Best Seller
+
+</label>
+
+
+<label className="flex gap-2 mb-4">
+
+<input
+type="checkbox"
+checked={isOffer}
+onChange={(e)=>setIsOffer(e.target.checked)}
+/>
+
+Special Offer
+
+</label>
 
 
       {trips.map(trip => (

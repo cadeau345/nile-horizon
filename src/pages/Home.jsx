@@ -15,25 +15,75 @@ function Home() {
 
   const [hotels, setHotels] = useState([]);
 
+  const [bestSellers, setBestSellers] = useState([]);
+
+  const [offers, setOffers] = useState([]);
+
+  const [bestTrips, setBestTrips] = useState([]);
+
+  const [bestTransport, setBestTransport] = useState([]);
+
 
   useEffect(() => {
 
-    const fetchHotels = async () => {
+    const fetchData = async () => {
 
-      const querySnapshot = await getDocs(
+      // HOTELS
+
+      const hotelsSnapshot = await getDocs(
         collection(db, "hotels")
       );
 
-      const data = querySnapshot.docs.map(doc => ({
+      const hotelsData = hotelsSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
-      setHotels(data.slice(0, 3));
+      setHotels(hotelsData.slice(0, 3));
+
+      setBestSellers(
+        hotelsData.filter(item => item.isBestSeller)
+      );
+
+      setOffers(
+        hotelsData.filter(item => item.isOffer)
+      );
+
+
+      // TRIPS
+
+      const tripsSnapshot = await getDocs(
+        collection(db, "trips")
+      );
+
+      const tripsData = tripsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setBestTrips(
+        tripsData.filter(item => item.isBestSeller)
+      );
+
+
+      // TRANSPORT
+
+      const transportSnapshot = await getDocs(
+        collection(db, "transport")
+      );
+
+      const transportData = transportSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setBestTransport(
+        transportData.filter(item => item.isBestSeller)
+      );
 
     };
 
-    fetchHotels();
+    fetchData();
 
   }, []);
 
@@ -56,329 +106,558 @@ function Home() {
       </Helmet>
 
 
-      {/* Hero Section */}
+{/* Hero Section */}
 
-      <div className="relative h-[90vh] flex items-center justify-center">
+<div className="relative h-[90vh] flex items-center justify-center">
 
-        <img
-          src={heroImage}
-          className="absolute w-full h-full object-cover"
-          alt="Aswan Nile"
-        />
+<img
+src={heroImage}
+className="absolute w-full h-full object-cover"
+alt="Aswan Nile"
+/>
 
-        <div className="absolute inset-0 bg-black/40"></div>
+<div className="absolute inset-0 bg-black/40"></div>
 
 
-        <div className="relative bg-white/90 backdrop-blur-md p-10 rounded-2xl shadow-xl text-center">
+<div className="relative bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center w-[95%] max-w-4xl">
 
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-900">
+<h1 className="text-4xl md:text-5xl font-bold text-blue-900">
 
-            Discover Aswan with Nile Horizon
+Discover Aswan with Nile Horizon
 
-          </h1>
+</h1>
 
 
-          <p className="mt-3 text-gray-600 text-lg">
+<p className="mt-3 text-gray-600 text-lg">
 
-            Hotels • Transport • Trips • Packages
+Hotels • Transport • Private Cars
 
-          </p>
+</p>
 
 
-          <div className="mt-6 flex gap-4 justify-center">
+<div className="flex justify-center gap-4 mt-6">
 
-            <Link to="/hotels">
+<button className="px-4 py-2 bg-blue-900 text-white rounded-lg">
 
-              <button className="bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-xl">
+Hotels
 
-                Explore Hotels
+</button>
 
-              </button>
 
-            </Link>
+<button className="px-4 py-2 bg-gray-200 rounded-lg">
 
+Transport
 
-            <Link to="/offers">
+</button>
 
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl">
 
-                View Offers
+<button className="px-4 py-2 bg-gray-200 rounded-lg">
 
-              </button>
+Private Cars
 
-            </Link>
+</button>
 
-          </div>
+</div>
 
-        </div>
 
-      </div>
+<div className="grid md:grid-cols-4 gap-3 mt-6">
 
+<input
+placeholder="Destination or hotel name"
+className="border p-3 rounded-lg"
+/>
 
 
-      {/* Services Section */}
+<input
+type="date"
+className="border p-3 rounded-lg"
+/>
 
-      <div className="py-16 px-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        <Link to="/hotels">
+<input
+type="date"
+className="border p-3 rounded-lg"
+/>
 
-          <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
-            <h2 className="text-xl font-bold">
+<input
+placeholder="Guests"
+className="border p-3 rounded-lg"
+/>
 
-              Hotels
+</div>
 
-            </h2>
 
-            <p className="text-gray-500">
+<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 py-3 rounded-xl">
 
-              Best hotels in Aswan
+Search
 
-            </p>
+</button>
 
-          </div>
+</div>
 
-        </Link>
+</div>
 
 
-        <Link to="/transport">
 
-          <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
+{/* Services Section */}
 
-            <h2 className="text-xl font-bold">
+<div className="py-16 px-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-              Transport
+<Link to="/hotels">
 
-            </h2>
+<div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
-            <p className="text-gray-500">
+<h2 className="text-xl font-bold">
 
-              Cairo ⇄ Aswan transport
+Hotels
 
-            </p>
+</h2>
 
-          </div>
+<p className="text-gray-500">
 
-        </Link>
+Best hotels in Aswan
 
+</p>
 
-        <Link to="/offers">
+</div>
 
-          <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
+</Link>
 
-            <h2 className="text-xl font-bold">
 
-              Packages
+<Link to="/transport">
 
-            </h2>
+<div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
-            <p className="text-gray-500">
+<h2 className="text-xl font-bold">
 
-              All-inclusive travel deals
+Transport
 
-            </p>
+</h2>
 
-          </div>
+<p className="text-gray-500">
 
-        </Link>
+Cairo ⇄ Aswan transport
 
+</p>
 
-        <Link to="/trips">
+</div>
 
-          <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
+</Link>
 
-            <h2 className="text-xl font-bold">
 
-              Trips
+<Link to="/offers">
 
-            </h2>
+<div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
-            <p className="text-gray-500">
+<h2 className="text-xl font-bold">
 
-              Abu Simbel • Nubian Village • Felucca
+Packages
 
-            </p>
+</h2>
 
-          </div>
+<p className="text-gray-500">
 
-        </Link>
+All-inclusive travel deals
 
-      </div>
+</p>
 
+</div>
 
+</Link>
 
-      {/* Featured Hotels Section */}
 
-      <div className="py-16 px-10 bg-gray-50">
+<Link to="/trips">
 
-        <h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
+<div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
 
-          Featured Hotels
+<h2 className="text-xl font-bold">
 
-        </h2>
+Trips
 
+</h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+<p className="text-gray-500">
 
-          {hotels.map(hotel => (
+Abu Simbel • Nubian Village • Felucca
 
-            <Link
-              to={`/hotel/${hotel.id}`}
-              key={hotel.id}
-            >
+</p>
 
-              <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
+</div>
 
-                <img
-                  src={hotel.image}
-                  className="h-52 w-full object-cover"
-                  alt={hotel.name}
-                />
+</Link>
 
+</div>
 
-                <div className="p-4">
 
-                  <h3 className="text-xl font-bold">
 
-                    {hotel.name}
+{/* Featured Hotels */}
 
-                  </h3>
+<div className="py-16 px-10 bg-gray-50">
 
+<h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
 
-                  <p className="text-gray-500">
+Featured Hotels
 
-                    {hotel.location}
+</h2>
 
-                  </p>
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+{hotels.map(hotel => (
 
-                  <p className="text-orange-500 font-bold mt-2">
+<Link to={`/hotel/${hotel.id}`} key={hotel.id}>
 
-                    ${hotel.price} / night
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
-                  </p>
+<img
+src={hotel.image}
+className="h-52 w-full object-cover"
+/>
 
-                </div>
+<div className="p-4">
 
-              </div>
+<h3 className="text-xl font-bold">
 
-            </Link>
+{hotel.name}
 
-          ))}
+</h3>
 
-        </div>
+<p className="text-gray-500">
 
+{hotel.location}
 
-        <div className="text-center mt-8">
+</p>
 
-          <Link to="/hotels">
+<p className="text-orange-500 font-bold mt-2">
 
-            <button className="bg-blue-900 text-white px-6 py-3 rounded-xl">
+${hotel.price} / night
 
-              View All Hotels
+</p>
 
-            </button>
+</div>
 
-          </Link>
+</div>
 
-        </div>
+</Link>
 
-      </div>
+))}
 
+</div>
 
+</div>
 
-      {/* Special Offers Section */}
 
-      <div className="bg-gray-100 py-16 px-10 text-center">
 
-        <h2 className="text-3xl font-bold text-blue-900">
+{/* Best Sellers Hotels */}
 
-          Special Offers
+{bestSellers.length > 0 && (
 
-        </h2>
+<div className="py-16 px-10">
 
+<h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
 
-        <p className="text-gray-500 mt-2">
+Best Sellers
 
-          Best value packages for your trip
+</h2>
 
-        </p>
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+{bestSellers.map(item => (
 
-        <Link to="/offers">
+<Link to={`/hotel/${item.id}`} key={item.id}>
 
-          <button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl">
+<div className="shadow-lg rounded-xl overflow-hidden border border-green-300">
 
-            View Packages
+<img
+src={item.image}
+className="h-52 w-full object-cover"
+/>
 
-          </button>
+<div className="p-4">
 
-        </Link>
+<h3 className="text-xl font-bold">
 
-      </div>
+{item.name}
 
+</h3>
 
+<p className="text-orange-500 font-bold mt-2">
 
-      {/* Why Choose Us */}
+${item.price}
 
-      <div className="py-16 px-10 grid md:grid-cols-3 gap-6 text-center">
+</p>
 
-        <div className="shadow-md rounded-xl p-6">
+</div>
 
-          <h3 className="text-xl font-bold">
+</div>
 
-            Best Prices
+</Link>
 
-          </h3>
+))}
 
-          <p className="text-gray-500">
+</div>
 
-            Local deals with competitive rates
+</div>
 
-          </p>
+)}
 
-        </div>
 
 
-        <div className="shadow-md rounded-xl p-6">
+{/* Special Offers Hotels */}
 
-          <h3 className="text-xl font-bold">
+{offers.length > 0 && (
 
-            Local Experts
+<div className="py-16 px-10 bg-gray-50">
 
-          </h3>
+<h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
 
-          <p className="text-gray-500">
+Special Offers
 
-            Real experience in Aswan tourism
+</h2>
 
-          </p>
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        </div>
+{offers.map(item => (
 
+<Link to={`/hotel/${item.id}`} key={item.id}>
 
-        <div className="shadow-md rounded-xl p-6">
+<div className="shadow-lg rounded-xl overflow-hidden border border-orange-300">
 
-          <h3 className="text-xl font-bold">
+<img
+src={item.image}
+className="h-52 w-full object-cover"
+/>
 
-            Easy Booking
+<div className="p-4">
 
-          </h3>
+<h3 className="text-xl font-bold">
 
-          <p className="text-gray-500">
+{item.name}
 
-            Simple reservation process
+</h3>
 
-          </p>
+<p className="text-orange-500 font-bold mt-2">
 
-        </div>
+${item.price}
 
-      </div>
+</p>
 
+</div>
 
-    </div>
+</div>
 
-  );
+</Link>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+
+
+{/* Popular Trips */}
+
+{bestTrips.length > 0 && (
+
+<div className="py-16 px-10">
+
+<h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
+
+Popular Trips
+
+</h2>
+
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{bestTrips.map(trip => (
+
+<Link to={`/trip/${trip.id}`} key={trip.id}>
+
+<div className="shadow-lg rounded-xl overflow-hidden">
+
+<img
+src={trip.image}
+className="h-52 w-full object-cover"
+/>
+
+<div className="p-4">
+
+<h3 className="text-xl font-bold">
+
+{trip.name}
+
+</h3>
+
+<p className="text-orange-500 font-bold mt-2">
+
+${trip.price}
+
+</p>
+
+</div>
+
+</div>
+
+</Link>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+
+
+{/* Top Transport Deals */}
+
+{bestTransport.length > 0 && (
+
+<div className="py-16 px-10 bg-gray-50">
+
+<h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">
+
+Top Transport Deals
+
+</h2>
+
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{bestTransport.map(item => (
+
+<Link to={`/transport/${item.id}`} key={item.id}>
+
+<div className="shadow-lg rounded-xl overflow-hidden">
+
+<img
+src={item.image}
+className="h-52 w-full object-cover"
+/>
+
+<div className="p-4">
+
+<h3 className="text-xl font-bold">
+
+{item.company}
+
+</h3>
+
+<p className="text-orange-500 font-bold mt-2">
+
+${item.price}
+
+</p>
+
+</div>
+
+</div>
+
+</Link>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+
+
+{/* CTA Offers Section */}
+
+<div className="bg-gray-100 py-16 px-10 text-center">
+
+<h2 className="text-3xl font-bold text-blue-900">
+
+Special Offers
+
+</h2>
+
+<p className="text-gray-500 mt-2">
+
+Best value packages for your trip
+
+</p>
+
+<Link to="/offers">
+
+<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl">
+
+View Packages
+
+</button>
+
+</Link>
+
+</div>
+
+
+
+{/* Why Choose Us */}
+
+<div className="py-16 px-10 grid md:grid-cols-3 gap-6 text-center">
+
+<div className="shadow-md rounded-xl p-6">
+
+<h3 className="text-xl font-bold">
+
+Best Prices
+
+</h3>
+
+<p className="text-gray-500">
+
+Local deals with competitive rates
+
+</p>
+
+</div>
+
+
+<div className="shadow-md rounded-xl p-6">
+
+<h3 className="text-xl font-bold">
+
+Local Experts
+
+</h3>
+
+<p className="text-gray-500">
+
+Real experience in Aswan tourism
+
+</p>
+
+</div>
+
+
+<div className="shadow-md rounded-xl p-6">
+
+<h3 className="text-xl font-bold">
+
+Easy Booking
+
+</h3>
+
+<p className="text-gray-500">
+
+Simple reservation process
+
+</p>
+
+</div>
+
+</div>
+
+
+</div>
+
+);
 
 }
 

@@ -29,6 +29,8 @@ function AddTransport() {
   const [price, setPrice] = useState("");
 
   const [image, setImage] = useState("");
+  const [isBestSeller,setIsBestSeller]=useState(false);
+const [isOffer,setIsOffer]=useState(false);
 
 
   const fetchTransport = async () => {
@@ -97,21 +99,18 @@ function AddTransport() {
 
     } else {
 
-      await addDoc(collection(db, "transport"), {
+   await addDoc(collection(db,"transport"),{
 
-        company,
+name,
+from,
+to,
+price,
+type,
+image,
+isBestSeller,
+isOffer
 
-        from,
-
-        to,
-
-        type,
-
-        price,
-
-        image
-
-      });
+});
 
     }
 
@@ -217,6 +216,30 @@ function AddTransport() {
         </button>
 
       </div>
+      <label className="flex gap-2 mb-2">
+
+<input
+type="checkbox"
+checked={isBestSeller}
+onChange={(e)=>setIsBestSeller(e.target.checked)}
+/>
+
+Best Seller
+
+</label>
+
+
+<label className="flex gap-2 mb-4">
+
+<input
+type="checkbox"
+checked={isOffer}
+onChange={(e)=>setIsOffer(e.target.checked)}
+/>
+
+Special Offer
+
+</label>
 
 
       {transport.map(item => (

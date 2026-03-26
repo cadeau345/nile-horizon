@@ -28,6 +28,10 @@ function AddHotel() {
 
   const [image, setImage] = useState("");
 
+  const [isBestSeller, setIsBestSeller] = useState(false);
+
+  const [isOffer, setIsOffer] = useState(false);
+
 
   const fetchHotels = async () => {
 
@@ -36,12 +40,10 @@ function AddHotel() {
     );
 
     setHotels(
-
       snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }))
-
     );
 
   };
@@ -78,14 +80,12 @@ function AddHotel() {
       await updateDoc(doc(db, "hotels", editingId), {
 
         name,
-
         location,
-
         price,
-
         description,
-
-        image
+        image,
+        isBestSeller,
+        isOffer
 
       });
 
@@ -96,19 +96,25 @@ function AddHotel() {
       await addDoc(collection(db, "hotels"), {
 
         name,
-
         location,
-
         price,
-
         description,
-
-        image
+        image,
+        isBestSeller,
+        isOffer
 
       });
 
     }
 
+
+    setName("");
+    setLocation("");
+    setPrice("");
+    setDescription("");
+    setImage("");
+    setIsBestSeller(false);
+    setIsOffer(false);
 
     fetchHotels();
 
@@ -137,6 +143,10 @@ function AddHotel() {
     setDescription(hotel.description);
 
     setImage(hotel.image);
+
+    setIsBestSeller(hotel.isBestSeller || false);
+
+    setIsOffer(hotel.isOffer || false);
 
   };
 
@@ -193,11 +203,45 @@ function AddHotel() {
         />
 
 
+        {/* NEW CHECKBOXES */}
+
+        <label className="flex gap-2 mb-2">
+
+          <input
+            type="checkbox"
+            checked={isBestSeller}
+            onChange={(e) =>
+              setIsBestSeller(e.target.checked)
+            }
+          />
+
+          Best Seller
+
+        </label>
+
+
+        <label className="flex gap-2 mb-4">
+
+          <input
+            type="checkbox"
+            checked={isOffer}
+            onChange={(e) =>
+              setIsOffer(e.target.checked)
+            }
+          />
+
+          Special Offer
+
+        </label>
+
+
         <button
           onClick={handleSubmit}
           className="bg-green-600 text-white px-6 py-2 rounded"
         >
+
           {editingId ? "Update Hotel" : "Add Hotel"}
+
         </button>
 
       </div>
@@ -234,7 +278,9 @@ function AddHotel() {
               onClick={() => handleEdit(hotel)}
               className="bg-yellow-500 text-white px-4 py-2 rounded"
             >
+
               Edit
+
             </button>
 
 
@@ -242,7 +288,9 @@ function AddHotel() {
               onClick={() => handleDelete(hotel.id)}
               className="bg-red-600 text-white px-4 py-2 rounded"
             >
+
               Delete
+
             </button>
 
           </div>
