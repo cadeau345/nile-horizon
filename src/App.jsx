@@ -24,6 +24,10 @@ import Temples from "./pages/Temples";
 import TempleDetails from "./pages/TempleDetails";
 import AddTemple from "./components/AddTemple";
 import Bookings from "./components/Bookings";
+import AswanTours from "./pages/AswanTours";
+import AbuSimbelTour from "./pages/AbuSimbelTour";
+import LuxorFromAswan from "./pages/LuxorFromAswan";
+import NileCruise from "./pages/NileCruise";
 
 function App() {
 
@@ -55,6 +59,10 @@ function App() {
 <Route path="/temple/:id" element={<TempleDetails />} />
 <Route path="/add-temple" element={<AddTemple />} />
 <Route path="/bookings" element={<Bookings />} />
+<Route path="/aswan-tours" element={<AswanTours />} />
+<Route path="/abu-simbel-tour" element={<AbuSimbelTour />} />
+<Route path="/luxor-tour-from-aswan" element={<LuxorFromAswan />} />
+<Route path="/nile-cruise-egypt" element={<NileCruise />} />
         
 
       </Routes>
