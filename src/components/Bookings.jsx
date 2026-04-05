@@ -93,7 +93,13 @@ return ()=>unsubscribe();
 },[bookings.length]);
 
 
-const confirmBooking=async(id)=>{
+/*
+Confirm booking + send SMS
+*/
+
+const confirmBooking = async (id, phone, serviceName) => {
+
+try {
 
 await updateDoc(doc(db,"bookings",id),{
 
@@ -101,8 +107,43 @@ status:"confirmed"
 
 });
 
+
+// إرسال SMS
+
+await fetch("http://localhost:5000/send-sms", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+phone,
+serviceName
+
+})
+
+});
+
+
+alert("Booking confirmed & SMS sent successfully");
+
+} catch(error){
+
+console.log(error);
+
+alert("Error sending SMS");
+
+}
+
 };
 
+
+/*
+Delete booking
+*/
 
 const deleteBooking=async(id)=>{
 
@@ -271,7 +312,7 @@ Status: {item.status || "pending"}
 <div className="flex gap-2 mt-4">
 
 <button
-onClick={()=>confirmBooking(item.id)}
+onClick={()=>confirmBooking(item.id, item.phone, item.serviceName)}
 className="bg-green-600 text-white px-4 py-2 rounded"
 >
 
