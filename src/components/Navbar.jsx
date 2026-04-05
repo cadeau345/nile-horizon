@@ -40,6 +40,7 @@ Nile Horizon
 <Link to="/about">About Aswan</Link>
 
 <Link to="/contact">Contact</Link>
+<Link to="/Temples">Temples</Link>
 
 <Link
 to="/cart"
@@ -91,6 +92,8 @@ ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5 pointer-eve
 <Link to="/about" onClick={closeMenu}>About Aswan</Link>
 
 <Link to="/contact" onClick={closeMenu}>Contact</Link>
+
+<Link to="/Temples">Temples</Link>
 
 <Link
 to="/cart"

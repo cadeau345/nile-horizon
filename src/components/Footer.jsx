@@ -59,6 +59,7 @@ function Footer() {
 
             <li>
               <Link to="/offers">Offers</Link>
+              
             </li>
 
           </ul>

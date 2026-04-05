@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 
@@ -7,13 +7,15 @@ import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 
 import WhatsAppButton from "../components/WhatsAppButton";
-import { useContext } from "react";
+
 import { CartContext } from "../context/CartContext";
 
 
 function HotelDetails() {
 
   const { id } = useParams();
+
+  const { addToCart } = useContext(CartContext);
 
   const [hotel, setHotel] = useState(null);
 
@@ -30,9 +32,9 @@ function HotelDetails() {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const [nights, setNights] = useState(0);
-  const { addToCart } = useContext(CartContext);
-  
 
+
+  // تحميل الفندق
 
   useEffect(() => {
 
@@ -54,6 +56,8 @@ function HotelDetails() {
 
   }, [id]);
 
+
+  // حساب عدد الليالي والسعر
 
   useEffect(() => {
 
@@ -78,18 +82,32 @@ function HotelDetails() {
     }
 
   }, [checkIn, checkOut, hotel]);
-  
 
+
+  // إرسال الحجز
 
   const handleBooking = async () => {
 
-    await addDoc(collection(db, "bookings"), {
+    if (!name || !phone || !checkIn || !checkOut || !guests) {
 
-      hotelName: hotel.name,
+      alert("Please fill all booking details");
+
+      return;
+
+    }
+
+
+    await addDoc(collection(db, "bookings"), {
 
       name,
 
       phone,
+
+      serviceName: hotel.name,
+
+      serviceType: "hotel",
+
+      price: totalPrice || hotel.price,
 
       checkIn,
 
@@ -99,13 +117,31 @@ function HotelDetails() {
 
       nights,
 
-      totalPrice,
+      status: "pending",
 
       createdAt: new Date()
 
     });
 
+
     alert("Booking request sent successfully");
+
+
+    // Reset form
+
+    setName("");
+
+    setPhone("");
+
+    setCheckIn("");
+
+    setCheckOut("");
+
+    setGuests("");
+
+    setTotalPrice(0);
+
+    setNights(0);
 
   };
 
@@ -120,6 +156,7 @@ function HotelDetails() {
       <img
         src={hotel.image}
         className="w-full h-[400px] object-cover rounded-xl"
+        alt=""
       />
 
 
@@ -147,15 +184,6 @@ function HotelDetails() {
       <p className="text-orange-500 text-xl mt-4">
 
         ${hotel.price} / night
-        {totalPrice > 0 && (
-
-<p className="text-green-600 font-bold mt-2">
-
-Total: ${totalPrice}
-
-</p>
-
-)}
 
       </p>
 
@@ -171,6 +199,7 @@ Total: ${totalPrice}
 
         <input
           placeholder="Your name"
+          value={name}
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setName(e.target.value)}
         />
@@ -178,6 +207,7 @@ Total: ${totalPrice}
 
         <input
           placeholder="Phone number"
+          value={phone}
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setPhone(e.target.value)}
         />
@@ -185,7 +215,6 @@ Total: ${totalPrice}
 
         <input
           type="date"
-          lang="en"
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setCheckIn(e.target.value)}
         />
@@ -193,7 +222,6 @@ Total: ${totalPrice}
 
         <input
           type="date"
-          lang="en"
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setCheckOut(e.target.value)}
         />
@@ -201,6 +229,7 @@ Total: ${totalPrice}
 
         <input
           placeholder="Guests number"
+          value={guests}
           className="border p-2 rounded w-full mb-3"
           onChange={(e) => setGuests(e.target.value)}
         />
@@ -215,23 +244,28 @@ Total: ${totalPrice}
               Nights: {nights}
 
             </p>
-            <button
-  onClick={() =>
-    addToCart({
-      name: hotel.name,
-      price: totalPrice || hotel.price
-    })
-  }
-  className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
->
-  Add to Cart
-</button>
+
 
             <p className="text-green-600 font-bold text-xl">
 
               Total Price: ${totalPrice}
 
             </p>
+
+
+            <button
+              onClick={() =>
+                addToCart({
+                  name: hotel.name,
+                  price: totalPrice || hotel.price
+                })
+              }
+              className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+            >
+
+              Add to Cart
+
+            </button>
 
           </div>
 
@@ -246,6 +280,13 @@ Total: ${totalPrice}
           Send booking request
 
         </button>
+        <a
+href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
+target="_blank"
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+>
+Pay Online Now
+</a>
 
 
         <WhatsAppButton serviceName={hotel.name} />
@@ -257,5 +298,6 @@ Total: ${totalPrice}
   );
 
 }
+
 
 export default HotelDetails;

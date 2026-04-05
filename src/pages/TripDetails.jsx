@@ -90,6 +90,7 @@ function TripDetails() {
       <img
         src={trip.image}
         className="w-full h-[400px] object-cover rounded-xl"
+        alt=""
       />
 
 
@@ -180,6 +181,13 @@ function TripDetails() {
           Send booking request
 
         </button>
+        <a
+href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
+target="_blank"
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+>
+Pay Online Now
+</a>
 
       </div>
 

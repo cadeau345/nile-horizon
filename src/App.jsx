@@ -20,6 +20,11 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Cart from "./pages/cart";
 import MobileBottomNav from "./components/MobileBottomNav";
+import Temples from "./pages/Temples";
+import TempleDetails from "./pages/TempleDetails";
+import AddTemple from "./components/AddTemple";
+import Bookings from "./components/Bookings";
+
 function App() {
 
   return (
@@ -45,6 +50,12 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/temples" element={<Temples />} />
+
+<Route path="/temple/:id" element={<TempleDetails />} />
+<Route path="/add-temple" element={<AddTemple />} />
+<Route path="/bookings" element={<Bookings />} />
+        
 
       </Routes>
 <FloatingWhatsApp />

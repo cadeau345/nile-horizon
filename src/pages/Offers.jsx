@@ -69,6 +69,7 @@ function Offers() {
               <img
                 src={item.image}
                 className="h-52 w-full object-cover"
+                alt=""
               />
 
 

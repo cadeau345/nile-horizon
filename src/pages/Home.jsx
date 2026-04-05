@@ -180,6 +180,7 @@ Best hotels in Aswan
 </Link>
 
 
+
 <Link to="/transport">
 
 <div className="shadow-lg rounded-xl p-6 hover:scale-105 transition bg-white">
@@ -279,6 +280,7 @@ SALE
 <img
 src={hotel.image}
 className="h-40 md:h-52 w-full object-cover"
+alt=""
 />
 
 </div>
@@ -296,38 +298,31 @@ className="h-40 md:h-52 w-full object-cover"
 
 </p>
 
-<p className="text-orange-500 font-bold mt-2">
+<div className="text-orange-500 font-bold mt-2">
 {
 hotel.discountPrice ? (
 
 <div>
 
 <span className="line-through text-gray-400 mr-2">
-
 ${hotel.price}
-
 </span>
 
-<span className="text-orange-500 font-bold">
-
+<span>
 ${hotel.discountPrice}
-
 </span>
 
 </div>
 
 ) : (
 
-<span className="text-orange-500 font-bold">
-
+<span>
 ${hotel.price}
-
 </span>
 
 )
 }
-
-</p>
+</div>
 
 </div>
 
@@ -366,6 +361,7 @@ Best Sellers
 <img
 src={item.image}
 className="h-40 md:h-52 w-full object-cover"
+alt=""
 />
 
 <div className="p-4">
@@ -376,11 +372,10 @@ className="h-40 md:h-52 w-full object-cover"
 
 </h3>
 
-<p className="text-orange-500 font-bold mt-2">
-
-${item.price}
-
-</p>
+<div className="text-orange-500 font-bold mt-2">
+  ${item.price}
+  <div>Details</div>
+</div>
 
 </div>
 
@@ -421,6 +416,7 @@ Special Offers
 <img
 src={item.image}
 className="h-40 md:h-52 w-full object-cover"
+alt=""
 />
 
 <div className="p-4">
@@ -476,6 +472,7 @@ Popular Trips
 <img
 src={trip.image}
 className="h-40 md:h-52 w-full object-cover"
+alt=""
 />
 
 <div className="p-4">
@@ -531,6 +528,7 @@ Top Transport Deals
 <img
 src={item.image}
 className="h-40 md:h-52 w-full object-cover"
+alt=""
 />
 
 <div className="p-4">

@@ -69,6 +69,7 @@ function Hotels() {
                 src={hotel.image}
                 alt={hotel.name}
                 className="h-52 w-full object-cover"
+                
               />
 
 

@@ -5,7 +5,7 @@ function Hero() {
     <div className="relative h-[45vh] md:h-[90vh] flex items-center justify-center">
 
       {/* Background Image */}
-      <img
+      <img 
         src={heroImage}
         className="absolute w-full h-full object-cover"
         alt="Aswan Nile"

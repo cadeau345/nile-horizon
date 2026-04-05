@@ -79,37 +79,53 @@ try {
 
 setLoading(true);
 
+
+// fallback values تمنع undefined error
+
+const serviceName = transport.company || transport.name || "Transport Service";
+
+const transportType = transport.type || "Transport";
+
+const fromLocation = transport.from || "Unknown";
+
+const toLocation = transport.to || "Unknown";
+
+const priceValue = transport.price || 0;
+
+
 await addDoc(collection(db, "bookings"), {
-
-serviceType: "transport",
-
-serviceName: transport.company,
-
-transportType: transport.type,
-
-from: transport.from,
-
-to: transport.to,
-
-price: transport.price,
 
 name,
 
 phone,
 
-date,
+serviceType: "transport",
+
+serviceName,
+
+transportType,
+
+from: fromLocation,
+
+to: toLocation,
+
+price: priceValue,
+
+travelDate: date,
 
 guests,
 
-createdAt: new Date(),
+status: "pending",
 
-status: "New"
+createdAt: new Date()
 
 });
 
 
-
 alert("Transport booking request sent successfully");
+
+
+// reset form
 
 setName("");
 
@@ -142,17 +158,15 @@ return (
 <div className="p-10 max-w-5xl mx-auto">
 
 <img
-
 src={transport.image}
-
 className="w-full h-[400px] object-cover rounded-xl"
-
+alt=""
 />
 
 
 <h1 className="text-3xl font-bold mt-6">
 
-{transport.company}
+{transport.company || transport.name}
 
 </h1>
 
@@ -179,23 +193,14 @@ ${transport.price} / seat
 
 
 <button
-
 onClick={() =>
-
 addToCart({
-
-name: transport.company,
-
+name: transport.company || transport.name,
 price: transport.price,
-
 type: "transport"
-
 })
-
 }
-
 className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
-
 >
 
 Add to Cart
@@ -215,75 +220,56 @@ Book this transport
 
 
 <input
-
 placeholder="Your name"
-
 value={name}
-
 className="border p-2 rounded w-full mb-3"
-
 onChange={(e) => setName(e.target.value)}
-
 />
 
 
 <input
-
 placeholder="Phone number"
-
 value={phone}
-
 className="border p-2 rounded w-full mb-3"
-
 onChange={(e) => setPhone(e.target.value)}
-
 />
 
 
 <input
-
 type="date"
-
-lang="en"
-
 value={date}
-
 className="border p-2 rounded w-full mb-3"
-
 onChange={(e) => setDate(e.target.value)}
-
 />
 
 
 <input
-
 placeholder="Passengers number"
-
 value={guests}
-
 className="border p-2 rounded w-full mb-3"
-
 onChange={(e) => setGuests(e.target.value)}
-
 />
 
 
 <button
-
 onClick={handleBooking}
-
 disabled={loading}
-
 className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
-
 >
 
 {loading ? "Sending..." : "Send booking request"}
 
 </button>
+<a
+href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
+target="_blank"
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+>
+Pay Online Now
+</a>
 
 
-<WhatsAppButton serviceName={transport.company} />
+<WhatsAppButton serviceName={transport.company || transport.name} />
 
 </div>
 

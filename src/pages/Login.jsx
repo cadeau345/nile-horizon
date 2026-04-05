@@ -28,7 +28,7 @@ function Login() {
 
       navigate("/admin");
 
-    } catch (error) {
+    } catch(_) {
 
       alert("Wrong email or password");
 

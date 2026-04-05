@@ -7,19 +7,17 @@ import { db } from "../firebase";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-
 function Transport() {
 
   const [transport, setTransport] = useState([]);
 
   const [filter, setFilter] = useState("All");
 
-  const [date, setDate] = useState("");
+const [_date, setDate] = useState("")
 
   const [returnDate, setReturnDate] = useState("");
 
   const [passengers, setPassengers] = useState("");
-
   const [searchClicked, setSearchClicked] = useState(true);
 
   const [tripType, setTripType] = useState("oneway");
@@ -372,18 +370,14 @@ function Transport() {
 
               <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
-                <img
-
-                  src={item.image}
-
-                  className="h-52 w-full object-cover"
-
-                />
+             <img src={item.image} alt={item.name} />
+             
 
 
                 <div className="p-4">
 
                   <h2 className="text-xl font-bold">
+                    
 
                     {item.company}
 

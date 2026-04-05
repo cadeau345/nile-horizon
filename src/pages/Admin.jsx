@@ -14,7 +14,9 @@ import AddTrip from "../components/AddTrip";
 
 import AddPackage from "../components/AddPackage";
 
-import ViewBookings from "../components/ViewBookings";
+import AddTemple from "../components/AddTemple";
+
+import Bookings from "../components/Bookings";
 
 
 function Admin() {
@@ -113,10 +115,18 @@ function Admin() {
 
 
         <button
-          onClick={() => setTab("bookings")}
-          className="bg-orange-500 text-white px-4 py-2 rounded"
+          onClick={() => setTab("temple")}
+          className="bg-blue-900 text-white px-4 py-2 rounded"
         >
-          View Bookings
+          Add Temple
+        </button>
+
+
+        <button
+          onClick={() => setTab("bookings")}
+          className="bg-indigo-600 text-white px-4 py-2 rounded"
+        >
+           Bookings
         </button>
 
       </div>
@@ -130,12 +140,15 @@ function Admin() {
 
       {tab === "package" && <AddPackage />}
 
-      {tab === "bookings" && <ViewBookings />}
+      {tab === "temple" && <AddTemple />}
+
+      {tab === "bookings" && <Bookings />}
 
     </div>
 
   );
 
 }
+
 
 export default Admin;

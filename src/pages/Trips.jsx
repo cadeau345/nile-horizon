@@ -73,6 +73,7 @@ function Trips() {
                 src={trip.image}
                 alt={trip.name}
                 className="h-52 w-full object-cover"
+                
               />
 
 
