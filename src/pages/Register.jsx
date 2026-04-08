@@ -2,12 +2,14 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 
 import {
 createUserWithEmailAndPassword,
 sendEmailVerification
 } from "firebase/auth";
+
+import { doc, setDoc } from "firebase/firestore";
 
 
 export default function Register(){
@@ -37,12 +39,26 @@ password
 );
 
 
+// حفظ المستخدم داخل Firestore
+
+await setDoc(
+doc(db,"users",userCredential.user.uid),
+{
+email: userCredential.user.email,
+verified: userCredential.user.emailVerified,
+createdAt: new Date()
+}
+);
+
+
 // إرسال رسالة التفعيل
 
 await sendEmailVerification(
 userCredential.user
 );
 
+
+// رسالة نجاح
 
 alert("Verification email sent. Please check your Gmail.");
 
@@ -54,7 +70,29 @@ navigate("/verify-email");
 
 }catch(error){
 
-alert(error.message);
+if(error.code === "auth/email-already-in-use"){
+
+alert("This email is already registered");
+
+}
+
+else if(error.code === "auth/invalid-email"){
+
+alert("Invalid email format");
+
+}
+
+else if(error.code === "auth/weak-password"){
+
+alert("Password should be at least 6 characters");
+
+}
+
+else{
+
+alert("Registration failed. Please try again");
+
+}
 
 }
 

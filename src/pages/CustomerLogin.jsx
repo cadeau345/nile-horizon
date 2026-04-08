@@ -46,7 +46,7 @@ await userCredential.user.reload();
 
 if(!userCredential.user.emailVerified){
 
-alert("Please verify your email first");
+alert("Please verify your email before logging in");
 
 navigate("/verify-email");
 
@@ -55,12 +55,44 @@ return;
 }
 
 
+// نجاح تسجيل الدخول
+
 navigate("/profile");
 
 
 }catch(error){
 
-alert(error.message);
+// رسائل خطأ احترافية بدل Firebase raw errors
+
+if(error.code === "auth/invalid-credential"){
+
+alert("Email or password is incorrect");
+
+}
+
+else if(error.code === "auth/user-not-found"){
+
+alert("No account found with this email");
+
+}
+
+else if(error.code === "auth/wrong-password"){
+
+alert("Incorrect password");
+
+}
+
+else if(error.code === "auth/too-many-requests"){
+
+alert("Too many attempts. Please try again later");
+
+}
+
+else{
+
+alert("Login failed. Please try again");
+
+}
 
 }
 
@@ -80,14 +112,14 @@ try{
 await signInWithPopup(auth,provider);
 
 
-// حساب Google يعتبر verified تلقائيًا
+// حساب Google verified تلقائيًا
 
 navigate("/profile");
 
 
 }catch(error){
 
-alert(error.message);
+alert("Google login failed. Please try again");
 
 }
 

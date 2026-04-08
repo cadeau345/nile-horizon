@@ -17,6 +17,7 @@ import AddPackage from "../components/AddPackage";
 import AddTemple from "../components/AddTemple";
 
 import Bookings from "../components/Bookings";
+import Users from "../components/Users";
 
 
 function Admin() {
@@ -79,6 +80,14 @@ return (
 Admin Dashboard
 
 </h1>
+<button
+onClick={()=>setTab("users")}
+className="bg-purple-600 text-white px-4 py-2 rounded"
+>
+
+Users
+
+</button>
 
 
 <button
@@ -171,6 +180,7 @@ Bookings
 {tab === "temple" && <AddTemple />}
 
 {tab === "bookings" && <Bookings />}
+{tab === "users" && <Users />}
 
 </div>
 

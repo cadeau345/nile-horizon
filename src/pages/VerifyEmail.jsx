@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 
 import { sendEmailVerification } from "firebase/auth";
+
+import { doc, updateDoc } from "firebase/firestore";
 
 import { useNavigate } from "react-router-dom";
 
@@ -11,10 +13,16 @@ function VerifyEmail(){
 
 const navigate = useNavigate();
 
+const [seconds,setSeconds]=useState(30);
+
+const [canResend,setCanResend]=useState(false);
+
+
+/*
+تحقق تلقائي هل المستخدم فعل الإيميل
+*/
 
 useEffect(()=>{
-
-// لو المستخدم مش مسجل دخول
 
 if(!auth.currentUser){
 
@@ -25,12 +33,24 @@ return;
 }
 
 
-const interval = setInterval(async ()=>{
+const verifyInterval = setInterval(async ()=>{
 
 await auth.currentUser.reload();
 
 
 if(auth.currentUser.emailVerified){
+
+// تحديث Firestore بعد التفعيل
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+verified: true
+}
+);
+
+
+// تحويل المستخدم إلى Profile
 
 navigate("/profile");
 
@@ -39,31 +59,64 @@ navigate("/profile");
 },3000);
 
 
-return ()=>clearInterval(interval);
+return ()=>clearInterval(verifyInterval);
 
 },[]);
 
 
-// إعادة إرسال رسالة التفعيل
+/*
+Countdown إعادة الإرسال
+*/
 
-const resendVerification = async ()=>{
+useEffect(()=>{
 
-if(auth.currentUser){
+if(seconds === 0){
+
+setCanResend(true);
+
+return;
+
+}
+
+
+const timer = setTimeout(()=>{
+
+setSeconds(seconds - 1);
+
+},1000);
+
+
+return ()=>clearTimeout(timer);
+
+},[seconds]);
+
+
+/*
+إعادة إرسال رسالة التفعيل
+*/
+
+const resendEmail = async ()=>{
+
+if(!auth.currentUser) return;
+
 
 await sendEmailVerification(auth.currentUser);
 
 alert("Verification email sent again");
 
-}
+
+setSeconds(30);
+
+setCanResend(false);
 
 };
 
 
 return(
 
-<div className="h-screen flex justify-center items-center">
+<div className="h-screen flex justify-center items-center bg-gray-100">
 
-<div className="text-center bg-white shadow-lg p-10 rounded-xl">
+<div className="bg-white shadow-xl rounded-xl p-10 text-center w-[400px]">
 
 <h2 className="text-2xl font-bold mb-4">
 
@@ -72,21 +125,42 @@ Verify your email
 </h2>
 
 
-<p className="mb-6">
+<p className="text-gray-600 mb-6">
 
-Check your Gmail and click verification link
+Check your Gmail and click the verification link
 
 </p>
 
 
+{
+
+canResend ?
+
 <button
-onClick={resendVerification}
-className="bg-blue-600 text-white px-6 py-2 rounded"
+onClick={resendEmail}
+className="bg-blue-600 text-white px-6 py-2 rounded-lg"
 >
 
 Resend verification email
 
 </button>
+
+:
+
+<p className="text-gray-500">
+
+You can resend email in {seconds}s
+
+</p>
+
+}
+
+
+<p className="mt-6 text-sm text-gray-400">
+
+After verification you will be redirected automatically
+
+</p>
 
 </div>
 
