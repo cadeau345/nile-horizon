@@ -181,6 +181,18 @@ className="bg-blue-500 text-white w-full p-2"
 Login
 
 </button>
+<div className="text-center mt-4">
+
+<Link
+to="/register"
+className="text-green-600 font-semibold"
+>
+
+Create new account
+
+</Link>
+
+</div>
 
 
 <button
