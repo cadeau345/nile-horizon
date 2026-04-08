@@ -95,19 +95,33 @@ return ()=>clearTimeout(timer);
 إعادة إرسال رسالة التفعيل
 */
 
-const resendEmail = async ()=>{
+const resendEmail = async () => {
 
 if(!auth.currentUser) return;
 
+try{
 
 await sendEmailVerification(auth.currentUser);
 
-alert("Verification email sent again");
+alert("Verification email sent successfully");
 
-
-setSeconds(30);
+setSeconds(60); // بدل 30 نخليها دقيقة
 
 setCanResend(false);
+
+}catch(error){
+
+if(error.code === "auth/too-many-requests"){
+
+alert("Too many requests. Please wait before trying again");
+
+}else{
+
+alert("Failed to resend email");
+
+}
+
+}
 
 };
 
