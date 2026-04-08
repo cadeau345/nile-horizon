@@ -94,23 +94,23 @@ return ()=>unsubscribe();
 
 
 /*
-Confirm booking + send SMS
+Approve booking + send SMS + send Email
 */
 
-const confirmBooking = async (id, phone, serviceName) => {
+const confirmBooking = async (id, phone, email, serviceName) => {
 
 try {
 
 await updateDoc(doc(db,"bookings",id),{
 
-status:"confirmed"
+status:"approved"
 
 });
 
 
 // إرسال SMS
 
-await fetch("http://localhost:5000/send-sms", {
+await fetch("http://localhost:5000/send-sms",{
 
 method:"POST",
 
@@ -128,15 +128,50 @@ serviceName
 });
 
 
-alert("Booking confirmed & SMS sent successfully");
+// إرسال Email
 
-} catch(error){
+await fetch("http://localhost:5000/send-email",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+email,
+serviceName
+
+})
+
+});
+
+
+alert("Booking approved & notifications sent successfully");
+
+}catch(error){
 
 console.log(error);
 
-alert("Error sending SMS");
+alert("Error sending notifications");
 
 }
+
+};
+
+
+/*
+Reject booking
+*/
+
+const rejectBooking = async (id) => {
+
+await updateDoc(doc(db,"bookings",id),{
+
+status:"rejected"
+
+});
 
 };
 
@@ -191,6 +226,13 @@ Customer: {item.name || "N/A"}
 <p>
 
 Phone: {item.phone || "N/A"}
+
+</p>
+
+
+<p>
+
+Email: {item.userEmail || "N/A"}
 
 </p>
 
@@ -298,8 +340,10 @@ item.createdAt.seconds * 1000
 
 <p
 className={`font-bold mt-2 ${
-item.status === "confirmed"
+item.status === "approved"
 ? "text-green-600"
+: item.status === "rejected"
+? "text-red-600"
 : "text-orange-500"
 }`}
 >
@@ -312,11 +356,26 @@ Status: {item.status || "pending"}
 <div className="flex gap-2 mt-4">
 
 <button
-onClick={()=>confirmBooking(item.id, item.phone, item.serviceName)}
+onClick={()=>confirmBooking(
+item.id,
+item.phone,
+item.userEmail,
+item.serviceName
+)}
 className="bg-green-600 text-white px-4 py-2 rounded"
 >
 
-Confirm
+Approve
+
+</button>
+
+
+<button
+onClick={()=>rejectBooking(item.id)}
+className="bg-gray-700 text-white px-4 py-2 rounded"
+>
+
+Reject
 
 </button>
 

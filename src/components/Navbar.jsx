@@ -1,13 +1,22 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState , useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { FaUserCircle } from "react-icons/fa";
 
 function Navbar() {
 
 const [menuOpen,setMenuOpen]=useState(false);
 
+const [profileOpen,setProfileOpen]=useState(false);
+
+const { user , logout } = useContext(AuthContext);
+
 const closeMenu=()=>{
+
 setMenuOpen(false);
+
 };
+
 
 return (
 
@@ -19,7 +28,9 @@ return (
 to="/"
 className="text-blue-900 font-bold text-xl"
 >
+
 Nile Horizon
+
 </Link>
 
 
@@ -40,17 +51,107 @@ Nile Horizon
 <Link to="/about">About Aswan</Link>
 
 <Link to="/contact">Contact</Link>
+
 <Link to="/Temples">Temples</Link>
 
+<Link to="/my-bookings">
+My Bookings
+</Link>
+
+
+{/* Auth Buttons */}
+
+{
+
+!user ?
+
+<>
+
 <Link
-to="/cart"
+to="/customer-login"
+className="text-blue-900 font-semibold"
+>
+
+Login
+
+</Link>
+
+<Link
+to="/register"
 className="bg-blue-900 text-white px-4 py-2 rounded-lg"
 >
-Cart
+
+Register
+
 </Link>
+
+</>
+
+:
+
+<div className="relative">
+
+<button
+onClick={()=>setProfileOpen(!profileOpen)}
+className="text-3xl text-blue-900"
+>
+
+<FaUserCircle />
+
+</button>
+
+
+{/* Profile Dropdown */}
+
+{
+
+profileOpen && (
+
+<div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-44 py-2">
+
+<Link
+to="/profile"
+className="block px-4 py-2 hover:bg-gray-100"
+>
+
+Profile
+
+</Link>
+
+
+<Link
+to="/my-bookings"
+className="block px-4 py-2 hover:bg-gray-100"
+>
+
+My Bookings
+
+</Link>
+
+
+<button
+onClick={logout}
+className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+>
+
+Logout
+
+</button>
 
 </div>
 
+)
+
+}
+
+</div>
+
+}
+
+</div>
+
+
+{/* Mobile Menu Button */}
 
 <div className="flex items-center gap-3 md:hidden">
 
@@ -58,14 +159,18 @@ Cart
 to="/cart"
 className="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm"
 >
+
 Cart
+
 </Link>
 
 <button
 onClick={()=>setMenuOpen(!menuOpen)}
 className="text-3xl text-blue-900"
 >
+
 {menuOpen ? "✕" : "☰"}
+
 </button>
 
 </div>
@@ -93,15 +198,75 @@ ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5 pointer-eve
 
 <Link to="/contact" onClick={closeMenu}>Contact</Link>
 
-<Link to="/Temples">Temples</Link>
+<Link to="/Temples" onClick={closeMenu}>Temples</Link>
+
+<Link to="/my-bookings">
+My Bookings
+</Link>
+
+
+{/* Auth Buttons Mobile */}
+
+{
+
+!user ?
+
+<>
 
 <Link
-to="/cart"
+to="/customer-login"
+onClick={closeMenu}
+className="text-blue-900 font-semibold"
+>
+
+Login
+
+</Link>
+
+<Link
+to="/register"
 onClick={closeMenu}
 className="bg-blue-900 text-white px-6 py-2 rounded-lg"
 >
-Cart
+
+Register
+
 </Link>
+
+</>
+
+:
+
+<>
+
+<Link
+to="/profile"
+onClick={closeMenu}
+className="text-blue-900 font-semibold"
+>
+
+Profile
+
+</Link>
+
+<button
+onClick={()=>{
+
+logout();
+
+closeMenu();
+
+}}
+className="bg-red-500 text-white px-6 py-2 rounded-lg"
+>
+
+Logout
+
+</button>
+
+</>
+
+}
 
 </div>
 

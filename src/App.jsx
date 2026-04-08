@@ -1,4 +1,6 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { auth } from "./firebase";
 
 import Navbar from "./components/Navbar";
 
@@ -28,6 +30,12 @@ import AswanTours from "./pages/AswanTours";
 import AbuSimbelTour from "./pages/AbuSimbelTour";
 import LuxorFromAswan from "./pages/LuxorFromAswan";
 import NileCruise from "./pages/NileCruise";
+import CustomerLogin from "./pages/CustomerLogin";
+import Register from "./pages/Register";
+import MyBookings from "./pages/MyBookings";
+import Profile from "./pages/Profile";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
 
@@ -45,7 +53,14 @@ function App() {
         <Route path="/hotel/:id" element={<HotelDetails />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/offers" element={<Offers />} />
-        <Route path="/admin" element={<Admin />} />
+       <Route
+path="/admin"
+element={
+auth.currentUser?.email === "abdocadeau2005@gmail.com"
+? <Admin />
+: <Navigate to="/" />
+}
+/>
         <Route path="/login" element={<Login />} />
         <Route path="/trips" element={<Trips />} />
         <Route path="/trip/:id" element={<TripDetails />} />
@@ -56,6 +71,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/temples" element={<Temples />} />
 
+
 <Route path="/temple/:id" element={<TempleDetails />} />
 <Route path="/add-temple" element={<AddTemple />} />
 <Route path="/bookings" element={<Bookings />} />
@@ -63,6 +79,12 @@ function App() {
 <Route path="/abu-simbel-tour" element={<AbuSimbelTour />} />
 <Route path="/luxor-tour-from-aswan" element={<LuxorFromAswan />} />
 <Route path="/nile-cruise-egypt" element={<NileCruise />} />
+<Route path="/customer-login" element={<CustomerLogin/>}/>
+<Route path="/register" element={<Register/>}/>
+<Route path="/my-bookings" element={<MyBookings/>}/>
+<Route path="/profile" element={<Profile />} />
+<Route path="/verify-email" element={<VerifyEmail />} />
+<Route path="/forgot-password" element={<ForgotPassword />} />
         
 
       </Routes>

@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { db } from "../firebase";
 
@@ -10,10 +10,18 @@ import WhatsAppButton from "../components/WhatsAppButton";
 
 import { CartContext } from "../context/CartContext";
 
+import { AuthContext } from "../context/AuthContext";
+
 
 function TransportDetails() {
 
 const { id } = useParams();
+
+const navigate = useNavigate();
+
+const { user } = useContext(AuthContext);
+
+const { addToCart } = useContext(CartContext);
 
 const [transport, setTransport] = useState(null);
 
@@ -27,8 +35,8 @@ const [guests, setGuests] = useState("");
 
 const [loading, setLoading] = useState(false);
 
-const { addToCart } = useContext(CartContext);
 
+// تحميل البيانات
 
 useEffect(() => {
 
@@ -55,7 +63,38 @@ fetchTransport();
 }, [id]);
 
 
+// حماية العمليات
+
+const checkAuthBeforeBooking = () => {
+
+if (!user) {
+
+alert("يجب تسجيل الدخول أولاً");
+
+navigate("/customer-login");
+
+return false;
+
+}
+
+if (!user.emailVerified) {
+
+alert("يجب تأكيد البريد الإلكتروني أولاً");
+
+return false;
+
+}
+
+return true;
+
+};
+
+
+// إرسال الحجز
+
 const handleBooking = async () => {
+
+if (!checkAuthBeforeBooking()) return;
 
 if (!transport) {
 
@@ -65,7 +104,6 @@ return;
 
 }
 
-
 if (!name || !phone || !date || !guests) {
 
 alert("Please fill all booking fields");
@@ -74,13 +112,12 @@ return;
 
 }
 
-
 try {
 
 setLoading(true);
 
 
-// fallback values تمنع undefined error
+// fallback values
 
 const serviceName = transport.company || transport.name || "Transport Service";
 
@@ -94,6 +131,10 @@ const priceValue = transport.price || 0;
 
 
 await addDoc(collection(db, "bookings"), {
+
+userId: user.uid,
+
+userEmail: user.email,
 
 name,
 
@@ -125,8 +166,6 @@ createdAt: new Date()
 alert("Transport booking request sent successfully");
 
 
-// reset form
-
 setName("");
 
 setPhone("");
@@ -146,6 +185,44 @@ alert("Booking failed — please try again");
 setLoading(false);
 
 }
+
+};
+
+
+// إضافة للكارت
+
+const handleAddToCart = () => {
+
+if (!checkAuthBeforeBooking()) return;
+
+addToCart({
+
+name: transport.company || transport.name,
+
+price: transport.price,
+
+type: "transport"
+
+});
+
+alert("Added to cart");
+
+};
+
+
+// الدفع
+
+const handlePayment = () => {
+
+if (!checkAuthBeforeBooking()) return;
+
+window.open(
+
+"https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN",
+
+"_blank"
+
+);
 
 };
 
@@ -193,13 +270,7 @@ ${transport.price} / seat
 
 
 <button
-onClick={() =>
-addToCart({
-name: transport.company || transport.name,
-price: transport.price,
-type: "transport"
-})
-}
+onClick={handleAddToCart}
 className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
 >
 
@@ -260,13 +331,16 @@ className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
 {loading ? "Sending..." : "Send booking request"}
 
 </button>
-<a
-href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
-target="_blank"
-className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+
+
+<button
+onClick={handlePayment}
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl w-full"
 >
+
 Pay Online Now
-</a>
+
+</button>
 
 
 <WhatsAppButton serviceName={transport.company || transport.name} />

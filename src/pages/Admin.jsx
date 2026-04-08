@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase";
 
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 
 import AddHotel from "../components/AddHotel";
 
@@ -21,132 +21,160 @@ import Bookings from "../components/Bookings";
 
 function Admin() {
 
-  const [tab, setTab] = useState("hotel");
+const navigate = useNavigate();
 
-  const navigate = useNavigate();
-
-
-  // حماية الصفحة
-
-  useEffect(() => {
-
-    const user = auth.currentUser;
-
-    if (!user) {
-
-      navigate("/login");
-
-    }
-
-  }, []);
+const [tab, setTab] = useState("hotel");
 
 
-  // Logout function
+// حماية صفحة الأدمن بشكل صحيح
 
-  const handleLogout = async () => {
+useEffect(() => {
 
-    await signOut(auth);
+const unsubscribe = onAuthStateChanged(auth, (user) => {
 
-    navigate("/login");
+if (!user) {
 
-  };
+navigate("/customer-login");
 
+return;
 
-  return (
-
-    <div className="p-10">
-
-      <div className="flex justify-between items-center mb-6">
-
-        <h1 className="text-3xl font-bold">
-
-          Admin Dashboard
-
-        </h1>
+}
 
 
-        <button
+// ضع هنا إيميل الأدمن الحقيقي فقط
 
-          onClick={handleLogout}
+if (user.email !== "abdocadeau2005@email.com") {
 
-          className="bg-red-600 text-white px-4 py-2 rounded"
+navigate("/");
 
-        >
+}
 
-          Logout
-
-        </button>
-
-      </div>
+});
 
 
-      <div className="flex gap-4 mb-8 flex-wrap">
+return () => unsubscribe();
 
-        <button
-          onClick={() => setTab("hotel")}
-          className="bg-blue-900 text-white px-4 py-2 rounded"
-        >
-          Add Hotel
-        </button>
+}, [navigate]);
 
 
-        <button
-          onClick={() => setTab("transport")}
-          className="bg-blue-900 text-white px-4 py-2 rounded"
-        >
-          Add Transport
-        </button>
+// Logout function
+
+const handleLogout = async () => {
+
+await signOut(auth);
+
+navigate("/customer-login");
+
+};
 
 
-        <button
-          onClick={() => setTab("trip")}
-          className="bg-blue-900 text-white px-4 py-2 rounded"
-        >
-          Add Trip
-        </button>
+return (
+
+<div className="p-10">
+
+<div className="flex justify-between items-center mb-6">
+
+<h1 className="text-3xl font-bold">
+
+Admin Dashboard
+
+</h1>
 
 
-        <button
-          onClick={() => setTab("package")}
-          className="bg-blue-900 text-white px-4 py-2 rounded"
-        >
-          Add Package
-        </button>
+<button
+
+onClick={handleLogout}
+
+className="bg-red-600 text-white px-4 py-2 rounded"
+
+>
+
+Logout
+
+</button>
+
+</div>
 
 
-        <button
-          onClick={() => setTab("temple")}
-          className="bg-blue-900 text-white px-4 py-2 rounded"
-        >
-          Add Temple
-        </button>
+<div className="flex gap-4 mb-8 flex-wrap">
+
+<button
+onClick={() => setTab("hotel")}
+className="bg-blue-900 text-white px-4 py-2 rounded"
+>
+
+Add Hotel
+
+</button>
 
 
-        <button
-          onClick={() => setTab("bookings")}
-          className="bg-indigo-600 text-white px-4 py-2 rounded"
-        >
-           Bookings
-        </button>
+<button
+onClick={() => setTab("transport")}
+className="bg-blue-900 text-white px-4 py-2 rounded"
+>
 
-      </div>
+Add Transport
+
+</button>
 
 
-      {tab === "hotel" && <AddHotel />}
+<button
+onClick={() => setTab("trip")}
+className="bg-blue-900 text-white px-4 py-2 rounded"
+>
 
-      {tab === "transport" && <AddTransport />}
+Add Trip
 
-      {tab === "trip" && <AddTrip />}
+</button>
 
-      {tab === "package" && <AddPackage />}
 
-      {tab === "temple" && <AddTemple />}
+<button
+onClick={() => setTab("package")}
+className="bg-blue-900 text-white px-4 py-2 rounded"
+>
 
-      {tab === "bookings" && <Bookings />}
+Add Package
 
-    </div>
+</button>
 
-  );
+
+<button
+onClick={() => setTab("temple")}
+className="bg-blue-900 text-white px-4 py-2 rounded"
+>
+
+Add Temple
+
+</button>
+
+
+<button
+onClick={() => setTab("bookings")}
+className="bg-indigo-600 text-white px-4 py-2 rounded"
+>
+
+Bookings
+
+</button>
+
+</div>
+
+
+{tab === "hotel" && <AddHotel />}
+
+{tab === "transport" && <AddTransport />}
+
+{tab === "trip" && <AddTrip />}
+
+{tab === "package" && <AddPackage />}
+
+{tab === "temple" && <AddTemple />}
+
+{tab === "bookings" && <Bookings />}
+
+</div>
+
+);
 
 }
 

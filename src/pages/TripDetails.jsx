@@ -1,199 +1,292 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { db } from "../firebase";
+
 import WhatsAppButton from "../components/WhatsAppButton";
-import { useContext } from "react";
+
 import { CartContext } from "../context/CartContext";
+
+import { AuthContext } from "../context/AuthContext";
 
 
 function TripDetails() {
 
-  const { id } = useParams();
+const { id } = useParams();
 
-  const [trip, setTrip] = useState(null);
+const navigate = useNavigate();
 
-  const [name, setName] = useState("");
+const { user } = useContext(AuthContext);
 
-  const [phone, setPhone] = useState("");
+const { addToCart } = useContext(CartContext);
 
-  const [date, setDate] = useState("");
+const [trip, setTrip] = useState(null);
 
-  const [guests, setGuests] = useState("");
-  const { addToCart } = useContext(CartContext);
+const [name, setName] = useState("");
 
+const [phone, setPhone] = useState("");
 
-  useEffect(() => {
+const [date, setDate] = useState("");
 
-    const fetchTrip = async () => {
-
-      const docRef = doc(db, "trips", id);
-
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-
-        setTrip(docSnap.data());
-
-      }
-
-    };
-
-    fetchTrip();
-
-  }, [id]);
+const [guests, setGuests] = useState("");
 
 
-  const handleBooking = async () => {
+// تحميل بيانات الرحلة
 
-    if (!name || !phone) {
+useEffect(() => {
 
-      alert("Please fill required fields");
+const fetchTrip = async () => {
 
-      return;
+const docRef = doc(db, "trips", id);
 
-    }
+const docSnap = await getDoc(docRef);
 
+if (docSnap.exists()) {
 
-    await addDoc(collection(db, "bookings"), {
+setTrip(docSnap.data());
 
-      serviceName: trip.name,
+}
 
-      name,
+};
 
-      phone,
+fetchTrip();
 
-      date,
-
-      guests,
-
-      createdAt: new Date()
-
-    });
+}, [id]);
 
 
-    alert("Trip booked successfully");
+// حماية العمليات
 
-  };
+const checkAuthBeforeBooking = () => {
 
+if (!user) {
 
-  if (!trip) return <p>Loading...</p>;
+alert("يجب تسجيل الدخول أولاً");
 
+navigate("/customer-login");
 
-  return (
+return false;
 
-    <div className="p-10 max-w-5xl mx-auto">
+}
 
-      <img
-        src={trip.image}
-        className="w-full h-[400px] object-cover rounded-xl"
-        alt=""
-      />
+if (!user.emailVerified) {
 
+alert("يجب تأكيد البريد الإلكتروني أولاً");
 
-      <h1 className="text-3xl font-bold mt-6">
+return false;
 
-        {trip.name}
+}
 
-      </h1>
+return true;
 
-
-      <p className="text-gray-500 mt-2">
-
-        Duration: {trip.duration}
-
-      </p>
+};
 
 
-      <p className="mt-4">
+// إرسال الحجز
 
-        {trip.description}
+const handleBooking = async () => {
 
-      </p>
+if (!checkAuthBeforeBooking()) return;
+
+if (!name || !phone) {
+
+alert("Please fill required fields");
+
+return;
+
+}
+
+await addDoc(collection(db, "bookings"), {
+
+userId: user.uid,
+
+userEmail: user.email,
+
+serviceType: "trip",
+
+serviceName: trip.name,
+
+name,
+
+phone,
+
+date,
+
+guests,
+
+price: trip.price,
+
+status: "pending",
+
+createdAt: new Date()
+
+});
 
 
-      <p className="text-orange-500 text-xl mt-4">
+alert("Trip booked successfully");
 
-        ${trip.price}
+};
 
-      </p>
-      <button
-  onClick={() =>
-    addToCart({
-      name: trip.name,
-      price: trip.price
-    })
-  }
-  className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+
+// إضافة للكارت
+
+const handleAddToCart = () => {
+
+if (!checkAuthBeforeBooking()) return;
+
+addToCart({
+
+name: trip.name,
+
+price: trip.price,
+
+type: "trip"
+
+});
+
+alert("Added to cart");
+
+};
+
+
+// الدفع
+
+const handlePayment = () => {
+
+if (!checkAuthBeforeBooking()) return;
+
+window.open(
+
+"https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN",
+
+"_blank"
+
+);
+
+};
+
+
+if (!trip) return <p>Loading...</p>;
+
+
+return (
+
+<div className="p-10 max-w-5xl mx-auto">
+
+<img
+src={trip.image}
+className="w-full h-[400px] object-cover rounded-xl"
+alt=""
+/>
+
+
+<h1 className="text-3xl font-bold mt-6">
+
+{trip.name}
+
+</h1>
+
+
+<p className="text-gray-500 mt-2">
+
+Duration: {trip.duration}
+
+</p>
+
+
+<p className="mt-4">
+
+{trip.description}
+
+</p>
+
+
+<p className="text-orange-500 text-xl mt-4">
+
+${trip.price}
+
+</p>
+
+
+<button
+onClick={handleAddToCart}
+className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
 >
-  Add to Cart
+
+Add to Cart
+
 </button>
 
 
-      {/* Booking Form */}
+{/* Booking Form */}
 
-      <div className="mt-10 bg-gray-100 p-6 rounded-xl">
+<div className="mt-10 bg-gray-100 p-6 rounded-xl">
 
-        <h2 className="text-2xl font-bold mb-4">
+<h2 className="text-2xl font-bold mb-4">
 
-          Book this trip
+Book this trip
 
-        </h2>
+</h2>
+
+
 <WhatsAppButton serviceName={trip.name} />
 
-        <input
-          placeholder="Your name"
-          className="border p-2 rounded w-full mb-3"
-          onChange={(e) => setName(e.target.value)}
-        />
+
+<input
+placeholder="Your name"
+className="border p-2 rounded w-full mb-3"
+onChange={(e) => setName(e.target.value)}
+/>
 
 
-        <input
-          placeholder="Phone number"
-          className="border p-2 rounded w-full mb-3"
-          onChange={(e) => setPhone(e.target.value)}
-        />
+<input
+placeholder="Phone number"
+className="border p-2 rounded w-full mb-3"
+onChange={(e) => setPhone(e.target.value)}
+/>
 
 
-        <input
-          type="date"
-            lang="en"
-          className="border p-2 rounded w-full mb-3"
-          onChange={(e) => setDate(e.target.value)}
-        />
+<input
+type="date"
+lang="en"
+className="border p-2 rounded w-full mb-3"
+onChange={(e) => setDate(e.target.value)}
+/>
 
 
-        <input
-          placeholder="Guests number"
-          className="border p-2 rounded w-full mb-3"
-          onChange={(e) => setGuests(e.target.value)}
-        />
+<input
+placeholder="Guests number"
+className="border p-2 rounded w-full mb-3"
+onChange={(e) => setGuests(e.target.value)}
+/>
 
 
-        <button
-          onClick={handleBooking}
-          className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
-        >
-
-          Send booking request
-
-        </button>
-        <a
-href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
-target="_blank"
-className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+<button
+onClick={handleBooking}
+className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
 >
+
+Send booking request
+
+</button>
+
+
+<button
+onClick={handlePayment}
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+>
+
 Pay Online Now
-</a>
 
-      </div>
+</button>
 
-    </div>
+</div>
 
-  );
+</div>
+
+);
 
 }
 

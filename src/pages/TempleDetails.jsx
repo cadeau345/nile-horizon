@@ -2,7 +2,7 @@ import { useEffect,useState,useContext } from "react";
 
 import { doc,getDoc,collection,addDoc } from "firebase/firestore";
 
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 
 import { db } from "../firebase";
 
@@ -10,10 +10,18 @@ import WhatsAppButton from "../components/WhatsAppButton";
 
 import { CartContext } from "../context/CartContext";
 
+import { AuthContext } from "../context/AuthContext";
+
 
 function TempleDetails(){
 
 const { id } = useParams();
+
+const navigate = useNavigate();
+
+const { user } = useContext(AuthContext);
+
+const { addToCart } = useContext(CartContext);
 
 const [temple,setTemple]=useState(null);
 
@@ -23,8 +31,8 @@ const [phone,setPhone]=useState("");
 
 const [date,setDate]=useState("");
 
-const { addToCart } = useContext(CartContext);
 
+// تحميل بيانات المعبد
 
 useEffect(()=>{
 
@@ -47,7 +55,38 @@ fetchTemple();
 },[id]);
 
 
+// حماية العمليات
+
+const checkAuthBeforeBooking = ()=>{
+
+if(!user){
+
+alert("يجب تسجيل الدخول أولاً");
+
+navigate("/customer-login");
+
+return false;
+
+}
+
+if(!user.emailVerified){
+
+alert("يجب تأكيد البريد الإلكتروني أولاً");
+
+return false;
+
+}
+
+return true;
+
+};
+
+
+// إرسال الحجز
+
 const handleBooking=async()=>{
+
+if(!checkAuthBeforeBooking()) return;
 
 if(!name || !phone || !date){
 
@@ -57,8 +96,6 @@ return;
 
 }
 
-
-// حماية إضافية لو البيانات مش جاهزة
 if(!temple){
 
 alert("Temple data not loaded yet");
@@ -69,6 +106,10 @@ return;
 
 
 await addDoc(collection(db,"bookings"),{
+
+userId:user.uid,
+
+userEmail:user.email,
 
 name,
 
@@ -92,12 +133,49 @@ createdAt:new Date()
 alert("Temple booking request sent");
 
 
-// reset form
 setName("");
 
 setPhone("");
 
 setDate("");
+
+};
+
+
+// إضافة للكارت
+
+const handleAddToCart = ()=>{
+
+if(!checkAuthBeforeBooking()) return;
+
+addToCart({
+
+name:temple.name,
+
+price:temple.price,
+
+type:"temple"
+
+});
+
+alert("Added to cart");
+
+};
+
+
+// الدفع
+
+const handlePayment = ()=>{
+
+if(!checkAuthBeforeBooking()) return;
+
+window.open(
+
+"https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN",
+
+"_blank"
+
+);
 
 };
 
@@ -145,15 +223,7 @@ ${temple.price} / ticket
 
 
 <button
-onClick={()=>addToCart({
-
-name:temple.name,
-
-price:temple.price,
-
-type:"temple"
-
-})}
+onClick={handleAddToCart}
 className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
 >
 
@@ -203,13 +273,16 @@ className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
 Send booking request
 
 </button>
-<a
-href="https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=TEST_TOKEN"
-target="_blank"
-className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl"
+
+
+<button
+onClick={handlePayment}
+className="mt-3 block text-center bg-green-600 text-white px-6 py-3 rounded-xl w-full"
 >
+
 Pay Online Now
-</a>
+
+</button>
 
 
 <WhatsAppButton serviceName={temple.name} />
