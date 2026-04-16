@@ -12,7 +12,7 @@ function Trips() {
 
   const [trips, setTrips] = useState([]);
 
-
+  // تحميل الرحلات من Firebase
   useEffect(() => {
 
     const fetchTrips = async () => {
@@ -35,10 +35,31 @@ function Trips() {
   }, []);
 
 
+  // تحميل Travelpayouts widget
+  useEffect(() => {
+
+    const script = document.createElement("script");
+
+    script.src =
+      "https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&product=1020186%2C1091294%2C1102460%2C1107020&language=en&layout=horizontal&powered_by=true&campaign_id=89&promo_id=3948";
+
+    script.async = true;
+    script.charset = "utf-8";
+
+    const container = document.getElementById("travelpayouts-widget");
+
+    if (container) {
+      container.appendChild(script);
+    }
+
+  }, []);
+
+
   return (
 
     <div className="p-10">
-         <Helmet>
+
+      <Helmet>
 
         <title>
           Trips in Aswan | Abu Simbel & Nubian Village Tours
@@ -51,12 +72,15 @@ function Trips() {
 
       </Helmet>
 
+
       <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
         Trips in Aswan
 
       </h1>
 
+
+      {/* الرحلات اليدوية من Firebase */}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -73,7 +97,6 @@ function Trips() {
                 src={trip.image}
                 alt={trip.name}
                 className="h-52 w-full object-cover"
-                
               />
 
 
@@ -123,11 +146,26 @@ function Trips() {
 
       </div>
 
+
+      {/* Travelpayouts Tours Widget */}
+
+      <div className="mt-16">
+
+        <h2 className="text-2xl font-bold text-blue-900 mb-6">
+
+          Recommended Egypt Tours
+
+        </h2>
+
+        <div id="travelpayouts-widget"></div>
+
+      </div>
+
+
     </div>
 
   );
 
 }
-
 
 export default Trips;
