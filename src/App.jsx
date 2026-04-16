@@ -38,6 +38,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import Flights from "./pages/Flights";
 
 function App() {
 
@@ -89,6 +90,8 @@ auth.currentUser?.email === "abdocadeau2005@gmail.com"
 <Route path="/forgot-password" element={<ForgotPassword />} />
 <Route path="/payment-success" element={<PaymentSuccess />} />
 <Route path="/payment-cancel" element={<PaymentCancel />} />
+<Route path="/flights" element={<Flights />} />
+
         
 
       </Routes>

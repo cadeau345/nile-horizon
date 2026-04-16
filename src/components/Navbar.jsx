@@ -53,6 +53,7 @@ Nile Horizon
 <Link to="/contact">Contact</Link>
 
 <Link to="/Temples">Temples</Link>
+<Link to="/flights">Flights</Link>
 
 <Link to="/my-bookings">
 My Bookings
@@ -199,6 +200,7 @@ ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5 pointer-eve
 <Link to="/contact" onClick={closeMenu}>Contact</Link>
 
 <Link to="/Temples" onClick={closeMenu}>Temples</Link>
+<Link to="/flights" onClick={closeMenu}>Flights</Link>
 
 <Link to="/my-bookings">
 My Bookings
