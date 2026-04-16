@@ -36,6 +36,8 @@ import MyBookings from "./pages/MyBookings";
 import Profile from "./pages/Profile";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 
 function App() {
 
@@ -85,6 +87,8 @@ auth.currentUser?.email === "abdocadeau2005@gmail.com"
 <Route path="/profile" element={<Profile />} />
 <Route path="/verify-email" element={<VerifyEmail />} />
 <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/payment-success" element={<PaymentSuccess />} />
+<Route path="/payment-cancel" element={<PaymentCancel />} />
         
 
       </Routes>
