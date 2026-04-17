@@ -17,7 +17,7 @@ const [isAdmin, setIsAdmin] = useState(false);
 
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user?.email === "abdocadeau2005@email.com") {
+    if (user?.email === "cadeau200510@email.com") {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
