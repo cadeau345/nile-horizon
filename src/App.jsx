@@ -59,7 +59,7 @@ function App() {
        <Route
 path="/admin"
 element={
-auth.currentUser?.email === "abdocadeau2005@gmail.com"
+auth.currentUser?.email === "cadeau200510@gmail.com"
 ? <Admin />
 : <Navigate to="/" />
 }
