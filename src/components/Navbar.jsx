@@ -1,38 +1,36 @@
 import { Link } from "react-router-dom";
-import { useState , useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { FaUserCircle } from "react-icons/fa";
-import { useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 function Navbar() {
 
 const [menuOpen,setMenuOpen]=useState(false);
-
 const [profileOpen,setProfileOpen]=useState(false);
 
 const { user , logout } = useContext(AuthContext);
+
 const [isAdmin, setIsAdmin] = useState(false);
 
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
+
     if (user?.email === "cadeau200510@gmail.com") {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
     }
+
   });
 
   return () => unsubscribe();
 }, []);
 
 const closeMenu=()=>{
-
 setMenuOpen(false);
-
 };
-
 
 return (
 
@@ -44,9 +42,7 @@ return (
 to="/"
 className="text-blue-900 font-bold text-xl"
 >
-
 Nile Horizon
-
 </Link>
 
 
@@ -55,39 +51,34 @@ Nile Horizon
 <div className="hidden md:flex gap-6 items-center">
 
 <Link to="/">Home</Link>
-
 <Link to="/hotels">Hotels</Link>
-
 <Link to="/transport">Transport</Link>
-
 <Link to="/trips">Trips</Link>
-
 <Link to="/offers">Offers</Link>
-
 <Link to="/about">About Aswan</Link>
-
 <Link to="/contact">Contact</Link>
-
 <Link to="/Temples">Temples</Link>
 <Link to="/flights">Flights</Link>
 
 <Link to="/my-bookings">
 My Bookings
 </Link>
+
+{/* Admin Button */}
+
 {isAdmin && (
-  <a
-    href="/#/admin"
+  <Link
+    to="/admin"
     className="bg-indigo-600 text-white px-4 py-2 rounded"
   >
     Admin Dashboard
-  </a>
+  </Link>
 )}
 
 
 {/* Auth Buttons */}
 
 {
-
 !user ?
 
 <>
@@ -96,18 +87,14 @@ My Bookings
 to="/customer-login"
 className="text-blue-900 font-semibold"
 >
-
 Login
-
 </Link>
 
 <Link
 to="/register"
 className="bg-blue-900 text-white px-4 py-2 rounded-lg"
 >
-
 Register
-
 </Link>
 
 </>
@@ -120,16 +107,13 @@ Register
 onClick={()=>setProfileOpen(!profileOpen)}
 className="text-3xl text-blue-900"
 >
-
 <FaUserCircle />
-
 </button>
 
 
 {/* Profile Dropdown */}
 
 {
-
 profileOpen && (
 
 <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-44 py-2">
@@ -138,35 +122,26 @@ profileOpen && (
 to="/profile"
 className="block px-4 py-2 hover:bg-gray-100"
 >
-
 Profile
-
 </Link>
-
 
 <Link
 to="/my-bookings"
 className="block px-4 py-2 hover:bg-gray-100"
 >
-
 My Bookings
-
 </Link>
-
 
 <button
 onClick={logout}
 className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
 >
-
 Logout
-
 </button>
 
 </div>
 
 )
-
 }
 
 </div>
@@ -184,18 +159,14 @@ Logout
 to="/cart"
 className="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm"
 >
-
 Cart
-
 </Link>
 
 <button
 onClick={()=>setMenuOpen(!menuOpen)}
 className="text-3xl text-blue-900"
 >
-
 {menuOpen ? "✕" : "☰"}
-
 </button>
 
 </div>
@@ -210,19 +181,12 @@ ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5 pointer-eve
 >
 
 <Link to="/" onClick={closeMenu}>Home</Link>
-
 <Link to="/hotels" onClick={closeMenu}>Hotels</Link>
-
 <Link to="/transport" onClick={closeMenu}>Transport</Link>
-
 <Link to="/trips" onClick={closeMenu}>Trips</Link>
-
 <Link to="/offers" onClick={closeMenu}>Offers</Link>
-
 <Link to="/about" onClick={closeMenu}>About Aswan</Link>
-
 <Link to="/contact" onClick={closeMenu}>Contact</Link>
-
 <Link to="/Temples" onClick={closeMenu}>Temples</Link>
 <Link to="/flights" onClick={closeMenu}>Flights</Link>
 
@@ -234,7 +198,6 @@ My Bookings
 {/* Auth Buttons Mobile */}
 
 {
-
 !user ?
 
 <>
@@ -244,9 +207,7 @@ to="/customer-login"
 onClick={closeMenu}
 className="text-blue-900 font-semibold"
 >
-
 Login
-
 </Link>
 
 <Link
@@ -254,9 +215,7 @@ to="/register"
 onClick={closeMenu}
 className="bg-blue-900 text-white px-6 py-2 rounded-lg"
 >
-
 Register
-
 </Link>
 
 </>
@@ -270,24 +229,19 @@ to="/profile"
 onClick={closeMenu}
 className="text-blue-900 font-semibold"
 >
-
 Profile
-
 </Link>
 
 <button
 onClick={()=>{
 
 logout();
-
 closeMenu();
 
 }}
 className="bg-red-500 text-white px-6 py-2 rounded-lg"
 >
-
 Logout
-
 </button>
 
 </>
