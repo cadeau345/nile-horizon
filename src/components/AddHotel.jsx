@@ -26,7 +26,7 @@ function AddHotel() {
 
   const [description, setDescription] = useState("");
 
-  const [image, setImage] = useState(""); // موجود زي ما هو
+
 
   const [images, setImages] = useState([]); // الجديد
 
@@ -223,9 +223,7 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
 />
 
 
-        <input
-          type="file"
-          multiple
+        <input type="file" multiple 
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />
