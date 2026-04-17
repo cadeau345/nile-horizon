@@ -1,221 +1,213 @@
 import { useEffect, useState } from "react";
 
 import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
 } from "firebase/firestore";
 
 import { db } from "../firebase";
 
-
 function AddHotel() {
 
-  const [hotels, setHotels] = useState([]);
+const [hotels, setHotels] = useState([]);
 
-  const [editingId, setEditingId] = useState(null);
+const [editingId, setEditingId] = useState(null);
 
-  const [name, setName] = useState("");
+const [name, setName] = useState("");
 
-  const [location, setLocation] = useState("");
+const [location, setLocation] = useState("");
 
-  const [price, setPrice] = useState("");
+const [price, setPrice] = useState("");
 
-  const [description, setDescription] = useState("");
+const [description, setDescription] = useState("");
 
+// بدل image
+const [images, setImages] = useState([]);
 
+const [isBestSeller, setIsBestSeller] = useState(false);
 
-  const [images, setImages] = useState([]); // الجديد
+const [isOffer, setIsOffer] = useState(false);
 
-  const [isBestSeller, setIsBestSeller] = useState(false);
-
-  const [isOffer, setIsOffer] = useState(false);
-
-  const [discountPrice,setDiscountPrice]=useState("");
-
-
-  const fetchHotels = async () => {
-
-    const snapshot = await getDocs(
-      collection(db, "hotels")
-    );
-
-    setHotels(
-      snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-    );
-
-  };
+const [discountPrice,setDiscountPrice]=useState("");
 
 
-  useEffect(() => {
+const fetchHotels = async () => {
 
-    fetchHotels();
+const snapshot = await getDocs(
+collection(db, "hotels")
+);
 
-  }, []);
+setHotels(
+snapshot.docs.map(doc => ({
+id: doc.id,
+...doc.data()
+}))
+);
 
-
-  // رفع صور متعددة
-
-  const handleImageUpload = (e) => {
-
-    const files = Array.from(e.target.files);
-
-    const readers = [];
-
-    files.forEach((file) => {
-
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-
-        readers.push(reader.result);
-
-        if (readers.length === files.length) {
-
-          setImages(readers);
-
-          setImage(readers[0]); // للحفاظ على التوافق مع القديم
-
-        }
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-  };
+};
 
 
-  const handleSubmit = async () => {
+useEffect(() => {
 
-    if (editingId) {
+fetchHotels();
 
-     await updateDoc(doc(db,"hotels",editingId),{
+}, []);
+
+
+// رفع صور متعددة
+
+const handleImageUpload = (e) => {
+
+const files = Array.from(e.target.files);
+
+Promise.all(
+
+files.map(file => {
+
+return new Promise(resolve => {
+
+const reader = new FileReader();
+
+reader.onloadend = () => resolve(reader.result);
+
+reader.readAsDataURL(file);
+
+});
+
+})
+
+).then(results => {
+
+setImages(results);
+
+});
+
+};
+
+
+const handleSubmit = async () => {
+
+if (editingId) {
+
+await updateDoc(doc(db,"hotels",editingId),{
 
 name,
 location,
 price,
 discountPrice,
 description,
-image,
 images,
 isBestSeller,
 isOffer
 
 });
 
-      setEditingId(null);
+setEditingId(null);
 
-    } else {
+} else {
 
-    await addDoc(collection(db,"hotels"),{
+await addDoc(collection(db,"hotels"),{
 
 name,
 location,
 price,
 discountPrice,
 description,
-image,
 images,
 isBestSeller,
 isOffer
 
 });
 
-    }
+}
 
 
-    setName("");
-    setLocation("");
-    setPrice("");
-    setDescription("");
-    setImage("");
-    setImages([]);
-    setIsBestSeller(false);
-    setIsOffer(false);
-    setDiscountPrice("");
+setName("");
+setLocation("");
+setPrice("");
+setDescription("");
+setImages([]);
+setIsBestSeller(false);
+setIsOffer(false);
 
-    fetchHotels();
+fetchHotels();
 
-  };
+};
 
 
-  const handleDelete = async (id) => {
+const handleDelete = async (id) => {
 
-    await deleteDoc(doc(db, "hotels", id));
+await deleteDoc(doc(db, "hotels", id));
 
-    fetchHotels();
+fetchHotels();
 
-  };
-
-
-  const handleEdit = (hotel) => {
-
-    setEditingId(hotel.id);
-
-    setName(hotel.name);
-
-    setLocation(hotel.location);
-
-    setPrice(hotel.price);
-
-    setDescription(hotel.description);
-
-    setImage(hotel.image);
-
-    setImages(hotel.images || []);
-
-    setIsBestSeller(hotel.isBestSeller || false);
-
-    setIsOffer(hotel.isOffer || false);
-
-  };
+};
 
 
-  return (
+const handleEdit = (hotel) => {
 
-    <div>
+setEditingId(hotel.id);
 
-      <div className="bg-gray-100 p-6 rounded-xl mb-10">
+setName(hotel.name);
 
-        <h2 className="text-xl font-bold mb-4">
+setLocation(hotel.location);
 
-          {editingId ? "Edit Hotel" : "Add Hotel"}
+setPrice(hotel.price);
 
-        </h2>
+setDescription(hotel.description);
 
+// دعم القديم والجديد
+setImages(hotel.images || []);
 
-        <input
-          value={name}
-          placeholder="Hotel Name"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setName(e.target.value)}
-        />
+setIsBestSeller(hotel.isBestSeller || false);
 
+setIsOffer(hotel.isOffer || false);
 
-        <input
-          value={location}
-          placeholder="Location"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setLocation(e.target.value)}
-        />
+};
 
 
-        <input
-          value={price}
-          placeholder="Price"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setPrice(e.target.value)}
-        />
+return (
 
-        <input
+<div>
+
+<div className="bg-gray-100 p-6 rounded-xl mb-10">
+
+<h2 className="text-xl font-bold mb-4">
+
+{editingId ? "Edit Hotel" : "Add Hotel"}
+
+</h2>
+
+
+<input
+value={name}
+placeholder="Hotel Name"
+className="border p-2 w-full mb-3"
+onChange={(e) => setName(e.target.value)}
+/>
+
+
+<input
+value={location}
+placeholder="Location"
+className="border p-2 w-full mb-3"
+onChange={(e) => setLocation(e.target.value)}
+/>
+
+
+<input
+value={price}
+placeholder="Price"
+className="border p-2 w-full mb-3"
+onChange={(e) => setPrice(e.target.value)}
+/>
+
+
+<input
 value={discountPrice}
 placeholder="Discount Price (optional)"
 className="border p-2 w-full mb-3"
@@ -223,117 +215,121 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
 />
 
 
-        <input type="file" multiple 
-          className="border p-2 w-full mb-3"
-          onChange={handleImageUpload}
-        />
+{/* multiple images */}
+
+<input
+type="file"
+multiple
+className="border p-2 w-full mb-3"
+onChange={handleImageUpload}
+/>
 
 
-        <input
-          value={description}
-          placeholder="Description"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setDescription(e.target.value)}
-        />
+<input
+value={description}
+placeholder="Description"
+className="border p-2 w-full mb-3"
+onChange={(e) => setDescription(e.target.value)}
+/>
 
 
-        <label className="flex gap-2 mb-2">
+<label className="flex gap-2 mb-2">
 
-          <input
-            type="checkbox"
-            checked={isBestSeller}
-            onChange={(e) =>
-              setIsBestSeller(e.target.checked)
-            }
-          />
+<input
+type="checkbox"
+checked={isBestSeller}
+onChange={(e) =>
+setIsBestSeller(e.target.checked)
+}
+/>
 
-          Best Seller
+Best Seller
 
-        </label>
-
-
-        <label className="flex gap-2 mb-4">
-
-          <input
-            type="checkbox"
-            checked={isOffer}
-            onChange={(e) =>
-              setIsOffer(e.target.checked)
-            }
-          />
-
-          Special Offer
-
-        </label>
+</label>
 
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded"
-        >
+<label className="flex gap-2 mb-4">
 
-          {editingId ? "Update Hotel" : "Add Hotel"}
+<input
+type="checkbox"
+checked={isOffer}
+onChange={(e) =>
+setIsOffer(e.target.checked)
+}
+/>
 
-        </button>
+Special Offer
 
-      </div>
-
-
-      {hotels.map(hotel => (
-
-        <div
-          key={hotel.id}
-          className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
-        >
-
-          <div>
-
-            <h3 className="font-bold">
-
-              {hotel.name}
-
-            </h3>
+</label>
 
 
-            <p className="text-gray-500">
+<button
+onClick={handleSubmit}
+className="bg-green-600 text-white px-6 py-2 rounded"
+>
 
-              ${hotel.price}
+{editingId ? "Update Hotel" : "Add Hotel"}
 
-            </p>
+</button>
 
-          </div>
-
-
-          <div className="flex gap-2">
-
-            <button
-              onClick={() => handleEdit(hotel)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-
-              Edit
-
-            </button>
+</div>
 
 
-            <button
-              onClick={() => handleDelete(hotel.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
+{hotels.map(hotel => (
 
-              Delete
+<div
+key={hotel.id}
+className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
+>
 
-            </button>
+<div>
 
-          </div>
+<h3 className="font-bold">
 
-        </div>
+{hotel.name}
 
-      ))}
+</h3>
 
-    </div>
 
-  );
+<p className="text-gray-500">
+
+${hotel.price}
+
+</p>
+
+</div>
+
+
+<div className="flex gap-2">
+
+<button
+onClick={() => handleEdit(hotel)}
+className="bg-yellow-500 text-white px-4 py-2 rounded"
+>
+
+Edit
+
+</button>
+
+
+<button
+onClick={() => handleDelete(hotel.id)}
+className="bg-red-600 text-white px-4 py-2 rounded"
+>
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+);
 
 }
 
