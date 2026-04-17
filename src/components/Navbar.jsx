@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import { useState , useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { FaUserCircle } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Navbar() {
 
@@ -10,6 +13,19 @@ const [menuOpen,setMenuOpen]=useState(false);
 const [profileOpen,setProfileOpen]=useState(false);
 
 const { user , logout } = useContext(AuthContext);
+const [isAdmin, setIsAdmin] = useState(false);
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user?.email === "abdocadeau2005@email.com") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
 
 const closeMenu=()=>{
 
@@ -58,6 +74,14 @@ Nile Horizon
 <Link to="/my-bookings">
 My Bookings
 </Link>
+{isAdmin && (
+  <a
+    href="/#/admin"
+    className="bg-indigo-600 text-white px-4 py-2 rounded"
+  >
+    Admin Dashboard
+  </a>
+)}
 
 
 {/* Auth Buttons */}
