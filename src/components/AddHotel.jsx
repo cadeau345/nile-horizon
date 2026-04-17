@@ -26,11 +26,14 @@ function AddHotel() {
 
   const [description, setDescription] = useState("");
 
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(""); // موجود زي ما هو
+
+  const [images, setImages] = useState([]); // الجديد
 
   const [isBestSeller, setIsBestSeller] = useState(false);
 
   const [isOffer, setIsOffer] = useState(false);
+
   const [discountPrice,setDiscountPrice]=useState("");
 
 
@@ -57,19 +60,35 @@ function AddHotel() {
   }, []);
 
 
+  // رفع صور متعددة
+
   const handleImageUpload = (e) => {
 
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    const reader = new FileReader();
+    const readers = [];
 
-    reader.onloadend = () => {
+    files.forEach((file) => {
 
-      setImage(reader.result);
+      const reader = new FileReader();
 
-    };
+      reader.onloadend = () => {
 
-    reader.readAsDataURL(file);
+        readers.push(reader.result);
+
+        if (readers.length === files.length) {
+
+          setImages(readers);
+
+          setImage(readers[0]); // للحفاظ على التوافق مع القديم
+
+        }
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
 
   };
 
@@ -79,14 +98,17 @@ function AddHotel() {
     if (editingId) {
 
      await updateDoc(doc(db,"hotels",editingId),{
+
 name,
 location,
 price,
 discountPrice,
 description,
 image,
+images,
 isBestSeller,
 isOffer
+
 });
 
       setEditingId(null);
@@ -94,14 +116,17 @@ isOffer
     } else {
 
     await addDoc(collection(db,"hotels"),{
+
 name,
 location,
 price,
 discountPrice,
 description,
 image,
+images,
 isBestSeller,
 isOffer
+
 });
 
     }
@@ -112,8 +137,10 @@ isOffer
     setPrice("");
     setDescription("");
     setImage("");
+    setImages([]);
     setIsBestSeller(false);
     setIsOffer(false);
+    setDiscountPrice("");
 
     fetchHotels();
 
@@ -142,6 +169,8 @@ isOffer
     setDescription(hotel.description);
 
     setImage(hotel.image);
+
+    setImages(hotel.images || []);
 
     setIsBestSeller(hotel.isBestSeller || false);
 
@@ -185,6 +214,7 @@ isOffer
           className="border p-2 w-full mb-3"
           onChange={(e) => setPrice(e.target.value)}
         />
+
         <input
 value={discountPrice}
 placeholder="Discount Price (optional)"
@@ -195,6 +225,7 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
 
         <input
           type="file"
+          multiple
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />
@@ -207,8 +238,6 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
           onChange={(e) => setDescription(e.target.value)}
         />
 
-
-        {/* NEW CHECKBOXES */}
 
         <label className="flex gap-2 mb-2">
 
@@ -309,6 +338,5 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
   );
 
 }
-
 
 export default AddHotel;

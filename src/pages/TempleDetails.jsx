@@ -6,6 +6,7 @@ import WhatsAppButton from "../components/WhatsAppButton";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import { convertUSDToEGP } from "../utils/currencyConverter";
+import ImageGallery from "../components/ImageGallery";
 
 function TempleDetails() {
 
@@ -16,7 +17,7 @@ const { user } = useContext(AuthContext);
 const { addToCart } = useContext(CartContext);
 
 const [temple, setTemple] = useState(null);
-
+const [currentImageIndex, setCurrentImageIndex] = useState(0);
 const [name, setName] = useState("");
 const [phone, setPhone] = useState("");
 const [date, setDate] = useState("");
@@ -251,10 +252,9 @@ return (
 
 <div className="p-10 max-w-5xl mx-auto">
 
-<img
-src={temple.image}
-className="w-full h-[400px] object-cover rounded-xl"
-alt=""
+<ImageGallery
+images={temple.images}
+fallback={temple.image}
 />
 
 <h1 className="text-3xl font-bold mt-6">

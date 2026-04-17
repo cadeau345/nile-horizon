@@ -29,8 +29,12 @@ function AddTransport() {
   const [price, setPrice] = useState("");
 
   const [image, setImage] = useState("");
+
+  const [images, setImages] = useState([]); // جديد
+
   const [isBestSeller,setIsBestSeller]=useState(false);
-const [isOffer,setIsOffer]=useState(false);
+
+  const [isOffer,setIsOffer]=useState(false);
 
 
   const fetchTransport = async () => {
@@ -58,19 +62,37 @@ const [isOffer,setIsOffer]=useState(false);
   }, []);
 
 
+  // رفع صور متعددة
+
   const handleImageUpload = (e) => {
 
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    const reader = new FileReader();
+    if (!files.length) return;
 
-    reader.onloadend = () => {
+    const readers = [];
 
-      setImage(reader.result);
+    files.forEach((file) => {
 
-    };
+      const reader = new FileReader();
 
-    reader.readAsDataURL(file);
+      reader.onloadend = () => {
+
+        readers.push(reader.result);
+
+        if (readers.length === files.length) {
+
+          setImages(readers);
+
+          setImage(readers[0]); // توافق مع القديم
+
+        }
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
 
   };
 
@@ -91,7 +113,13 @@ const [isOffer,setIsOffer]=useState(false);
 
         price,
 
-        image
+        image,
+
+        images,
+
+        isBestSeller,
+
+        isOffer
 
       });
 
@@ -103,13 +131,28 @@ const [isOffer,setIsOffer]=useState(false);
   company,
   price,
   image,
+  images,
   from,
   to,
   type,
-  isBestSeller: true
+  isBestSeller,
+  isOffer
 });
 
     }
+
+
+    // Reset form
+
+    setCompany("");
+    setFrom("");
+    setTo("");
+    setType("");
+    setPrice("");
+    setImage("");
+    setImages([]);
+    setIsBestSeller(false);
+    setIsOffer(false);
 
 
     fetchTransport();
@@ -141,6 +184,12 @@ const [isOffer,setIsOffer]=useState(false);
     setPrice(item.price);
 
     setImage(item.image);
+
+    setImages(item.images || []);
+
+    setIsBestSeller(item.isBestSeller || false);
+
+    setIsOffer(item.isOffer || false);
 
   };
 
@@ -200,6 +249,7 @@ const [isOffer,setIsOffer]=useState(false);
 
         <input
           type="file"
+          multiple
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />
@@ -213,6 +263,8 @@ const [isOffer,setIsOffer]=useState(false);
         </button>
 
       </div>
+
+
       <label className="flex gap-2 mb-2">
 
 <input
@@ -292,6 +344,5 @@ Special Offer
   );
 
 }
-
 
 export default AddTransport;

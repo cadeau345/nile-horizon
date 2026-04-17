@@ -28,6 +28,8 @@ function AddTemple() {
 
   const [image, setImage] = useState("");
 
+  const [images, setImages] = useState([]); // جديد
+
   const [isBestSeller, setIsBestSeller] = useState(false);
 
   const [isOffer, setIsOffer] = useState(false);
@@ -56,22 +58,36 @@ function AddTemple() {
   }, []);
 
 
-  // رفع الصورة
+  // رفع صور متعددة بدل صورة واحدة
   const handleImageUpload = (e) => {
 
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    if (!file) return;
+    if (!files.length) return;
 
-    const reader = new FileReader();
+    const readers = [];
 
-    reader.onloadend = () => {
+    files.forEach((file) => {
 
-      setImage(reader.result);
+      const reader = new FileReader();
 
-    };
+      reader.onloadend = () => {
 
-    reader.readAsDataURL(file);
+        readers.push(reader.result);
+
+        if (readers.length === files.length) {
+
+          setImages(readers);
+
+          setImage(readers[0]); // توافق مع النظام القديم
+
+        }
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
 
   };
 
@@ -97,6 +113,7 @@ function AddTemple() {
         price: Number(price),
         description,
         image,
+        images,
         isBestSeller,
         isOffer,
 
@@ -113,6 +130,7 @@ function AddTemple() {
         price: Number(price),
         description,
         image,
+        images,
         isBestSeller,
         isOffer,
 
@@ -127,6 +145,7 @@ function AddTemple() {
     setPrice("");
     setDescription("");
     setImage("");
+    setImages([]);
     setIsBestSeller(false);
     setIsOffer(false);
 
@@ -160,6 +179,8 @@ function AddTemple() {
     setDescription(temple.description);
 
     setImage(temple.image);
+
+    setImages(temple.images || []);
 
     setIsBestSeller(temple.isBestSeller || false);
 
@@ -207,6 +228,7 @@ function AddTemple() {
 
         <input
           type="file"
+          multiple
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />

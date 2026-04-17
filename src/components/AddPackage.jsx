@@ -34,6 +34,8 @@ function AddPackage() {
 
   const [image, setImage] = useState("");
 
+  const [images, setImages] = useState([]); // جديد
+
 
   const fetchOffers = async () => {
 
@@ -60,19 +62,35 @@ function AddPackage() {
   }, []);
 
 
+  // دعم رفع صور متعددة
+
   const handleImageUpload = (e) => {
 
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    const reader = new FileReader();
+    const readers = [];
 
-    reader.onloadend = () => {
+    files.forEach((file) => {
 
-      setImage(reader.result);
+      const reader = new FileReader();
 
-    };
+      reader.onloadend = () => {
 
-    reader.readAsDataURL(file);
+        readers.push(reader.result);
+
+        if (readers.length === files.length) {
+
+          setImages(readers);
+
+          setImage(readers[0]); // توافق مع النظام القديم
+
+        }
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
 
   };
 
@@ -97,7 +115,9 @@ function AddPackage() {
 
         price,
 
-        image
+        image,
+
+        images
 
       });
 
@@ -121,12 +141,24 @@ function AddPackage() {
 
         price,
 
-        image
+        image,
+
+        images
 
       });
 
     }
 
+
+    setTitle("");
+    setDuration("");
+    setHotel("");
+    setTransport("");
+    setTrips("");
+    setFood("");
+    setPrice("");
+    setImage("");
+    setImages([]);
 
     fetchOffers();
 
@@ -161,6 +193,8 @@ function AddPackage() {
     setPrice(item.price);
 
     setImage(item.image);
+
+    setImages(item.images || []);
 
   };
 
@@ -236,6 +270,7 @@ function AddPackage() {
 
         <input
           type="file"
+          multiple
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />

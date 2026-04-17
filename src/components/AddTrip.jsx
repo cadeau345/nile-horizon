@@ -27,8 +27,12 @@ function AddTrip() {
   const [description, setDescription] = useState("");
 
   const [image, setImage] = useState("");
+
+  const [images, setImages] = useState([]); // جديد
+
   const [isBestSeller, setIsBestSeller] = useState(false);
-const [isOffer, setIsOffer] = useState(false);
+
+  const [isOffer, setIsOffer] = useState(false);
 
 
   const fetchTrips = async () => {
@@ -56,19 +60,37 @@ const [isOffer, setIsOffer] = useState(false);
   }, []);
 
 
+  // دعم رفع صور متعددة
+
   const handleImageUpload = (e) => {
 
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    const reader = new FileReader();
+    if (!files.length) return;
 
-    reader.onloadend = () => {
+    const readers = [];
 
-      setImage(reader.result);
+    files.forEach((file) => {
 
-    };
+      const reader = new FileReader();
 
-    reader.readAsDataURL(file);
+      reader.onloadend = () => {
+
+        readers.push(reader.result);
+
+        if (readers.length === files.length) {
+
+          setImages(readers);
+
+          setImage(readers[0]); // توافق مع النظام القديم
+
+        }
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
 
   };
 
@@ -87,25 +109,46 @@ const [isOffer, setIsOffer] = useState(false);
 
         description,
 
-        image
+        image,
+
+        images,
+
+        isBestSeller,
+
+        isOffer
 
       });
 
       setEditingId(null);
 
     } else {
-await addDoc(collection(db,"trips"),{
 
-name,
-price,
-description,
-image,
-isBestSeller,
-isOffer
+      await addDoc(collection(db,"trips"),{
 
-});
+        name,
+        duration,
+        price,
+        description,
+        image,
+        images,
+        isBestSeller,
+        isOffer
+
+      });
 
     }
+
+
+    // Reset form
+
+    setName("");
+    setDuration("");
+    setPrice("");
+    setDescription("");
+    setImage("");
+    setImages([]);
+    setIsBestSeller(false);
+    setIsOffer(false);
 
 
     fetchTrips();
@@ -135,6 +178,12 @@ isOffer
     setDescription(trip.description);
 
     setImage(trip.image);
+
+    setImages(trip.images || []);
+
+    setIsBestSeller(trip.isBestSeller || false);
+
+    setIsOffer(trip.isOffer || false);
 
   };
 
@@ -174,11 +223,11 @@ isOffer
           className="border p-2 w-full mb-3"
           onChange={(e) => setPrice(e.target.value)}
         />
-        
 
 
         <input
           type="file"
+          multiple
           className="border p-2 w-full mb-3"
           onChange={handleImageUpload}
         />
@@ -200,6 +249,8 @@ isOffer
         </button>
 
       </div>
+
+
       <label className="flex gap-2 mb-2">
 
 <input
@@ -279,6 +330,5 @@ Special Offer
   );
 
 }
-
 
 export default AddTrip;

@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import WhatsAppButton from "../components/WhatsAppButton";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+import ImageGallery from "../components/ImageGallery";
 
 // ✅ استدعاء محول العملة المركزي
 import { convertUSDToEGP } from "../utils/currencyConverter";
@@ -18,6 +19,7 @@ const { user } = useContext(AuthContext);
 const { addToCart } = useContext(CartContext);
 
 const [trip, setTrip] = useState(null);
+const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 const [name, setName] = useState("");
 const [phone, setPhone] = useState("");
@@ -255,10 +257,9 @@ return (
 
 <div className="p-10 max-w-5xl mx-auto">
 
-<img
-src={trip.image}
-className="w-full h-[400px] object-cover rounded-xl"
-alt=""
+<ImageGallery
+images={offer.images}
+fallback={offer.image}
 />
 
 
