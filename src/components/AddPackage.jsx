@@ -1,60 +1,66 @@
 import { useEffect, useState } from "react";
 
 import {
-collection,
-addDoc,
-getDocs,
-deleteDoc,
-doc,
-updateDoc
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc
 } from "firebase/firestore";
 
 import { db } from "../firebase";
 
+
 function AddPackage() {
 
-const [offers, setOffers] = useState([]);
+  const [offers, setOffers] = useState([]);
 
-const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
-const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("");
 
-const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState("");
 
-const [hotel, setHotel] = useState("");
+  const [hotel, setHotel] = useState("");
 
-const [transport, setTransport] = useState("");
+  const [transport, setTransport] = useState("");
 
-const [trips, setTrips] = useState("");
+  const [trips, setTrips] = useState("");
 
-const [food, setFood] = useState("");
+  const [food, setFood] = useState("");
 
-const [price, setPrice] = useState("");
+  const [price, setPrice] = useState("");
 
-// ⭐ بدل image
-const [images, setImages] = useState([]);
-
-const fetchOffers = async () => {
-
-const snapshot = await getDocs(collection(db, "offers"));
-
-setOffers(snapshot.docs.map(doc => ({
-id: doc.id,
-...doc.data()
-})));
-
-};
-
-useEffect(() => {
-
-fetchOffers();
-
-}, []);
+ const [images, setImages] = useState([]);
 
 
-// ⭐ رفع صور متعددة
+  const fetchOffers = async () => {
 
-const handleImageUpload = (e) => {
+    const snapshot = await getDocs(
+      collection(db, "offers")
+    );
+
+    setOffers(
+
+      snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+
+    );
+
+  };
+
+
+  useEffect(() => {
+
+    fetchOffers();
+
+  }, []);
+
+
+  const handleImageUpload = (e) => {
 
 const files = Array.from(e.target.files);
 
@@ -82,228 +88,233 @@ setImages(results);
 
 };
 
+  const handleSubmit = async () => {
 
-const handleSubmit = async () => {
+    if (editingId) {
 
-if (editingId) {
+      await updateDoc(doc(db, "offers", editingId), {
 
-await updateDoc(doc(db, "offers", editingId), {
+        title,
 
-title,
-duration,
-hotel,
-transport,
-trips,
-food,
-price,
-images
+        duration,
 
-});
+        hotel,
 
-setEditingId(null);
+        transport,
 
-} else {
+        trips,
 
-await addDoc(collection(db, "offers"), {
+        food,
 
-title,
-duration,
-hotel,
-transport,
-trips,
-food,
-price,
-images
+        price,
 
-});
+        images
 
-}
+      });
 
-fetchOffers();
+      setEditingId(null);
 
-};
+    } else {
 
+      await addDoc(collection(db, "offers"), {
 
-const handleDelete = async (id) => {
+        title,
 
-await deleteDoc(doc(db, "offers", id));
+        duration,
 
-fetchOffers();
+        hotel,
 
-};
+        transport,
 
+        trips,
 
-const handleEdit = (item) => {
+        food,
 
-setEditingId(item.id);
+        price,
 
-setTitle(item.title);
+        image
 
-setDuration(item.duration);
+      });
 
-setHotel(item.hotel);
-
-setTransport(item.transport);
-
-setTrips(item.trips);
-
-setFood(item.food);
-
-setPrice(item.price);
-
-// ⭐ دعم الصور القديمة والجديدة
-setImages(item.images || []);
-
-};
+    }
 
 
-return (
+    fetchOffers();
 
-<div>
-
-<div className="bg-gray-100 p-6 rounded-xl mb-10">
-
-<h2 className="text-xl font-bold mb-4">
-
-{editingId ? "Edit Package" : "Add Package"}
-
-</h2>
+  };
 
 
-<input
-value={title}
-placeholder="Package Title"
-className="border p-2 w-full mb-3"
-onChange={(e) => setTitle(e.target.value)}
-/>
+  const handleDelete = async (id) => {
+
+    await deleteDoc(doc(db, "offers", id));
+
+    fetchOffers();
+
+  };
 
 
-<input
-value={duration}
-placeholder="Duration"
-className="border p-2 w-full mb-3"
-onChange={(e) => setDuration(e.target.value)}
-/>
+  const handleEdit = (item) => {
+
+    setEditingId(item.id);
+
+    setTitle(item.title);
+
+    setDuration(item.duration);
+
+    setHotel(item.hotel);
+
+    setTransport(item.transport);
+
+    setTrips(item.trips);
+
+    setFood(item.food);
+
+    setPrice(item.price);
+
+    setImage(item.image);
+
+  };
 
 
-<input
-value={hotel}
-placeholder="Hotel Name"
-className="border p-2 w-full mb-3"
-onChange={(e) => setHotel(e.target.value)}
-/>
+  return (
+
+    <div>
+
+      <div className="bg-gray-100 p-6 rounded-xl mb-10">
+
+        <h2 className="text-xl font-bold mb-4">
+
+          {editingId ? "Edit Package" : "Add Package"}
+
+        </h2>
 
 
-<input
-value={transport}
-placeholder="Transport Details"
-className="border p-2 w-full mb-3"
-onChange={(e) => setTransport(e.target.value)}
-/>
+        <input
+          value={title}
+          placeholder="Package Title"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
 
-<input
-value={trips}
-placeholder="Trips Included"
-className="border p-2 w-full mb-3"
-onChange={(e) => setTrips(e.target.value)}
-/>
+        <input
+          value={duration}
+          placeholder="Duration"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setDuration(e.target.value)}
+        />
 
 
-<input
-value={food}
-placeholder="Food Included"
-className="border p-2 w-full mb-3"
-onChange={(e) => setFood(e.target.value)}
-/>
+        <input
+          value={hotel}
+          placeholder="Hotel Name"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setHotel(e.target.value)}
+        />
 
 
-<input
-value={price}
-placeholder="Price"
-className="border p-2 w-full mb-3"
-onChange={(e) => setPrice(e.target.value)}
-/>
+        <input
+          value={transport}
+          placeholder="Transport Details"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setTransport(e.target.value)}
+        />
 
 
-{/* ⭐ multiple images */}
+        <input
+          value={trips}
+          placeholder="Trips Included"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setTrips(e.target.value)}
+        />
 
-<input
+
+        <input
+          value={food}
+          placeholder="Food Included"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setFood(e.target.value)}
+        />
+
+
+        <input
+          value={price}
+          placeholder="Price"
+          className="border p-2 w-full mb-3"
+          onChange={(e) => setPrice(e.target.value)}
+        />
+
+
+    <input
 type="file"
 multiple
 className="border p-2 w-full mb-3"
 onChange={handleImageUpload}
 />
 
+        <button
+          onClick={handleSubmit}
+          className="bg-green-600 text-white px-6 py-2 rounded"
+        >
+          {editingId ? "Update Package" : "Add Package"}
+        </button>
 
-<button
-onClick={handleSubmit}
-className="bg-green-600 text-white px-6 py-2 rounded"
->
-
-{editingId ? "Update Package" : "Add Package"}
-
-</button>
-
-</div>
+      </div>
 
 
-{offers.map(item => (
+      {offers.map(item => (
 
-<div
-key={item.id}
-className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
->
+        <div
+          key={item.id}
+          className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
+        >
 
-<div>
+          <div>
 
-<h3 className="font-bold">
+            <h3 className="font-bold">
 
-{item.title}
+              {item.title}
 
-</h3>
-
-
-<p className="text-gray-500">
-
-${item.price}
-
-</p>
-
-</div>
+            </h3>
 
 
-<div className="flex gap-2">
+            <p className="text-gray-500">
 
-<button
-onClick={() => handleEdit(item)}
-className="bg-yellow-500 text-white px-4 py-2 rounded"
->
+              ${item.price}
 
-Edit
+            </p>
 
-</button>
+          </div>
 
 
-<button
-onClick={() => handleDelete(item.id)}
-className="bg-red-600 text-white px-4 py-2 rounded"
->
+          <div className="flex gap-2">
 
-Delete
+            <button
+              onClick={() => handleEdit(item)}
+              className="bg-yellow-500 text-white px-4 py-2 rounded"
+            >
+              Edit
+            </button>
 
-</button>
 
-</div>
+            <button
+              onClick={() => handleDelete(item.id)}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
+              Delete
+            </button>
 
-</div>
+          </div>
 
-))}
+        </div>
 
-</div>
+      ))}
 
-);
+    </div>
+
+  );
 
 }
+
 
 export default AddPackage;
