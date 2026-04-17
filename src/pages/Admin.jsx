@@ -44,7 +44,7 @@ return;
 
 // ضع هنا إيميل الأدمن الحقيقي فقط
 
-if (user.email !== "cadeau200510@email.com") {
+if (user.email !== "cadeau200510@gmail.com") {
 
 navigate("/");
 
