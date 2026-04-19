@@ -1,46 +1,71 @@
 import { useEffect, useState } from "react";
 
-import { auth, db } from "../firebase";
+import {
+auth,
+db
+} from "../firebase";
 
-import { sendEmailVerification } from "firebase/auth";
+import {
+applyActionCode,
+sendEmailVerification
+} from "firebase/auth";
 
-import { doc, updateDoc } from "firebase/firestore";
+import {
+doc,
+updateDoc
+} from "firebase/firestore";
 
-import { useNavigate } from "react-router-dom";
+import {
+useNavigate,
+useSearchParams
+} from "react-router-dom";
 
 
 function VerifyEmail(){
 
 const navigate = useNavigate();
 
-const [seconds,setSeconds]=useState(30);
+const [searchParams] = useSearchParams();
 
-const [canResend,setCanResend]=useState(false);
+const [seconds,setSeconds] = useState(30);
+
+const [canResend,setCanResend] = useState(false);
+
+const [status,setStatus] = useState("verifying");
 
 
-/*
-تحقق تلقائي هل المستخدم فعل الإيميل
-*/
+// استخراج كود Firebase من الرابط
+
+const oobCode = searchParams.get("oobCode");
+
+
+// تنفيذ عملية التفعيل من الرابط مباشرة
 
 useEffect(()=>{
 
-if(!auth.currentUser){
+const verifyEmail = async()=>{
 
-navigate("/customer-login");
+if(!oobCode){
+
+setStatus("invalid");
 
 return;
 
 }
 
+try{
 
-const verifyInterval = setInterval(async ()=>{
+await applyActionCode(
+auth,
+oobCode
+);
 
-await auth.currentUser.reload();
+setStatus("success");
 
-
-if(auth.currentUser.emailVerified){
 
 // تحديث Firestore بعد التفعيل
+
+if(auth.currentUser){
 
 await updateDoc(
 doc(db,"users",auth.currentUser.uid),
@@ -49,24 +74,34 @@ verified: true
 }
 );
 
+}
 
-// تحويل المستخدم إلى Profile
+
+// تحويل المستخدم
+
+setTimeout(()=>{
 
 navigate("/profile");
 
+},2000);
+
+
+}catch(error){
+
+console.log(error);
+
+setStatus("error");
+
 }
 
-},3000);
+};
+
+verifyEmail();
+
+},[oobCode,navigate]);
 
 
-return ()=>clearInterval(verifyInterval);
-
-},[]);
-
-
-/*
-Countdown إعادة الإرسال
-*/
+// Countdown إعادة الإرسال
 
 useEffect(()=>{
 
@@ -78,34 +113,35 @@ return;
 
 }
 
-
 const timer = setTimeout(()=>{
 
 setSeconds(seconds - 1);
 
 },1000);
 
-
 return ()=>clearTimeout(timer);
 
 },[seconds]);
 
 
-/*
-إعادة إرسال رسالة التفعيل
-*/
+// إعادة إرسال رسالة التفعيل
 
-const resendEmail = async () => {
+const resendEmail = async()=>{
 
 if(!auth.currentUser) return;
 
 try{
 
-await sendEmailVerification(auth.currentUser);
+await sendEmailVerification(
+auth.currentUser,
+{
+url: window.location.origin + "/#/verify-email"
+}
+);
 
-alert("Verification email sent successfully");
+alert("Verification email sent successfully 📩");
 
-setSeconds(60); // بدل 30 نخليها دقيقة
+setSeconds(60);
 
 setCanResend(false);
 
@@ -113,7 +149,7 @@ setCanResend(false);
 
 if(error.code === "auth/too-many-requests"){
 
-alert("Too many requests. Please wait before trying again");
+alert("Too many requests. Please wait");
 
 }else{
 
@@ -132,6 +168,7 @@ return(
 
 <div className="bg-white shadow-xl rounded-xl p-10 text-center w-[400px]">
 
+
 <h2 className="text-2xl font-bold mb-4">
 
 Verify your email
@@ -139,12 +176,42 @@ Verify your email
 </h2>
 
 
-<p className="text-gray-600 mb-6">
+{status === "verifying" && (
 
-Check your Gmail and click the verification link
+<p className="text-gray-600">
+
+Verifying your email...
 
 </p>
 
+)}
+
+
+{status === "success" && (
+
+<p className="text-green-600 font-semibold">
+
+Email verified successfully ✅
+
+</p>
+
+)}
+
+
+{status === "error" && (
+
+<p className="text-red-600 font-semibold">
+
+Verification link invalid or expired ❌
+
+</p>
+
+)}
+
+
+{status !== "success" && (
+
+<>
 
 {
 
@@ -152,7 +219,7 @@ canResend ?
 
 <button
 onClick={resendEmail}
-className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+className="bg-blue-600 text-white px-6 py-2 rounded-lg mt-6"
 >
 
 Resend verification email
@@ -161,7 +228,7 @@ Resend verification email
 
 :
 
-<p className="text-gray-500">
+<p className="text-gray-500 mt-6">
 
 You can resend email in {seconds}s
 
@@ -175,6 +242,10 @@ You can resend email in {seconds}s
 After verification you will be redirected automatically
 
 </p>
+
+</>
+
+)}
 
 </div>
 

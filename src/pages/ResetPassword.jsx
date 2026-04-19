@@ -1,7 +1,17 @@
-import { useState } from "react";
-import { confirmPasswordReset } from "firebase/auth";
+import { useState, useEffect } from "react";
+
+import {
+confirmPasswordReset,
+verifyPasswordResetCode
+} from "firebase/auth";
+
 import { auth } from "../firebase";
-import { useSearchParams, useNavigate } from "react-router-dom";
+
+import {
+useSearchParams,
+useNavigate
+} from "react-router-dom";
+
 
 export default function ResetPassword(){
 
@@ -11,10 +21,65 @@ const [searchParams]=useSearchParams();
 
 const navigate = useNavigate();
 
+const [status,setStatus]=useState("checking");
+
+
+// استخراج بيانات الرابط
+
 const oobCode = searchParams.get("oobCode");
 
+const mode = searchParams.get("mode");
+
+
+// التحقق من صحة الرابط أولاً
+
+useEffect(()=>{
+
+const checkCode = async()=>{
+
+if(!oobCode || mode !== "resetPassword"){
+
+setStatus("invalid");
+
+return;
+
+}
+
+try{
+
+await verifyPasswordResetCode(
+auth,
+oobCode
+);
+
+setStatus("valid");
+
+}catch(error){
+
+console.log(error);
+
+setStatus("invalid");
+
+}
+
+};
+
+checkCode();
+
+},[oobCode,mode]);
+
+
+// تنفيذ تغيير كلمة السر
 
 const resetPassword = async()=>{
+
+if(password.length < 6){
+
+alert("Password must be at least 6 characters");
+
+return;
+
+}
 
 try{
 
@@ -32,7 +97,7 @@ navigate("/login");
 
 console.log(error);
 
-alert("Invalid or expired reset link");
+alert("Reset link expired or invalid");
 
 }
 
@@ -51,12 +116,40 @@ Reset Password
 
 </h2>
 
+
+{status === "checking" && (
+
+<p className="text-gray-500 text-center">
+
+Checking reset link...
+
+</p>
+
+)}
+
+
+{status === "invalid" && (
+
+<p className="text-red-500 text-center">
+
+Invalid or expired reset link ❌
+
+</p>
+
+)}
+
+
+{status === "valid" && (
+
+<>
+
 <input
 type="password"
 placeholder="Enter new password"
 className="border p-2 w-full mb-4"
 onChange={(e)=>setPassword(e.target.value)}
 />
+
 
 <button
 onClick={resetPassword}
@@ -66,6 +159,10 @@ className="bg-blue-600 text-white w-full py-2 rounded"
 Update Password
 
 </button>
+
+</>
+
+)}
 
 </div>
 
