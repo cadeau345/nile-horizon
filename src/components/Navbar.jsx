@@ -433,46 +433,84 @@ className="lg:hidden"
 
 {isOpen && (
 
-<div className="lg:hidden bg-white shadow-xl px-6 pb-6 pt-4 space-y-3 text-gray-800 rounded-b-2xl">
+<div className="lg:hidden bg-white shadow-lg px-6 pb-6 space-y-4 text-gray-800">
 
-<Link to="/" className="block py-2 border-b">Home</Link>
+<Link to="/" onClick={()=>setIsOpen(false)}>Home</Link>
 
-<Link to="/hotels" className="block py-2 border-b">Hotels</Link>
+<Link to="/hotels" onClick={()=>setIsOpen(false)}>Hotels</Link>
 
-<Link to="/transport" className="block py-2 border-b">Transport</Link>
+<Link to="/transport" onClick={()=>setIsOpen(false)}>Transport</Link>
 
-<Link to="/trips" className="block py-2 border-b">Trips</Link>
+<Link to="/trips" onClick={()=>setIsOpen(false)}>Trips</Link>
 
-<Link to="/offers" className="block py-2 border-b">Offers</Link>
+<Link to="/offers" onClick={()=>setIsOpen(false)}>Offers</Link>
 
-<Link to="/about" className="block py-2 border-b">About Aswan</Link>
+<Link to="/about" onClick={()=>setIsOpen(false)}>About Aswan</Link>
 
-<Link to="/contact" className="block py-2 border-b">Contact</Link>
+<Link to="/contact" onClick={()=>setIsOpen(false)}>Contact</Link>
 
-<Link to="/temples" className="block py-2 border-b">Temples</Link>
+<Link to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
 
-<Link to="/flights" className="block py-2 border-b">Flights</Link>
+<Link to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
 
 
-{
-isAdmin && (
+{/* USER MENU MOBILE */}
 
-<Link to="/bookings" className="block py-2 border-b">
+{user ? (
+
+<>
+
+<Link to="/profile" onClick={()=>setIsOpen(false)}>
+
+Profile
+
+</Link>
+
+<Link to="/my-bookings" onClick={()=>setIsOpen(false)}>
 
 My Bookings
 
 </Link>
 
-)
-}
+<div
+onClick={handleLogout}
+className="text-red-500 cursor-pointer"
+>
+
+Logout
+
+</div>
+
+</>
+
+) : (
+
+<>
+
+<Link to="/login" onClick={()=>setIsOpen(false)}>
+
+Login
+
+</Link>
+
+<Link to="/register" onClick={()=>setIsOpen(false)}>
+
+Register
+
+</Link>
+
+</>
+
+)}
 
 
-{
-isAdmin && (
+{/* ADMIN BUTTON MOBILE */}
 
-<Link to="/admin">
+{isAdmin && (
 
-<button className="mt-3 bg-indigo-600 text-white w-full py-3 rounded-xl shadow-md">
+<Link to="/admin" onClick={()=>setIsOpen(false)}>
+
+<button className="bg-indigo-600 text-white w-full py-2 rounded-xl">
 
 Admin Dashboard
 
@@ -480,8 +518,7 @@ Admin Dashboard
 
 </Link>
 
-)
-}
+)}
 
 </div>
 
