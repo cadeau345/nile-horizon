@@ -35,7 +35,7 @@ setActiveDropdown(null);
 
 } catch (error) {
 
-console.log(error);
+console.log(docSnap.data());
 
 }
 
