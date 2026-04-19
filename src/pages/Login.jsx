@@ -2,12 +2,15 @@ import { useState } from "react";
 
 import {
 signInWithEmailAndPassword,
-reload
+reload,
+sendEmailVerification
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 
 import { useNavigate } from "react-router-dom";
+
+import { doc, getDoc } from "firebase/firestore";
 
 
 function Login() {
@@ -36,18 +39,49 @@ password
 await reload(userCredential.user);
 
 
-// التحقق من تفعيل الإيميل
+// لو الحساب غير مفعل
 
 if(!userCredential.user.emailVerified){
 
-alert("Please verify your email first 📩");
+await sendEmailVerification(userCredential.user);
+
+alert("Verification email sent again 📩");
 
 return;
 
 }
 
 
-// تحويل الأدمن فقط إلى لوحة التحكم
+// التحقق من أنه Admin
+
+const docRef = doc(
+db,
+"users",
+userCredential.user.uid
+);
+
+const docSnap = await getDoc(docRef);
+
+
+if(!docSnap.exists()){
+
+alert("User data not found");
+
+return;
+
+}
+
+
+if(docSnap.data().role !== "admin"){
+
+alert("Access denied. Admin only.");
+
+return;
+
+}
+
+
+// دخول لوحة التحكم
 
 navigate("/admin");
 
