@@ -1,120 +1,136 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, User, ChevronDown } from "lucide-react";
-import { onAuthStateChanged } from "firebase/auth";
 
-import { auth, db } from "../firebase";
+import {
+Menu,
+X,
+User,
+ChevronDown
+} from "lucide-react";
 
+import {
+auth
+} from "../firebase";
+
+import {
+onAuthStateChanged,
+signOut
+} from "firebase/auth";
 
 import {
 doc,
 getDoc
 } from "firebase/firestore";
 
+import { db } from "../firebase";
 
-function Navbar() {
 
-const [isAdmin,setIsAdmin]=useState(false);
-const [isOpen,setIsOpen]=useState(false);
-const [isScrolled,setIsScrolled]=useState(false);
-const [activeDropdown,setActiveDropdown]=useState(null);
+function Navbar(){
+
 const [user,setUser]=useState(null);
 
-const location=useLocation();
+const [isAdmin,setIsAdmin]=useState(false);
+
+const [isOpen,setIsOpen]=useState(false);
+
+const [activeDropdown,setActiveDropdown]=useState(null);
+
+const location = useLocation();
 
 
-// LOGOUT FUNCTION
-
-const handleLogout = async () => {
-
-try {
-
-await signOut(auth);
-
-setActiveDropdown(null);
-
-} catch (error) {
-
-console.log(docSnap.data());
-
-}
-
-};
-
-
-// CHECK USER ROLE
+// CHECK USER AUTH
 
 useEffect(()=>{
 
-const unsubscribe = onAuthStateChanged(auth, async(currentUser)=>{
+const unsubscribe = onAuthStateChanged(
+
+auth,
+
+async(currentUser)=>{
 
 setUser(currentUser);
 
 if(currentUser){
 
-const docRef = doc(db,"users",currentUser.uid);
+const docRef = doc(
+
+db,
+
+"users",
+
+currentUser.uid
+
+);
 
 const docSnap = await getDoc(docRef);
 
-if(docSnap.exists() && docSnap.data().role==="admin"){
+if(docSnap.exists()){
 
-setIsAdmin(true);
+setIsAdmin(
 
-}else{
+docSnap.data().role === "admin"
 
-setIsAdmin(false);
+);
+
+}
 
 }
 
 }
 
-});
+);
 
 return ()=>unsubscribe();
 
 },[]);
 
 
-// SCROLL EFFECT
+// LOGOUT
 
-useEffect(()=>{
+const handleLogout = async()=>{
 
-const handleScroll=()=>{
+await signOut(auth);
 
-setIsScrolled(window.scrollY>50);
+setUser(null);
 
 };
 
-window.addEventListener("scroll",handleScroll);
 
-return()=>window.removeEventListener("scroll",handleScroll);
-
-},[]);
+const isHome = location.pathname === "/";
 
 
-const isHome=location.pathname==="/";
-
-
-// DROPDOWN DATA
+// DROPDOWNS
 
 const dropdownMenus={
 
 hotels:[
+
 {label:"Luxury Hotels",link:"/hotels?type=luxury"},
+
 {label:"Budget Hotels",link:"/hotels?type=budget"},
+
 {label:"Nile View Hotels",link:"/hotels?view=nile"}
+
 ],
 
 trips:[
+
 {label:"Daily Trips",link:"/trips?type=daily"},
+
 {label:"Nile Cruise",link:"/trips?type=cruise"},
+
 {label:"Historical Tours",link:"/trips?type=history"}
+
 ],
 
 transport:[
+
 {label:"Airport Transfer",link:"/transport?type=airport"},
+
 {label:"Private Car",link:"/transport?type=private"},
+
 {label:"Bus Booking",link:"/transport?type=bus"}
+
 ]
 
 };
@@ -122,26 +138,22 @@ transport:[
 
 return(
 
-<nav
-className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
-
-${
-isHome && !isScrolled
-? "bg-transparent text-white"
-: "bg-white shadow text-gray-800"
-}
-
-`}
->
+<nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isHome?"bg-transparent":"bg-white shadow"}`}>
 
 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
 
 {/* LOGO */}
 
-<Link to="/" className="text-2xl font-extrabold tracking-tight">
+<Link to="/" className="text-2xl font-bold">
 
-<span className="text-indigo-600">Nile</span> Horizon
+<span className="text-indigo-600">
+
+Nile
+
+</span>
+
+Horizon
 
 </Link>
 
@@ -149,161 +161,36 @@ isHome && !isScrolled
 
 {/* DESKTOP MENU */}
 
-<div className="hidden lg:flex gap-6 items-center font-medium relative">
-
+<div className="hidden lg:flex items-center gap-6">
 
 <Link to="/">Home</Link>
 
+<Link to="/hotels">Hotels</Link>
 
-{/* HOTELS DROPDOWN */}
+<Link to="/transport">Transport</Link>
 
-<div
-className="relative"
-onMouseEnter={()=>setActiveDropdown("hotels")}
-onMouseLeave={()=>setActiveDropdown(null)}
->
-
-<div className="flex items-center gap-1 cursor-pointer">
-
-Hotels <ChevronDown size={16}/>
-
-</div>
-
-{
-activeDropdown==="hotels" && (
-
-<div className="absolute top-8 left-0 bg-white shadow-xl rounded-xl p-4 space-y-2 text-gray-800 min-w-[200px]">
-
-{
-dropdownMenus.hotels.map(item=>(
-
-<Link key={item.label} to={item.link}>
-
-<div className="hover:text-indigo-600">
-
-{item.label}
-
-</div>
-
-</Link>
-
-))
-}
-
-</div>
-
-)
-
-}
-
-</div>
-
-
-
-{/* TRANSPORT DROPDOWN */}
-
-<div
-className="relative"
-onMouseEnter={()=>setActiveDropdown("transport")}
-onMouseLeave={()=>setActiveDropdown(null)}
->
-
-<div className="flex items-center gap-1 cursor-pointer">
-
-Transport <ChevronDown size={16}/>
-
-</div>
-
-{
-activeDropdown==="transport" && (
-
-<div className="absolute top-8 left-0 bg-white shadow-xl rounded-xl p-4 space-y-2 text-gray-800 min-w-[200px]">
-
-{
-dropdownMenus.transport.map(item=>(
-
-<Link key={item.label} to={item.link}>
-
-<div className="hover:text-indigo-600">
-
-{item.label}
-
-</div>
-
-</Link>
-
-))
-}
-
-</div>
-
-)
-
-}
-
-</div>
-
-
-
-{/* TRIPS DROPDOWN */}
-
-<div
-className="relative"
-onMouseEnter={()=>setActiveDropdown("trips")}
-onMouseLeave={()=>setActiveDropdown(null)}
->
-
-<div className="flex items-center gap-1 cursor-pointer">
-
-Trips <ChevronDown size={16}/>
-
-</div>
-
-{
-activeDropdown==="trips" && (
-
-<div className="absolute top-8 left-0 bg-white shadow-xl rounded-xl p-4 space-y-2 text-gray-800 min-w-[200px]">
-
-{
-dropdownMenus.trips.map(item=>(
-
-<Link key={item.label} to={item.link}>
-
-<div className="hover:text-indigo-600">
-
-{item.label}
-
-</div>
-
-</Link>
-
-))
-}
-
-</div>
-
-)
-
-}
-
-</div>
-
+<Link to="/trips">Trips</Link>
 
 <Link to="/offers">Offers</Link>
+
 <Link to="/about">About Aswan</Link>
+
 <Link to="/contact">Contact</Link>
+
 <Link to="/temples">Temples</Link>
+
 <Link to="/flights">Flights</Link>
 
 
 {/* ADMIN BUTTON */}
 
 {
+
 isAdmin && (
 
 <Link to="/admin">
 
-<button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl">
+<button className="bg-indigo-600 text-white px-5 py-2 rounded-xl">
 
 Admin Dashboard
 
@@ -312,58 +199,63 @@ Admin Dashboard
 </Link>
 
 )
+
 }
 
 
-{/* USER DROPDOWN */}
+{/* USER ICON */}
 
 <div className="relative">
 
 <User
-onClick={()=>setActiveDropdown("user")}
+
 className="cursor-pointer"
+
+onClick={()=>setActiveDropdown(
+
+activeDropdown==="user"
+
+? null
+
+: "user"
+
+)}
+
 />
 
+
 {
+
 activeDropdown==="user" && (
 
-<div className="absolute right-0 top-8 bg-white shadow-xl rounded-xl p-4 space-y-2 text-gray-800 min-w-[180px]">
+<div className="absolute right-0 top-8 bg-white shadow-xl rounded-xl p-4 space-y-2 min-w-[150px]">
 
 {
-user ? (
+
+user
+
+?
 
 <>
 
-{
-isAdmin && (
-
-<Link to="/bookings">
-
-<div className="hover:text-indigo-600">
-
-My Bookings
-
-</div>
-
-</Link>
-
-)
-}
-
 <Link to="/profile">
-
-<div className="hover:text-indigo-600">
 
 Profile
 
-</div>
+</Link>
+
+<Link to="/my-bookings">
+
+My Bookings
 
 </Link>
 
-
 <div
+
 onClick={handleLogout}
-className="hover:text-red-500 cursor-pointer"
+
+className="text-red-500 cursor-pointer"
+
 >
 
 Logout
@@ -372,27 +264,73 @@ Logout
 
 </>
 
-) : (
+:
 
 <>
 
 <Link to="/login">
 
-<div className="hover:text-indigo-600">
-
 Login
-
-</div>
 
 </Link>
 
 <Link to="/register">
 
-<div className="hover:text-indigo-600">
-
 Register
 
+</Link>
+
+</>
+
+}
+
 </div>
+
+)
+
+}
+
+</div>
+
+
+</div>
+
+
+
+{/* MOBILE RIGHT SIDE */}
+
+<div className="flex items-center gap-3 lg:hidden">
+
+
+{/* LOGIN REGISTER BUTTONS */}
+
+{
+
+!user && (
+
+<>
+
+<Link
+
+to="/login"
+
+className="text-sm font-medium"
+
+>
+
+Login
+
+</Link>
+
+<Link
+
+to="/register"
+
+className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm"
+
+>
+
+Register
 
 </Link>
 
@@ -402,28 +340,61 @@ Register
 
 }
 
-</div>
+
+{/* PROFILE ICON */}
+
+{
+
+user && (
+
+<User
+
+className="cursor-pointer"
+
+onClick={()=>setActiveDropdown(
+
+activeDropdown==="user"
+
+? null
+
+: "user"
+
+)}
+
+/>
 
 )
 
+
 }
 
-</div>
 
-</div>
-
-
-
-{/* MOBILE BUTTON */}
+{/* MENU BUTTON */}
 
 <button
+
 onClick={()=>setIsOpen(!isOpen)}
-className="lg:hidden"
+
 >
 
-{isOpen ? <X size={28}/> : <Menu size={28}/>}
+{
+
+isOpen
+
+?
+
+<X size={26}/>
+
+:
+
+<Menu size={26}/>
+
+}
 
 </button>
+
+</div>
+
 
 </div>
 
@@ -431,84 +402,36 @@ className="lg:hidden"
 
 {/* MOBILE MENU */}
 
-{isOpen && (
+{
 
-<div className="lg:hidden bg-white shadow-lg px-6 pb-6 space-y-4 text-gray-800">
+isOpen && (
 
-<Link to="/" onClick={()=>setIsOpen(false)}>Home</Link>
+<div className="lg:hidden bg-white shadow-lg px-6 pb-6 space-y-4">
 
-<Link to="/hotels" onClick={()=>setIsOpen(false)}>Hotels</Link>
+<Link to="/">Home</Link>
 
-<Link to="/transport" onClick={()=>setIsOpen(false)}>Transport</Link>
+<Link to="/hotels">Hotels</Link>
 
-<Link to="/trips" onClick={()=>setIsOpen(false)}>Trips</Link>
+<Link to="/transport">Transport</Link>
 
-<Link to="/offers" onClick={()=>setIsOpen(false)}>Offers</Link>
+<Link to="/trips">Trips</Link>
 
-<Link to="/about" onClick={()=>setIsOpen(false)}>About Aswan</Link>
+<Link to="/offers">Offers</Link>
 
-<Link to="/contact" onClick={()=>setIsOpen(false)}>Contact</Link>
+<Link to="/about">About Aswan</Link>
 
-<Link to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
+<Link to="/contact">Contact</Link>
 
-<Link to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
+<Link to="/temples">Temples</Link>
 
-
-{/* USER MENU MOBILE */}
-
-{user ? (
-
-<>
-
-<Link to="/profile" onClick={()=>setIsOpen(false)}>
-
-Profile
-
-</Link>
-
-<Link to="/my-bookings" onClick={()=>setIsOpen(false)}>
-
-My Bookings
-
-</Link>
-
-<div
-onClick={handleLogout}
-className="text-red-500 cursor-pointer"
->
-
-Logout
-
-</div>
-
-</>
-
-) : (
-
-<>
-
-<Link to="/login" onClick={()=>setIsOpen(false)}>
-
-Login
-
-</Link>
-
-<Link to="/register" onClick={()=>setIsOpen(false)}>
-
-Register
-
-</Link>
-
-</>
-
-)}
+<Link to="/flights">Flights</Link>
 
 
-{/* ADMIN BUTTON MOBILE */}
+{
 
-{isAdmin && (
+isAdmin && (
 
-<Link to="/admin" onClick={()=>setIsOpen(false)}>
+<Link to="/admin">
 
 <button className="bg-indigo-600 text-white w-full py-2 rounded-xl">
 
@@ -518,16 +441,43 @@ Admin Dashboard
 
 </Link>
 
-)}
+)
+
+}
+
+
+{
+
+user && (
+
+<div
+
+onClick={handleLogout}
+
+className="text-red-500 cursor-pointer"
+
+>
+
+Logout
 
 </div>
 
-)}
+)
+
+}
+
+</div>
+
+)
+
+}
+
 
 </nav>
 
 );
 
 }
+
 
 export default Navbar;
