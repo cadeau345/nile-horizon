@@ -5,14 +5,19 @@ signInWithEmailAndPassword,
 GoogleAuthProvider,
 signInWithPopup,
 sendPasswordResetEmail,
-reload
+reload,
+sendEmailVerification
 } from "firebase/auth";
 
 import { auth, db } from "../firebase";
 
 import { useNavigate } from "react-router-dom";
 
-import { doc, getDoc } from "firebase/firestore";
+import {
+doc,
+getDoc,
+setDoc
+} from "firebase/firestore";
 
 
 function Login() {
@@ -40,11 +45,18 @@ password
 await reload(userCredential.user);
 
 
-// CHECK EMAIL VERIFIED
+// لو الحساب غير مفعل
 
 if(!userCredential.user.emailVerified){
 
-alert("Please verify your email first 📩");
+await sendEmailVerification(
+userCredential.user,
+{
+url: window.location.origin + "/#/verify-email"
+}
+);
+
+alert("Verification email sent again 📩");
 
 return;
 
@@ -53,39 +65,11 @@ return;
 
 // CHECK ADMIN ROLE
 
-const docRef = doc(db,"users",userCredential.user.uid);
-
-const docSnap = await getDoc(docRef);
-
-
-if(docSnap.exists() && docSnap.data().role === "admin"){
-
-navigate("/admin");
-
-}else{
-
-navigate("/");
-
-}
-
-}catch(error){
-
-alert("Wrong email or password");
-
-}
-
-};
-
-
-// LOGIN WITH GOOGLE
-
-const loginWithGoogle = async () => {
-
-try{
-
-const result = await signInWithPopup(auth,provider);
-
-const docRef = doc(db,"users",result.user.uid);
+const docRef = doc(
+db,
+"users",
+userCredential.user.uid
+);
 
 const docSnap = await getDoc(docRef);
 
@@ -104,6 +88,69 @@ navigate("/");
 
 console.log(error);
 
+alert("Wrong email or password");
+
+}
+
+};
+
+
+// LOGIN WITH GOOGLE
+
+const loginWithGoogle = async () => {
+
+try{
+
+const result = await signInWithPopup(
+auth,
+provider
+);
+
+
+// تأكد إن المستخدم موجود في Firestore
+
+const docRef = doc(
+db,
+"users",
+result.user.uid
+);
+
+const docSnap = await getDoc(docRef);
+
+
+if(!docSnap.exists()){
+
+await setDoc(
+docRef,
+{
+email: result.user.email,
+role: "user",
+verified: true,
+createdAt: new Date()
+}
+);
+
+}
+
+
+// CHECK ROLE
+
+if(docSnap.exists() && docSnap.data().role === "admin"){
+
+navigate("/admin");
+
+}else{
+
+navigate("/");
+
+}
+
+}catch(error){
+
+console.log(error);
+
+alert("Google login failed");
+
 }
 
 };
@@ -120,9 +167,16 @@ alert("Enter your email first");
 return;
 
 }
-await sendPasswordResetEmail(auth,email,{
-url: window.location.origin + "/reset-password"
-});
+
+
+await sendPasswordResetEmail(
+auth,
+email,
+{
+url: window.location.origin + "/#/reset-password"
+}
+);
+
 
 alert("Password reset email sent 📩");
 

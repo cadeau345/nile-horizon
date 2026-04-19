@@ -1,24 +1,19 @@
 import { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 
 import { auth, db } from "../firebase";
 
 import {
-
 createUserWithEmailAndPassword,
 sendEmailVerification,
 GoogleAuthProvider,
 signInWithPopup
-
 } from "firebase/auth";
 
 import {
-
 doc,
 setDoc,
 getDoc
-
 } from "firebase/firestore";
 
 
@@ -48,11 +43,11 @@ password
 );
 
 
-// إعداد رابط التفعيل
+// إعداد رابط التفعيل (مهم جدًا مع HashRouter)
 
 const actionCodeSettings = {
 
-url: window.location.origin + "/verify-email",
+url: window.location.origin + "/#/verify-email",
 
 handleCodeInApp: true
 
@@ -132,12 +127,18 @@ provider
 );
 
 
-// تأكد هل المستخدم موجود بالفعل
+// التأكد هل المستخدم موجود بالفعل
 
-const docRef = doc(db,"users",result.user.uid);
+const docRef = doc(
+db,
+"users",
+result.user.uid
+);
 
 const docSnap = await getDoc(docRef);
 
+
+// لو أول مرة يسجل
 
 if(!docSnap.exists()){
 
