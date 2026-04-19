@@ -120,8 +120,9 @@ alert("Enter your email first");
 return;
 
 }
-
-await sendPasswordResetEmail(auth,email);
+await sendPasswordResetEmail(auth,email,{
+url: window.location.origin + "/reset-password"
+});
 
 alert("Password reset email sent 📩");
 

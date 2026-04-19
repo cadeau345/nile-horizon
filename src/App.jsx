@@ -52,6 +52,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 
 import Flights from "./pages/Flights";
+import ResetPassword from "./pages/ResetPassword";
 
 
 function App() {
@@ -129,6 +130,7 @@ element={
 <Route path="/payment-cancel" element={<PaymentCancel />} />
 
 <Route path="/flights" element={<Flights />} />
+<Route path="/reset-password" element={<ResetPassword />} />
 
 </Routes>
 
