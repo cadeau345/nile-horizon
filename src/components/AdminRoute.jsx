@@ -11,13 +11,13 @@ const [isAdmin,setIsAdmin]=useState(false);
 
 useEffect(()=>{
 
-const unsubscribe=onAuthStateChanged(auth,async(user)=>{
+const unsubscribe = onAuthStateChanged(auth, async(user)=>{
 
 if(user){
 
-const docRef=doc(db,"users",user.uid);
+const docRef = doc(db,"users",user.uid);
 
-const docSnap=await getDoc(docRef);
+const docSnap = await getDoc(docRef);
 
 if(docSnap.exists() && docSnap.data().role==="admin"){
 
@@ -31,7 +31,7 @@ setLoading(false);
 
 });
 
-return()=>unsubscribe();
+return ()=>unsubscribe();
 
 },[]);
 
@@ -42,13 +42,11 @@ return null;
 
 }
 
-
 if(!isAdmin){
 
 return <Navigate to="/" replace />;
 
 }
-
 
 return children;
 
