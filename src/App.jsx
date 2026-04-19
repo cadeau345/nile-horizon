@@ -39,6 +39,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import Flights from "./pages/Flights";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
 
@@ -91,6 +92,17 @@ auth.currentUser?.email === "cadeau200510@gmail.com"
 <Route path="/payment-success" element={<PaymentSuccess />} />
 <Route path="/payment-cancel" element={<PaymentCancel />} />
 <Route path="/flights" element={<Flights />} />
+<Route
+path="/admin"
+element={
+<AdminRoute>
+
+<AdminDashboard />
+
+</AdminRoute>
+}
+/>
+
 
         
 

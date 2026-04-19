@@ -10,132 +10,139 @@ import { Helmet } from "react-helmet-async";
 
 function Offers() {
 
-  const [offers, setOffers] = useState([]);
+const [offers,setOffers]=useState([]);
 
 
-  useEffect(() => {
+useEffect(()=>{
 
-    const fetchOffers = async () => {
+const fetchOffers=async()=>{
 
-      const querySnapshot = await getDocs(
-        collection(db, "offers")
-      );
+const querySnapshot=await getDocs(
+collection(db,"offers")
+);
 
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+const data=querySnapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
 
-      setOffers(data);
+setOffers(data);
 
-    };
+};
 
-    fetchOffers();
+fetchOffers();
 
-  }, []);
-
-
-  return (
-
-    <div className="p-10">
-           <Helmet>
-
-        <title>
-          Aswan Travel Packages | Nile Horizon Offers
-        </title>
-
-        <meta
-          name="description"
-          content="Exclusive Aswan travel packages including hotels, transport and guided tours at affordable prices."
-        />
-
-      </Helmet>
-
-      <h1 className="text-3xl font-bold text-blue-900 mb-6">
-
-        Special Offers in Aswan
-
-      </h1>
+},[]);
 
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+return(
 
-        {offers.map(item => (
+<div className="p-10">
 
-          <Link key={item.id} to={`/offer/${item.id}`}>
+<Helmet>
 
-            <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
+<title>
+Aswan Travel Packages | Nile Horizon Offers
+</title>
 
-              <img
-                src={item.image}
-                className="h-52 w-full object-cover"
-                alt=""
-              />
+<meta
+name="description"
+content="Exclusive Aswan travel packages including hotels, transport and guided tours at affordable prices."
+/>
 
-
-              <div className="p-4">
-
-                <h2 className="text-xl font-bold">
-
-                  {item.title}
-
-                </h2>
+</Helmet>
 
 
-                <p className="text-gray-500">
+<h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-                  {item.duration}
+Special Offers in Aswan
 
-                </p>
-
-
-                <p className="mt-2">
-
-                  Hotel: {item.hotel}
-
-                </p>
+</h1>
 
 
-                <p>
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                  Trips: {item.trips}
+{offers.map(item=>(
 
-                </p>
+<Link key={item.id} to={`/offer/${item.id}`}>
 
-
-                <p>
-
-                  Food: {item.food}
-
-                </p>
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
 
-                <p className="text-orange-500 font-bold mt-2">
+<img
+src={
+item.images?.[0] ||
+item.image ||
+"/placeholder.jpg"
+}
+className="h-52 w-full object-cover"
+alt={item.title}
+/>
 
-                  ${item.price}
 
-                </p>
+<div className="p-4">
+
+<h2 className="text-xl font-bold">
+
+{item.title}
+
+</h2>
 
 
-                <button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
+<p className="text-gray-500">
 
-                  View Details
+{item.duration}
 
-                </button>
+</p>
 
-              </div>
 
-            </div>
+<p className="mt-2">
 
-          </Link>
+Hotel: {item.hotel}
 
-        ))}
+</p>
 
-      </div>
 
-    </div>
+<p>
 
-  );
+Trips: {item.trips}
+
+</p>
+
+
+<p>
+
+Food: {item.food}
+
+</p>
+
+
+<p className="text-orange-500 font-bold mt-2">
+
+${item.price}
+
+</p>
+
+
+<button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
+
+View Details
+
+</button>
+
+</div>
+
+</div>
+
+</Link>
+
+))}
+
+</div>
+
+</div>
+
+);
 
 }
 

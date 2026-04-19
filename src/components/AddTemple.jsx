@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+updateDoc,
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -14,329 +14,469 @@ import { db } from "../firebase";
 
 function AddTemple() {
 
-  const [temples, setTemples] = useState([]);
+const [temples,setTemples]=useState([]);
 
-  const [editingId, setEditingId] = useState(null);
+const [editingId,setEditingId]=useState(null);
 
-  const [name, setName] = useState("");
+const [name,setName]=useState("");
 
-  const [location, setLocation] = useState("");
+const [location,setLocation]=useState("");
 
-  const [price, setPrice] = useState("");
+const [price,setPrice]=useState("");
 
-  const [description, setDescription] = useState("");
+const [description,setDescription]=useState("");
 
-  const [image, setImage] = useState("");
+const [image,setImage]=useState("");
 
-  const [images, setImages] = useState([]); // جديد
+const [images,setImages]=useState([]);
 
-  const [isBestSeller, setIsBestSeller] = useState(false);
+const [previewImages,setPreviewImages]=useState([]);
 
-  const [isOffer, setIsOffer] = useState(false);
+const [isBestSeller,setIsBestSeller]=useState(false);
 
+const [isOffer,setIsOffer]=useState(false);
 
-  // تحميل المعابد من Firebase
-  const fetchTemples = async () => {
 
-    const snapshot = await getDocs(
-      collection(db, "temples")
-    );
 
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+/*
+============================
+ضغط الصور تلقائيًا
+============================
+*/
 
-    setTemples(data);
-  };
+const compressImage=(file)=>{
 
+return new Promise((resolve)=>{
 
-  useEffect(() => {
+const reader=new FileReader();
 
-    fetchTemples();
+reader.readAsDataURL(file);
 
-  }, []);
+reader.onload=(event)=>{
 
+const img=new Image();
 
-  // رفع صور متعددة بدل صورة واحدة
-  const handleImageUpload = (e) => {
+img.src=event.target.result;
 
-    const files = Array.from(e.target.files);
+img.onload=()=>{
 
-    if (!files.length) return;
+const canvas=document.createElement("canvas");
 
-    const readers = [];
+const maxWidth=800;
 
-    files.forEach((file) => {
+const scale=maxWidth/img.width;
 
-      const reader = new FileReader();
+canvas.width=maxWidth;
 
-      reader.onloadend = () => {
+canvas.height=img.height*scale;
 
-        readers.push(reader.result);
+const ctx=canvas.getContext("2d");
 
-        if (readers.length === files.length) {
+ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
-          setImages(readers);
+const compressed=canvas.toDataURL("image/jpeg",0.6);
 
-          setImage(readers[0]); // توافق مع النظام القديم
+resolve(compressed);
 
-        }
+};
 
-      };
+};
 
-      reader.readAsDataURL(file);
+});
 
-    });
+};
 
-  };
 
 
-  // إضافة أو تعديل
-  const handleSubmit = async () => {
+/*
+============================
+تحميل المعابد
+============================
+*/
 
-    if (!name || !location || !price) {
+const fetchTemples=async()=>{
 
-      alert("Please fill all required fields");
+const snapshot=await getDocs(
+collection(db,"temples")
+);
 
-      return;
+const data=snapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
 
-    }
+setTemples(data);
 
+};
 
-    if (editingId) {
 
-      await updateDoc(doc(db, "temples", editingId), {
+useEffect(()=>{
 
-        name,
-        location,
-        price: Number(price),
-        description,
-        image,
-        images,
-        isBestSeller,
-        isOffer,
+fetchTemples();
 
-      });
+},[]);
 
-      setEditingId(null);
 
-    } else {
 
-      await addDoc(collection(db, "temples"), {
+/*
+============================
+رفع الصور
+============================
+*/
 
-        name,
-        location,
-        price: Number(price),
-        description,
-        image,
-        images,
-        isBestSeller,
-        isOffer,
+const handleImageUpload=async(e)=>{
 
-      });
+const files=Array.from(e.target.files);
 
-    }
 
+// حد أقصى 10 صور
 
-    // Reset form
-    setName("");
-    setLocation("");
-    setPrice("");
-    setDescription("");
-    setImage("");
-    setImages([]);
-    setIsBestSeller(false);
-    setIsOffer(false);
+if(images.length+files.length>10){
 
+alert("Maximum 10 images allowed");
 
-    fetchTemples();
+return;
 
-  };
+}
 
 
-  // حذف
-  const handleDelete = async (id) => {
+const compressedImages=await Promise.all(
 
-    await deleteDoc(doc(db, "temples", id));
+files.map(file=>compressImage(file))
 
-    fetchTemples();
+);
 
-  };
 
+// دعم النظام القديم + الجديد
 
-  // تعديل
-  const handleEdit = (temple) => {
+setImages(prev=>[...prev,...compressedImages]);
 
-    setEditingId(temple.id);
+setPreviewImages(prev=>[...prev,...compressedImages]);
 
-    setName(temple.name);
+setImage(compressedImages[0] || image);
 
-    setLocation(temple.location);
+};
 
-    setPrice(temple.price);
 
-    setDescription(temple.description);
 
-    setImage(temple.image);
+/*
+============================
+إضافة أو تعديل
+============================
+*/
 
-    setImages(temple.images || []);
+const handleSubmit=async()=>{
 
-    setIsBestSeller(temple.isBestSeller || false);
+if(!name||!location||!price){
 
-    setIsOffer(temple.isOffer || false);
+alert("Please fill required fields");
 
-  };
+return;
 
+}
 
-  return (
 
-    <div className="p-10">
+if(editingId){
 
-      <div className="bg-gray-100 p-6 rounded-xl mb-10">
+await updateDoc(
 
-        <h2 className="text-xl font-bold mb-4">
+doc(db,"temples",editingId),
 
-          {editingId ? "Edit Temple" : "Add Temple"}
+{
+name,
+location,
+price:Number(price),
+description,
+image,
+images,
+isBestSeller,
+isOffer,
+}
 
-        </h2>
+);
 
+setEditingId(null);
 
-        <input
-          value={name}
-          placeholder="Temple Name"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setName(e.target.value)}
-        />
+}
 
+else{
 
-        <input
-          value={location}
-          placeholder="Location"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setLocation(e.target.value)}
-        />
+await addDoc(
 
+collection(db,"temples"),
 
-        <input
-          value={price}
-          placeholder="Ticket Price"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setPrice(e.target.value)}
-        />
+{
+name,
+location,
+price:Number(price),
+description,
+image,
+images,
+isBestSeller,
+isOffer,
+}
 
+);
 
-        <input
-          type="file"
-          multiple
-          className="border p-2 w-full mb-3"
-          onChange={handleImageUpload}
-        />
+}
 
 
-        <textarea
-          value={description}
-          placeholder="Description"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setDescription(e.target.value)}
-        />
+// Reset form
 
+setName("");
 
-        <label className="flex gap-2 mb-2">
+setLocation("");
 
-          <input
-            type="checkbox"
-            checked={isBestSeller}
-            onChange={(e) => setIsBestSeller(e.target.checked)}
-          />
+setPrice("");
 
-          Best Seller
+setDescription("");
 
-        </label>
+setImage("");
 
+setImages([]);
 
-        <label className="flex gap-2 mb-4">
+setPreviewImages([]);
 
-          <input
-            type="checkbox"
-            checked={isOffer}
-            onChange={(e) => setIsOffer(e.target.checked)}
-          />
+setIsBestSeller(false);
 
-          Special Offer
+setIsOffer(false);
 
-        </label>
 
+fetchTemples();
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded"
-        >
+};
 
-          {editingId ? "Update Temple" : "Add Temple"}
 
-        </button>
 
-      </div>
+/*
+============================
+حذف
+============================
+*/
 
+const handleDelete=async(id)=>{
 
-      {/* عرض المعابد */}
+await deleteDoc(doc(db,"temples",id));
 
-      {temples.map((temple) => (
+fetchTemples();
 
-        <div
-          key={temple.id}
-          className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
-        >
+};
 
-          <div>
 
-            <h3 className="font-bold">
 
-              {temple.name}
+/*
+============================
+تعديل
+============================
+*/
 
-            </h3>
+const handleEdit=(temple)=>{
 
+setEditingId(temple.id);
 
-            <p className="text-gray-500">
+setName(temple.name);
 
-              ${temple.price}
+setLocation(temple.location);
 
-            </p>
+setPrice(temple.price);
 
-          </div>
+setDescription(temple.description);
 
+setImage(temple.image||"");
 
-          <div className="flex gap-2">
+setImages(temple.images||[]);
 
-            <button
-              onClick={() => handleEdit(temple)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
+setPreviewImages(temple.images||[]);
 
-              Edit
+setIsBestSeller(temple.isBestSeller||false);
 
-            </button>
+setIsOffer(temple.isOffer||false);
 
+};
 
-            <button
-              onClick={() => handleDelete(temple.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
 
-              Delete
 
-            </button>
+return(
 
-          </div>
+<div className="p-10">
 
-        </div>
+<div className="bg-gray-100 p-6 rounded-xl mb-10">
 
-      ))}
+<h2 className="text-xl font-bold mb-4">
 
-    </div>
+{editingId?"Edit Temple":"Add Temple"}
 
-  );
+</h2>
+
+
+<input
+value={name}
+placeholder="Temple Name"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setName(e.target.value)}
+/>
+
+
+<input
+value={location}
+placeholder="Location"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setLocation(e.target.value)}
+/>
+
+
+<input
+value={price}
+placeholder="Ticket Price"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setPrice(e.target.value)}
+/>
+
+
+<input
+type="file"
+multiple
+accept="image/*"
+className="border p-2 w-full mb-3"
+onChange={handleImageUpload}
+/>
+
+
+{/* preview */}
+
+<div className="flex gap-2 flex-wrap mb-4">
+
+{previewImages.map((img,index)=>(
+
+<img
+key={index}
+src={img}
+alt="preview"
+className="w-20 h-20 object-cover rounded"
+/>
+
+))}
+
+</div>
+
+
+<textarea
+value={description}
+placeholder="Description"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setDescription(e.target.value)}
+/>
+
+
+<label className="flex gap-2 mb-2">
+
+<input
+type="checkbox"
+checked={isBestSeller}
+onChange={(e)=>setIsBestSeller(e.target.checked)}
+/>
+
+Best Seller
+
+</label>
+
+
+<label className="flex gap-2 mb-4">
+
+<input
+type="checkbox"
+checked={isOffer}
+onChange={(e)=>setIsOffer(e.target.checked)}
+/>
+
+Special Offer
+
+</label>
+
+
+<button
+onClick={handleSubmit}
+className="bg-green-600 text-white px-6 py-2 rounded"
+>
+
+{editingId?"Update Temple":"Add Temple"}
+
+</button>
+
+</div>
+
+
+
+{/* عرض المعابد */}
+
+{temples.map(temple=>(
+
+<div
+key={temple.id}
+className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
+>
+
+<div className="flex items-center gap-4">
+
+{temple.images?.length>0&&(
+
+<img
+src={temple.images[0]}
+className="w-16 h-16 object-cover rounded"
+alt=""
+/>
+
+)}
+
+<div>
+
+<h3 className="font-bold">
+
+{temple.name}
+
+</h3>
+
+<p className="text-gray-500">
+
+${temple.price}
+
+</p>
+
+</div>
+
+</div>
+
+
+<div className="flex gap-2">
+
+<button
+onClick={()=>handleEdit(temple)}
+className="bg-yellow-500 text-white px-4 py-2 rounded"
+>
+
+Edit
+
+</button>
+
+
+<button
+onClick={()=>handleDelete(temple.id)}
+className="bg-red-600 text-white px-4 py-2 rounded"
+>
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+);
 
 }
 

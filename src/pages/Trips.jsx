@@ -10,161 +10,173 @@ import { Helmet } from "react-helmet-async";
 
 function Trips() {
 
-  const [trips, setTrips] = useState([]);
+const [trips,setTrips]=useState([]);
 
-  // تحميل الرحلات من Firebase
-  useEffect(() => {
 
-    const fetchTrips = async () => {
+// تحميل الرحلات من Firebase
 
-      const querySnapshot = await getDocs(
-        collection(db, "trips")
-      );
+useEffect(()=>{
 
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+const fetchTrips=async()=>{
 
-      setTrips(data);
+const querySnapshot=await getDocs(
+collection(db,"trips")
+);
 
-    };
+const data=querySnapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
 
-    fetchTrips();
+setTrips(data);
 
-  }, []);
+};
 
+fetchTrips();
 
-  // تحميل Travelpayouts widget
-  useEffect(() => {
+},[]);
 
-    const script = document.createElement("script");
 
-    script.src =
-      "https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&product=1020186%2C1091294%2C1102460%2C1107020&language=en&layout=horizontal&powered_by=true&campaign_id=89&promo_id=3948";
+// تحميل Travelpayouts widget
 
-    script.async = true;
-    script.charset = "utf-8";
+useEffect(()=>{
 
-    const container = document.getElementById("travelpayouts-widget");
+const script=document.createElement("script");
 
-    if (container) {
-      container.appendChild(script);
-    }
+script.src=
+"https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&product=1020186%2C1091294%2C1102460%2C1107020&language=en&layout=horizontal&powered_by=true&campaign_id=89&promo_id=3948";
 
-  }, []);
+script.async=true;
 
+script.charset="utf-8";
 
-  return (
+const container=document.getElementById("travelpayouts-widget");
 
-    <div className="p-10">
+if(container){
 
-      <Helmet>
+container.appendChild(script);
 
-        <title>
-          Trips in Aswan | Abu Simbel & Nubian Village Tours
-        </title>
+}
 
-        <meta
-          name="description"
-          content="Discover top tours in Aswan including Abu Simbel temples, Nubian Village visits and Nile felucca rides."
-        />
+},[]);
 
-      </Helmet>
 
+return(
 
-      <h1 className="text-3xl font-bold text-blue-900 mb-6">
+<div className="p-10">
 
-        Trips in Aswan
+<Helmet>
 
-      </h1>
+<title>
 
+Trips in Aswan | Abu Simbel & Nubian Village Tours
 
-      {/* الرحلات اليدوية من Firebase */}
+</title>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+<meta
+name="description"
+content="Discover top tours in Aswan including Abu Simbel temples, Nubian Village visits and Nile felucca rides."
+/>
 
-        {trips.map(trip => (
+</Helmet>
 
-          <Link
-            key={trip.id}
-            to={`/trip/${trip.id}`}
-          >
 
-            <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300 cursor-pointer">
+<h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-              <img
-                src={trip.image}
-                alt={trip.name}
-                className="h-52 w-full object-cover"
-              />
+Trips in Aswan
 
+</h1>
 
-              <div className="p-4">
 
-                <h2 className="text-xl font-bold">
+{/* الرحلات اليدوية من Firebase */}
 
-                  {trip.name}
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                </h2>
+{trips.map(trip=>(
 
+<Link
+key={trip.id}
+to={`/trip/${trip.id}`}
+>
 
-                <p className="text-gray-500">
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300 cursor-pointer">
 
-                  Duration: {trip.duration}
+<img
+src={
+trip.images?.[0] ||
+trip.image ||
+"/placeholder.jpg"
+}
+alt={trip.name}
+className="h-52 w-full object-cover"
+/>
 
-                </p>
 
+<div className="p-4">
 
-                <p className="mt-2 text-gray-600 line-clamp-2">
+<h2 className="text-xl font-bold">
 
-                  {trip.description}
+{trip.name}
 
-                </p>
+</h2>
 
 
-                <p className="text-orange-500 font-bold mt-3">
+<p className="text-gray-500">
 
-                  ${trip.price}
+Duration: {trip.duration}
 
-                </p>
+</p>
 
 
-                <button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
+<p className="mt-2 text-gray-600 line-clamp-2">
 
-                  View Details
+{trip.description}
 
-                </button>
+</p>
 
-              </div>
 
-            </div>
+<p className="text-orange-500 font-bold mt-3">
 
-          </Link>
+${trip.price}
 
-        ))}
+</p>
 
-      </div>
 
+<button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
 
-      {/* Travelpayouts Tours Widget */}
+View Details
 
-      <div className="mt-16">
+</button>
 
-        <h2 className="text-2xl font-bold text-blue-900 mb-6">
+</div>
 
-          Recommended Egypt Tours
+</div>
 
-        </h2>
+</Link>
 
-        <div id="travelpayouts-widget"></div>
+))}
 
-      </div>
+</div>
 
 
-    </div>
+{/* Travelpayouts Tours Widget */}
 
-  );
+<div className="mt-16">
+
+<h2 className="text-2xl font-bold text-blue-900 mb-6">
+
+Recommended Egypt Tours
+
+</h2>
+
+<div id="travelpayouts-widget"></div>
+
+</div>
+
+
+</div>
+
+);
 
 }
 

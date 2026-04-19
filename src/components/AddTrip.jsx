@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -14,244 +14,361 @@ import { db } from "../firebase";
 
 function AddTrip() {
 
-  const [trips, setTrips] = useState([]);
+const [trips,setTrips]=useState([]);
 
-  const [editingId, setEditingId] = useState(null);
+const [editingId,setEditingId]=useState(null);
 
-  const [name, setName] = useState("");
+const [name,setName]=useState("");
 
-  const [duration, setDuration] = useState("");
+const [duration,setDuration]=useState("");
 
-  const [price, setPrice] = useState("");
+const [price,setPrice]=useState("");
 
-  const [description, setDescription] = useState("");
+const [description,setDescription]=useState("");
 
-  const [image, setImage] = useState("");
+const [image,setImage]=useState("");
 
-  const [images, setImages] = useState([]); // جديد
+const [images,setImages]=useState([]);
 
-  const [isBestSeller, setIsBestSeller] = useState(false);
+const [previewImages,setPreviewImages]=useState([]);
 
-  const [isOffer, setIsOffer] = useState(false);
+const [isBestSeller,setIsBestSeller]=useState(false);
 
+const [isOffer,setIsOffer]=useState(false);
 
-  const fetchTrips = async () => {
 
-    const snapshot = await getDocs(
-      collection(db, "trips")
-    );
 
-    setTrips(
+/*
+============================
+ضغط الصور تلقائيًا
+============================
+*/
 
-      snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
+const compressImage=(file)=>{
 
-    );
+return new Promise((resolve)=>{
 
-  };
+const reader=new FileReader();
 
+reader.readAsDataURL(file);
 
-  useEffect(() => {
+reader.onload=(event)=>{
 
-    fetchTrips();
+const img=new Image();
 
-  }, []);
+img.src=event.target.result;
 
+img.onload=()=>{
 
-  // دعم رفع صور متعددة
+const canvas=document.createElement("canvas");
 
-  const handleImageUpload = (e) => {
+const maxWidth=800;
 
-    const files = Array.from(e.target.files);
+const scale=maxWidth/img.width;
 
-    if (!files.length) return;
+canvas.width=maxWidth;
 
-    const readers = [];
+canvas.height=img.height*scale;
 
-    files.forEach((file) => {
+const ctx=canvas.getContext("2d");
 
-      const reader = new FileReader();
+ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
-      reader.onloadend = () => {
+const compressed=canvas.toDataURL("image/jpeg",0.6);
 
-        readers.push(reader.result);
+resolve(compressed);
 
-        if (readers.length === files.length) {
+};
 
-          setImages(readers);
+};
 
-          setImage(readers[0]); // توافق مع النظام القديم
+});
 
-        }
+};
 
-      };
 
-      reader.readAsDataURL(file);
 
-    });
+/*
+============================
+تحميل البيانات
+============================
+*/
 
-  };
+const fetchTrips=async()=>{
 
+const snapshot=await getDocs(
+collection(db,"trips")
+);
 
-  const handleSubmit = async () => {
+setTrips(
 
-    if (editingId) {
+snapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}))
 
-      await updateDoc(doc(db, "trips", editingId), {
+);
 
-        name,
+};
 
-        duration,
 
-        price,
+useEffect(()=>{
 
-        description,
+fetchTrips();
 
-        image,
+},[]);
 
-        images,
 
-        isBestSeller,
 
-        isOffer
+/*
+============================
+رفع الصور
+============================
+*/
 
-      });
+const handleImageUpload=async(e)=>{
 
-      setEditingId(null);
+const files=Array.from(e.target.files);
 
-    } else {
 
-      await addDoc(collection(db,"trips"),{
+// حد أقصى 10 صور
 
-        name,
-        duration,
-        price,
-        description,
-        image,
-        images,
-        isBestSeller,
-        isOffer
+if(images.length+files.length>10){
 
-      });
+alert("Maximum 10 images allowed");
 
-    }
+return;
 
+}
 
-    // Reset form
 
-    setName("");
-    setDuration("");
-    setPrice("");
-    setDescription("");
-    setImage("");
-    setImages([]);
-    setIsBestSeller(false);
-    setIsOffer(false);
+const compressedImages=await Promise.all(
 
+files.map(file=>compressImage(file))
 
-    fetchTrips();
+);
 
-  };
 
+setImages(prev=>[...prev,...compressedImages]);
 
-  const handleDelete = async (id) => {
+setPreviewImages(prev=>[...prev,...compressedImages]);
 
-    await deleteDoc(doc(db, "trips", id));
+setImage(compressedImages[0]||image);
 
-    fetchTrips();
+};
 
-  };
 
 
-  const handleEdit = (trip) => {
+/*
+============================
+إضافة / تعديل
+============================
+*/
 
-    setEditingId(trip.id);
+const handleSubmit=async()=>{
 
-    setName(trip.name);
+if(!name||!duration||!price){
 
-    setDuration(trip.duration);
+alert("Please fill required fields");
 
-    setPrice(trip.price);
+return;
 
-    setDescription(trip.description);
+}
 
-    setImage(trip.image);
 
-    setImages(trip.images || []);
+if(editingId){
 
-    setIsBestSeller(trip.isBestSeller || false);
+await updateDoc(
 
-    setIsOffer(trip.isOffer || false);
+doc(db,"trips",editingId),
 
-  };
+{
+name,
+duration,
+price,
+description,
+image,
+images,
+isBestSeller,
+isOffer
+}
 
+);
 
-  return (
+setEditingId(null);
 
-    <div>
+}
 
-      <div className="bg-gray-100 p-6 rounded-xl mb-10">
+else{
 
-        <h2 className="text-xl font-bold mb-4">
+await addDoc(
 
-          {editingId ? "Edit Trip" : "Add Trip"}
+collection(db,"trips"),
 
-        </h2>
+{
+name,
+duration,
+price,
+description,
+image,
+images,
+isBestSeller,
+isOffer
+}
 
+);
 
-        <input
-          value={name}
-          placeholder="Trip Name"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setName(e.target.value)}
-        />
+}
 
 
-        <input
-          value={duration}
-          placeholder="Duration"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setDuration(e.target.value)}
-        />
+// reset form
 
+setName("");
 
-        <input
-          value={price}
-          placeholder="Price"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setPrice(e.target.value)}
-        />
+setDuration("");
 
+setPrice("");
 
-        <input
-          type="file"
-          multiple
-          className="border p-2 w-full mb-3"
-          onChange={handleImageUpload}
-        />
+setDescription("");
 
+setImage("");
 
-        <input
-          value={description}
-          placeholder="Description"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setDescription(e.target.value)}
-        />
+setImages([]);
 
+setPreviewImages([]);
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded"
-        >
-          {editingId ? "Update Trip" : "Add Trip"}
-        </button>
+setIsBestSeller(false);
 
-      </div>
+setIsOffer(false);
 
 
-      <label className="flex gap-2 mb-2">
+fetchTrips();
+
+};
+
+
+
+/*
+============================
+حذف
+============================
+*/
+
+const handleDelete=async(id)=>{
+
+await deleteDoc(doc(db,"trips",id));
+
+fetchTrips();
+
+};
+
+
+
+/*
+============================
+تعديل
+============================
+*/
+
+const handleEdit=(trip)=>{
+
+setEditingId(trip.id);
+
+setName(trip.name);
+
+setDuration(trip.duration);
+
+setPrice(trip.price);
+
+setDescription(trip.description);
+
+setImage(trip.image||"");
+
+setImages(trip.images||[]);
+
+setPreviewImages(trip.images||[]);
+
+setIsBestSeller(trip.isBestSeller||false);
+
+setIsOffer(trip.isOffer||false);
+
+};
+
+
+
+return(
+
+<div>
+
+<div className="bg-gray-100 p-6 rounded-xl mb-10">
+
+<h2 className="text-xl font-bold mb-4">
+
+{editingId?"Edit Trip":"Add Trip"}
+
+</h2>
+
+
+<input
+value={name}
+placeholder="Trip Name"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setName(e.target.value)}
+/>
+
+
+<input
+value={duration}
+placeholder="Duration"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setDuration(e.target.value)}
+/>
+
+
+<input
+value={price}
+placeholder="Price"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setPrice(e.target.value)}
+/>
+
+
+<input
+type="file"
+multiple
+accept="image/*"
+className="border p-2 w-full mb-3"
+onChange={handleImageUpload}
+/>
+
+
+{/* preview */}
+
+<div className="flex gap-2 flex-wrap mb-4">
+
+{previewImages.map((img,index)=>(
+
+<img
+key={index}
+src={img}
+alt="preview"
+className="w-20 h-20 object-cover rounded"
+/>
+
+))}
+
+</div>
+
+
+<input
+value={description}
+placeholder="Description"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setDescription(e.target.value)}
+/>
+
+
+<label className="flex gap-2 mb-2">
 
 <input
 type="checkbox"
@@ -277,57 +394,89 @@ Special Offer
 </label>
 
 
-      {trips.map(trip => (
+<button
+onClick={handleSubmit}
+className="bg-green-600 text-white px-6 py-2 rounded"
+>
 
-        <div
-          key={trip.id}
-          className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
-        >
+{editingId?"Update Trip":"Add Trip"}
 
-          <div>
+</button>
 
-            <h3 className="font-bold">
-
-              {trip.name}
-
-            </h3>
+</div>
 
 
-            <p className="text-gray-500">
 
-              ${trip.price}
+{/* عرض الرحلات */}
 
-            </p>
+{trips.map(trip=>(
 
-          </div>
+<div
+key={trip.id}
+className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
+>
+
+<div className="flex items-center gap-4">
+
+{trip.images?.length>0&&(
+
+<img
+src={trip.images[0]}
+className="w-16 h-16 object-cover rounded"
+alt=""
+/>
+
+)}
+
+<div>
+
+<h3 className="font-bold">
+
+{trip.name}
+
+</h3>
+
+<p className="text-gray-500">
+
+${trip.price}
+
+</p>
+
+</div>
+
+</div>
 
 
-          <div className="flex gap-2">
+<div className="flex gap-2">
 
-            <button
-              onClick={() => handleEdit(trip)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              Edit
-            </button>
+<button
+onClick={()=>handleEdit(trip)}
+className="bg-yellow-500 text-white px-4 py-2 rounded"
+>
+
+Edit
+
+</button>
 
 
-            <button
-              onClick={() => handleDelete(trip.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-              Delete
-            </button>
+<button
+onClick={()=>handleDelete(trip.id)}
+className="bg-red-600 text-white px-4 py-2 rounded"
+>
 
-          </div>
+Delete
 
-        </div>
+</button>
 
-      ))}
+</div>
 
-    </div>
+</div>
 
-  );
+))}
+
+</div>
+
+);
 
 }
 

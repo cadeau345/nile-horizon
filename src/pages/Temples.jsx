@@ -41,14 +41,19 @@ Temples & Attractions
 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
 {temples.map(item=>(
+
 <Link key={item.id} to={`/temple/${item.id}`}>
 
-<div className="shadow-lg rounded-xl overflow-hidden">
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition duration-300">
 
 <img
-src={item.image}
+src={
+item.images?.[0] ||
+item.image ||
+"/placeholder.jpg"
+}
 className="h-52 w-full object-cover"
-alt=""
+alt={item.name}
 />
 
 <div className="p-4">
@@ -59,7 +64,7 @@ alt=""
 
 </h2>
 
-<p className="text-orange-500">
+<p className="text-orange-500 font-bold mt-2">
 
 ${item.price}
 
@@ -70,6 +75,7 @@ ${item.price}
 </div>
 
 </Link>
+
 ))}
 
 </div>

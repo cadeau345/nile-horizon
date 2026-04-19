@@ -25,8 +25,9 @@ const [price, setPrice] = useState("");
 
 const [description, setDescription] = useState("");
 
-// بدل image
 const [images, setImages] = useState([]);
+
+const [previewImages, setPreviewImages] = useState([]);
 
 const [isBestSeller, setIsBestSeller] = useState(false);
 
@@ -35,66 +36,147 @@ const [isOffer, setIsOffer] = useState(false);
 const [discountPrice,setDiscountPrice]=useState("");
 
 
+/*
+============================
+ضغط الصور تلقائيًا
+============================
+*/
+
+const compressImage = (file) => {
+
+return new Promise((resolve) => {
+
+const reader = new FileReader();
+
+reader.readAsDataURL(file);
+
+reader.onload = (event) => {
+
+const img = new Image();
+
+img.src = event.target.result;
+
+img.onload = () => {
+
+const canvas = document.createElement("canvas");
+
+const maxWidth = 800;
+
+const scaleSize = maxWidth / img.width;
+
+canvas.width = maxWidth;
+
+canvas.height = img.height * scaleSize;
+
+const ctx = canvas.getContext("2d");
+
+ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+// ضغط الجودة
+const compressedBase64 =
+canvas.toDataURL("image/jpeg", 0.6);
+
+resolve(compressedBase64);
+
+};
+
+};
+
+});
+
+};
+
+
+/*
+============================
+جلب الفنادق
+============================
+*/
+
 const fetchHotels = async () => {
 
-const snapshot = await getDocs(
-collection(db, "hotels")
-);
+const snapshot =
+await getDocs(collection(db,"hotels"));
 
 setHotels(
+
 snapshot.docs.map(doc => ({
 id: doc.id,
 ...doc.data()
 }))
+
 );
 
 };
 
 
-useEffect(() => {
+useEffect(()=>{
 
 fetchHotels();
 
-}, []);
+},[]);
 
 
-// رفع صور متعددة
+/*
+============================
+رفع الصور
+============================
+*/
 
-const handleImageUpload = (e) => {
+const handleImageUpload = async (e) => {
 
 const files = Array.from(e.target.files);
 
-Promise.all(
 
-files.map(file => {
+// حد أقصى 10 صور
 
-return new Promise(resolve => {
+if(images.length + files.length > 10){
 
-const reader = new FileReader();
+alert("Maximum 10 images allowed");
 
-reader.onloadend = () => resolve(reader.result);
+return;
 
-reader.readAsDataURL(file);
+}
 
-});
 
-})
+const compressedImages = await Promise.all(
 
-).then(results => {
+files.map(file => compressImage(file))
 
-setImages(results);
+);
 
-});
+
+setImages(prev=>[...prev,...compressedImages]);
+
+setPreviewImages(prev=>[...prev,...compressedImages]);
 
 };
 
 
+/*
+============================
+إضافة أو تعديل فندق
+============================
+*/
+
 const handleSubmit = async () => {
 
-if (editingId) {
+if(!name || !location || !price){
 
-await updateDoc(doc(db,"hotels",editingId),{
+alert("Please fill required fields");
 
+return;
+
+}
+
+
+if(editingId){
+
+await updateDoc(
+
+doc(db,"hotels",editingId),
+
+{
 name,
 location,
 price,
@@ -103,15 +185,21 @@ description,
 images,
 isBestSeller,
 isOffer
+}
 
-});
+);
 
 setEditingId(null);
 
-} else {
+}
 
-await addDoc(collection(db,"hotels"),{
+else{
 
+await addDoc(
+
+collection(db,"hotels"),
+
+{
 name,
 location,
 price,
@@ -120,33 +208,57 @@ description,
 images,
 isBestSeller,
 isOffer
+}
 
-});
+);
 
 }
 
 
 setName("");
+
 setLocation("");
+
 setPrice("");
+
 setDescription("");
+
 setImages([]);
+
+setPreviewImages([]);
+
+setDiscountPrice("");
+
 setIsBestSeller(false);
+
 setIsOffer(false);
+
 
 fetchHotels();
 
 };
 
+
+/*
+============================
+حذف فندق
+============================
+*/
 
 const handleDelete = async (id) => {
 
-await deleteDoc(doc(db, "hotels", id));
+await deleteDoc(doc(db,"hotels",id));
 
 fetchHotels();
 
 };
 
+
+/*
+============================
+تعديل فندق
+============================
+*/
 
 const handleEdit = (hotel) => {
 
@@ -160,8 +272,11 @@ setPrice(hotel.price);
 
 setDescription(hotel.description);
 
-// دعم القديم والجديد
 setImages(hotel.images || []);
+
+setPreviewImages(hotel.images || []);
+
+setDiscountPrice(hotel.discountPrice || "");
 
 setIsBestSeller(hotel.isBestSeller || false);
 
@@ -170,7 +285,7 @@ setIsOffer(hotel.isOffer || false);
 };
 
 
-return (
+return(
 
 <div>
 
@@ -187,7 +302,7 @@ return (
 value={name}
 placeholder="Hotel Name"
 className="border p-2 w-full mb-3"
-onChange={(e) => setName(e.target.value)}
+onChange={(e)=>setName(e.target.value)}
 />
 
 
@@ -195,7 +310,7 @@ onChange={(e) => setName(e.target.value)}
 value={location}
 placeholder="Location"
 className="border p-2 w-full mb-3"
-onChange={(e) => setLocation(e.target.value)}
+onChange={(e)=>setLocation(e.target.value)}
 />
 
 
@@ -203,7 +318,7 @@ onChange={(e) => setLocation(e.target.value)}
 value={price}
 placeholder="Price"
 className="border p-2 w-full mb-3"
-onChange={(e) => setPrice(e.target.value)}
+onChange={(e)=>setPrice(e.target.value)}
 />
 
 
@@ -215,21 +330,36 @@ onChange={(e)=>setDiscountPrice(e.target.value)}
 />
 
 
-{/* multiple images */}
-
 <input
 type="file"
 multiple
+accept="image/*"
 className="border p-2 w-full mb-3"
 onChange={handleImageUpload}
 />
+
+
+<div className="flex gap-2 flex-wrap mb-4">
+
+{previewImages.map((img,index)=>(
+
+<img
+key={index}
+src={img}
+alt="preview"
+className="w-20 h-20 object-cover rounded"
+/>
+
+))}
+
+</div>
 
 
 <input
 value={description}
 placeholder="Description"
 className="border p-2 w-full mb-3"
-onChange={(e) => setDescription(e.target.value)}
+onChange={(e)=>setDescription(e.target.value)}
 />
 
 
@@ -238,7 +368,7 @@ onChange={(e) => setDescription(e.target.value)}
 <input
 type="checkbox"
 checked={isBestSeller}
-onChange={(e) =>
+onChange={(e)=>
 setIsBestSeller(e.target.checked)
 }
 />
@@ -253,7 +383,7 @@ Best Seller
 <input
 type="checkbox"
 checked={isOffer}
-onChange={(e) =>
+onChange={(e)=>
 setIsOffer(e.target.checked)
 }
 />
@@ -275,12 +405,24 @@ className="bg-green-600 text-white px-6 py-2 rounded"
 </div>
 
 
-{hotels.map(hotel => (
+{hotels.map(hotel=>(
 
 <div
 key={hotel.id}
 className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
 >
+
+<div className="flex items-center gap-4">
+
+{hotel.images?.length>0 &&(
+
+<img
+src={hotel.images[0]}
+alt="hotel"
+className="w-16 h-16 object-cover rounded"
+/>
+
+)}
 
 <div>
 
@@ -290,7 +432,6 @@ className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
 
 </h3>
 
-
 <p className="text-gray-500">
 
 ${hotel.price}
@@ -299,11 +440,13 @@ ${hotel.price}
 
 </div>
 
+</div>
+
 
 <div className="flex gap-2">
 
 <button
-onClick={() => handleEdit(hotel)}
+onClick={()=>handleEdit(hotel)}
 className="bg-yellow-500 text-white px-4 py-2 rounded"
 >
 
@@ -313,7 +456,7 @@ Edit
 
 
 <button
-onClick={() => handleDelete(hotel.id)}
+onClick={()=>handleDelete(hotel.id)}
 className="bg-red-600 text-white px-4 py-2 rounded"
 >
 

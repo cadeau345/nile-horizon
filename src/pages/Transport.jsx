@@ -4,432 +4,431 @@ import { collection, getDocs } from "firebase/firestore";
 
 import { db } from "../firebase";
 
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+
 import { Helmet } from "react-helmet-async";
+
 
 function Transport() {
 
-  const [transport, setTransport] = useState([]);
+const [searchParams]=useSearchParams();
 
-  const [filter, setFilter] = useState("All");
+const [transport,setTransport]=useState([]);
 
-const [_date, setDate] = useState("")
+const [filter,setFilter]=useState("All");
 
-  const [returnDate, setReturnDate] = useState("");
+const [date,setDate]=useState("");
 
-  const [passengers, setPassengers] = useState("");
-  const [searchClicked, setSearchClicked] = useState(true);
+const [returnDate,setReturnDate]=useState("");
 
-  const [tripType, setTripType] = useState("oneway");
+const [passengers,setPassengers]=useState("");
 
-  const [direction, setDirection] = useState("aswan-cairo");
+const [searchClicked,setSearchClicked]=useState(true);
 
+const [tripType,setTripType]=useState("oneway");
 
-  useEffect(() => {
+const [direction,setDirection]=useState("aswan-cairo");
 
-    const fetchTransport = async () => {
 
-      const querySnapshot = await getDocs(
-        collection(db, "transport")
-      );
 
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+/*
+============================
+قراءة بيانات البحث من الرابط
+============================
+*/
 
-      setTransport(data);
+useEffect(()=>{
 
-    };
+const urlDirection=searchParams.get("direction");
 
-    fetchTransport();
+const urlDate=searchParams.get("date");
 
-  }, []);
+const urlReturnDate=searchParams.get("returnDate");
 
+const urlPassengers=searchParams.get("passengers");
 
-  const filteredTransport =
 
-    filter === "All"
+if(urlDirection)setDirection(urlDirection);
 
-      ? transport
+if(urlDate)setDate(urlDate);
 
-      : transport.filter(item =>
-          item.type.toLowerCase().includes(
-            filter.toLowerCase()
-          )
-        );
+if(urlReturnDate)setReturnDate(urlReturnDate);
 
+if(urlPassengers)setPassengers(urlPassengers);
 
-  return (
+},[searchParams]);
 
-    <div className="p-10">
 
-      <Helmet>
 
-        <title>
+/*
+============================
+تحميل البيانات
+============================
+*/
 
-          Transport Booking | Aswan ⇄ Cairo Bus Train Private Car
+useEffect(()=>{
 
-        </title>
+const fetchTransport=async()=>{
 
-        <meta
+const querySnapshot=await getDocs(
+collection(db,"transport")
+);
 
-          name="description"
+const data=querySnapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
 
-          content="Book transport between Aswan and Cairo by bus, train or private car with flexible one-way or round-trip options."
+setTransport(data);
 
-        />
+};
 
-      </Helmet>
+fetchTransport();
 
+},[]);
 
-      <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-        {direction === "aswan-cairo"
 
-          ? "Aswan → Cairo Transport"
+/*
+============================
+فلترة حسب النوع
+============================
+*/
 
-          : "Cairo → Aswan Transport"}
+const filteredTransport = transport
+.filter(item => {
 
-      </h1>
+if(direction === "aswan-cairo"){
 
+return (
+item.from?.toLowerCase() === "aswan" &&
+item.to?.toLowerCase() === "cairo"
+);
 
-      {/* Direction Buttons */}
+}
 
-      <div className="flex gap-3 mb-6 flex-wrap">
+if(direction === "cairo-aswan"){
 
-        <button
+return (
+item.from?.toLowerCase() === "cairo" &&
+item.to?.toLowerCase() === "aswan"
+);
 
-          onClick={() => setDirection("aswan-cairo")}
+}
 
-          className={`px-4 py-2 rounded ${
+return true;
 
-            direction === "aswan-cairo"
+})
+.filter(item => {
 
-              ? "bg-blue-900 text-white"
+if(filter === "All") return true;
 
-              : "bg-gray-200"
+return item.type
+?.toLowerCase()
+.includes(filter.toLowerCase());
 
-          }`}
+});
 
-        >
 
-          Aswan → Cairo
 
-        </button>
+return(
 
+<div className="p-10">
 
-        <button
+<Helmet>
 
-          onClick={() => setDirection("cairo-aswan")}
+<title>
 
-          className={`px-4 py-2 rounded ${
+Transport Booking | Aswan ⇄ Cairo Bus Train Private Car
 
-            direction === "cairo-aswan"
+</title>
 
-              ? "bg-blue-900 text-white"
+<meta
 
-              : "bg-gray-200"
+name="description"
 
-          }`}
+content="Book transport between Aswan and Cairo by bus, train or private car with flexible one-way or round-trip options."
 
-        >
+/>
 
-          Cairo → Aswan
+</Helmet>
 
-        </button>
 
-      </div>
 
+<h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-      {/* Trip Type Buttons */}
+{direction==="aswan-cairo"
 
-      <div className="flex gap-3 mb-6 flex-wrap">
+?"Aswan → Cairo Transport"
 
-        <button
+:"Cairo → Aswan Transport"}
 
-          onClick={() => setTripType("oneway")}
+</h1>
 
-          className={`px-4 py-2 rounded ${
 
-            tripType === "oneway"
 
-              ? "bg-orange-500 text-white"
+{/* Direction Buttons */}
 
-              : "bg-gray-200"
+<div className="flex gap-3 mb-6 flex-wrap">
 
-          }`}
+<button
 
-        >
+onClick={()=>setDirection("aswan-cairo")}
 
-          One Way
+className={`px-4 py-2 rounded ${
+direction==="aswan-cairo"
+?"bg-blue-900 text-white"
+:"bg-gray-200"
+}`}
+>
 
-        </button>
+Aswan → Cairo
 
+</button>
 
-        <button
 
-          onClick={() => setTripType("roundtrip")}
+<button
 
-          className={`px-4 py-2 rounded ${
+onClick={()=>setDirection("cairo-aswan")}
 
-            tripType === "roundtrip"
+className={`px-4 py-2 rounded ${
+direction==="cairo-aswan"
+?"bg-blue-900 text-white"
+:"bg-gray-200"
+}`}
+>
 
-              ? "bg-orange-500 text-white"
+Cairo → Aswan
 
-              : "bg-gray-200"
+</button>
 
-          }`}
+</div>
 
-        >
 
-          Round Trip
 
-        </button>
+{/* Trip Type */}
 
-      </div>
+<div className="flex gap-3 mb-6 flex-wrap">
 
+<button
 
-      {/* Search Bar */}
+onClick={()=>setTripType("oneway")}
 
-      <div className="bg-gray-100 p-6 rounded-xl mb-8 flex flex-wrap gap-4">
+className={`px-4 py-2 rounded ${
+tripType==="oneway"
+?"bg-orange-500 text-white"
+:"bg-gray-200"
+}`}
+>
 
-        <input
+One Way
 
-          type="date"
+</button>
 
-          lang="en"
 
-          className="border p-2 rounded"
+<button
 
-          onChange={(e) => setDate(e.target.value)}
+onClick={()=>setTripType("roundtrip")}
 
-        />
+className={`px-4 py-2 rounded ${
+tripType==="roundtrip"
+?"bg-orange-500 text-white"
+:"bg-gray-200"
+}`}
+>
 
+Round Trip
 
-        {tripType === "roundtrip" && (
+</button>
 
-          <input
+</div>
 
-            type="date"
 
-            lang="en"
 
-            className="border p-2 rounded"
+{/* Search Box */}
 
-            placeholder="Return date"
+<div className="bg-gray-100 p-6 rounded-xl mb-8 flex flex-wrap gap-4">
 
-            onChange={(e) => setReturnDate(e.target.value)}
+<input
 
-          />
+type="date"
 
-        )}
+className="border p-2 rounded"
 
+value={date}
 
-        <input
+onChange={(e)=>setDate(e.target.value)}
 
-          type="number"
+/>
 
-          placeholder="Passengers"
 
-          className="border p-2 rounded"
+{tripType==="roundtrip"&&(
 
-          onChange={(e) => setPassengers(e.target.value)}
+<input
 
-        />
+type="date"
 
+className="border p-2 rounded"
 
-        <button
+value={returnDate}
 
-          onClick={() => setSearchClicked(true)}
+onChange={(e)=>setReturnDate(e.target.value)}
 
-          className="bg-blue-900 text-white px-6 py-2 rounded"
+/>
 
-        >
+)}
 
-          Search
 
-        </button>
+<input
 
-      </div>
+type="number"
 
+placeholder="Passengers"
 
-      {/* Filter Buttons */}
+className="border p-2 rounded"
 
-      <div className="flex gap-3 mb-8 flex-wrap">
+value={passengers}
 
-        <button
+onChange={(e)=>setPassengers(e.target.value)}
 
-          onClick={() => setFilter("All")}
+/>
 
-          className={`px-4 py-2 rounded ${
 
-            filter === "All"
+<button
 
-              ? "bg-blue-900 text-white"
+onClick={()=>setSearchClicked(true)}
 
-              : "bg-gray-200"
+className="bg-blue-900 text-white px-6 py-2 rounded"
 
-          }`}
+>
 
-        >
+Search
 
-          All
+</button>
 
-        </button>
+</div>
 
 
-        <button
 
-          onClick={() => setFilter("Bus")}
+{/* Filters */}
 
-          className={`px-4 py-2 rounded ${
+<div className="flex gap-3 mb-8 flex-wrap">
 
-            filter === "Bus"
+{["All","Bus","Train","Car"].map(type=>(
 
-              ? "bg-blue-900 text-white"
+<button
 
-              : "bg-gray-200"
+key={type}
 
-          }`}
+onClick={()=>setFilter(type)}
 
-        >
+className={`px-4 py-2 rounded ${
+filter===type
+?"bg-blue-900 text-white"
+:"bg-gray-200"
+}`}
+>
 
-          Bus
+{type==="Car"?"Private Car":type}
 
-        </button>
+</button>
 
+))}
 
-        <button
+</div>
 
-          onClick={() => setFilter("Train")}
 
-          className={`px-4 py-2 rounded ${
 
-            filter === "Train"
+{/* Results */}
 
-              ? "bg-blue-900 text-white"
+{!searchClicked?(
 
-              : "bg-gray-200"
+<p className="text-gray-500 mb-6">
 
-          }`}
+Please select trip details then click search
 
-        >
+</p>
 
-          Train
+):( 
 
-        </button>
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+{filteredTransport.map(item=>(
 
-        <button
+<Link key={item.id} to={`/transport/${item.id}`}>
 
-          onClick={() => setFilter("Car")}
+<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
-          className={`px-4 py-2 rounded ${
+<img
 
-            filter === "Car"
+src={
+item.images?.[0] ||
+item.image ||
+"/placeholder.jpg"
+}
 
-              ? "bg-blue-900 text-white"
+alt={item.company}
 
-              : "bg-gray-200"
+className="h-52 w-full object-cover"
 
-          }`}
+/>
 
-        >
 
-          Private Car
+<div className="p-4">
 
-        </button>
+<h2 className="text-xl font-bold">
 
-      </div>
+{item.company}
 
+</h2>
 
-      {/* Results */}
 
-      {!searchClicked ? (
+<p className="text-gray-500">
 
-        <p className="text-gray-500 mb-6">
+{direction==="aswan-cairo"
 
-          Please select trip type, direction, date and passengers then click search
+?"Aswan → Cairo"
 
-        </p>
+:"Cairo → Aswan"}
 
-      ) : (
+</p>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {filteredTransport.map(item => (
+<p className="text-gray-600">
 
-            <Link
+{item.type}
 
-              key={item.id}
+</p>
 
-              to={`/transport/${item.id}`}
 
-            >
+<p className="text-orange-500 font-bold mt-2">
 
-              <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
+${item.price} / seat
 
-             <img src={item.image} alt={item.name} />
-             
+</p>
 
 
-                <div className="p-4">
+<button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
 
-                  <h2 className="text-xl font-bold">
-                    
+View Details
 
-                    {item.company}
+</button>
 
-                  </h2>
+</div>
 
+</div>
 
-                  <p className="text-gray-500">
+</Link>
 
-                    {direction === "aswan-cairo"
+))}
 
-                      ? "Aswan → Cairo"
+</div>
 
-                      : "Cairo → Aswan"}
+)}
 
-                  </p>
+</div>
 
-
-                  <p className="text-gray-600">
-
-                    {item.type}
-
-                  </p>
-
-
-                  <p className="text-orange-500 font-bold mt-2">
-
-                    ${item.price} / seat
-
-                  </p>
-
-
-                  <button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
-
-                    View Details
-
-                  </button>
-
-                </div>
-
-              </div>
-
-            </Link>
-
-          ))}
-
-        </div>
-
-      )}
-
-    </div>
-
-  );
+);
 
 }
 

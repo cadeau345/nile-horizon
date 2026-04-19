@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -14,258 +14,377 @@ import { db } from "../firebase";
 
 function AddTransport() {
 
-  const [transport, setTransport] = useState([]);
+const [transport,setTransport]=useState([]);
 
-  const [editingId, setEditingId] = useState(null);
+const [editingId,setEditingId]=useState(null);
 
-  const [company, setCompany] = useState("");
+const [company,setCompany]=useState("");
 
-  const [from, setFrom] = useState("");
+const [from,setFrom]=useState("");
 
-  const [to, setTo] = useState("");
+const [to,setTo]=useState("");
 
-  const [type, setType] = useState("");
+const [type,setType]=useState("");
 
-  const [price, setPrice] = useState("");
+const [price,setPrice]=useState("");
 
-  const [image, setImage] = useState("");
+const [image,setImage]=useState("");
 
-  const [images, setImages] = useState([]); // جديد
+const [images,setImages]=useState([]);
 
-  const [isBestSeller,setIsBestSeller]=useState(false);
+const [previewImages,setPreviewImages]=useState([]);
 
-  const [isOffer,setIsOffer]=useState(false);
+const [isBestSeller,setIsBestSeller]=useState(false);
 
-
-  const fetchTransport = async () => {
-
-    const snapshot = await getDocs(
-      collection(db, "transport")
-    );
-
-    setTransport(
-
-      snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-
-    );
-
-  };
+const [isOffer,setIsOffer]=useState(false);
 
 
-  useEffect(() => {
 
-    fetchTransport();
+/*
+============================
+ضغط الصور تلقائيًا
+============================
+*/
 
-  }, []);
+const compressImage=(file)=>{
 
+return new Promise((resolve)=>{
 
-  // رفع صور متعددة
+const reader=new FileReader();
 
-  const handleImageUpload = (e) => {
+reader.readAsDataURL(file);
 
-    const files = Array.from(e.target.files);
+reader.onload=(event)=>{
 
-    if (!files.length) return;
+const img=new Image();
 
-    const readers = [];
+img.src=event.target.result;
 
-    files.forEach((file) => {
+img.onload=()=>{
 
-      const reader = new FileReader();
+const canvas=document.createElement("canvas");
 
-      reader.onloadend = () => {
+const maxWidth=800;
 
-        readers.push(reader.result);
+const scale=maxWidth/img.width;
 
-        if (readers.length === files.length) {
+canvas.width=maxWidth;
 
-          setImages(readers);
+canvas.height=img.height*scale;
 
-          setImage(readers[0]); // توافق مع القديم
+const ctx=canvas.getContext("2d");
 
-        }
+ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
-      };
+const compressed=canvas.toDataURL("image/jpeg",0.6);
 
-      reader.readAsDataURL(file);
+resolve(compressed);
 
-    });
+};
 
-  };
+};
 
-
-  const handleSubmit = async () => {
-
-    if (editingId) {
-
-      await updateDoc(doc(db, "transport", editingId), {
-
-        company,
-
-        from,
-
-        to,
-
-        type,
-
-        price,
-
-        image,
-
-        images,
-
-        isBestSeller,
-
-        isOffer
-
-      });
-
-      setEditingId(null);
-
-    } else {
-
- await addDoc(collection(db, "transport"), {
-  company,
-  price,
-  image,
-  images,
-  from,
-  to,
-  type,
-  isBestSeller,
-  isOffer
 });
 
-    }
+};
 
 
-    // Reset form
 
-    setCompany("");
-    setFrom("");
-    setTo("");
-    setType("");
-    setPrice("");
-    setImage("");
-    setImages([]);
-    setIsBestSeller(false);
-    setIsOffer(false);
+/*
+============================
+تحميل البيانات
+============================
+*/
 
+const fetchTransport=async()=>{
 
-    fetchTransport();
+const snapshot=await getDocs(
+collection(db,"transport")
+);
 
-  };
+setTransport(
 
+snapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}))
 
-  const handleDelete = async (id) => {
+);
 
-    await deleteDoc(doc(db, "transport", id));
-
-    fetchTransport();
-
-  };
+};
 
 
-  const handleEdit = (item) => {
+useEffect(()=>{
 
-    setEditingId(item.id);
+fetchTransport();
 
-    setCompany(item.company);
-
-    setFrom(item.from);
-
-    setTo(item.to);
-
-    setType(item.type);
-
-    setPrice(item.price);
-
-    setImage(item.image);
-
-    setImages(item.images || []);
-
-    setIsBestSeller(item.isBestSeller || false);
-
-    setIsOffer(item.isOffer || false);
-
-  };
+},[]);
 
 
-  return (
 
-    <div>
+/*
+============================
+رفع الصور
+============================
+*/
 
-      <div className="bg-gray-100 p-6 rounded-xl mb-10">
+const handleImageUpload=async(e)=>{
 
-        <h2 className="text-xl font-bold mb-4">
-
-          {editingId ? "Edit Transport" : "Add Transport"}
-
-        </h2>
-
-
-        <input
-          value={company}
-          placeholder="Company Name"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setCompany(e.target.value)}
-        />
+const files=Array.from(e.target.files);
 
 
-        <input
-          value={from}
-          placeholder="From"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setFrom(e.target.value)}
-        />
+// حد أقصى 10 صور
+
+if(images.length+files.length>10){
+
+alert("Maximum 10 images allowed");
+
+return;
+
+}
 
 
-        <input
-          value={to}
-          placeholder="To"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setTo(e.target.value)}
-        />
+const compressedImages=await Promise.all(
+
+files.map(file=>compressImage(file))
+
+);
 
 
-        <input
-          value={type}
-          placeholder="Type (Bus / Train / Car)"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setType(e.target.value)}
-        />
+setImages(prev=>[...prev,...compressedImages]);
+
+setPreviewImages(prev=>[...prev,...compressedImages]);
+
+setImage(compressedImages[0]||image);
+
+};
 
 
-        <input
-          value={price}
-          placeholder="Price"
-          className="border p-2 w-full mb-3"
-          onChange={(e) => setPrice(e.target.value)}
-        />
+
+/*
+============================
+إضافة / تعديل
+============================
+*/
+
+const handleSubmit=async()=>{
+
+if(!company||!from||!to||!price){
+
+alert("Please fill required fields");
+
+return;
+
+}
 
 
-        <input
-          type="file"
-          multiple
-          className="border p-2 w-full mb-3"
-          onChange={handleImageUpload}
-        />
+if(editingId){
+
+await updateDoc(
+
+doc(db,"transport",editingId),
+
+{
+company,
+from,
+to,
+type,
+price,
+image,
+images,
+isBestSeller,
+isOffer
+}
+
+);
+
+setEditingId(null);
+
+}
+
+else{
+
+await addDoc(
+
+collection(db,"transport"),
+
+{
+company,
+from,
+to,
+type,
+price,
+image,
+images,
+isBestSeller,
+isOffer
+}
+
+);
+
+}
 
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded"
-        >
-          {editingId ? "Update Transport" : "Add Transport"}
-        </button>
+// reset form
 
-      </div>
+setCompany("");
+
+setFrom("");
+
+setTo("");
+
+setType("");
+
+setPrice("");
+
+setImage("");
+
+setImages([]);
+
+setPreviewImages([]);
+
+setIsBestSeller(false);
+
+setIsOffer(false);
 
 
-      <label className="flex gap-2 mb-2">
+fetchTransport();
+
+};
+
+
+
+/*
+============================
+حذف
+============================
+*/
+
+const handleDelete=async(id)=>{
+
+await deleteDoc(doc(db,"transport",id));
+
+fetchTransport();
+
+};
+
+
+
+/*
+============================
+تعديل
+============================
+*/
+
+const handleEdit=(item)=>{
+
+setEditingId(item.id);
+
+setCompany(item.company);
+
+setFrom(item.from);
+
+setTo(item.to);
+
+setType(item.type);
+
+setPrice(item.price);
+
+setImage(item.image||"");
+
+setImages(item.images||[]);
+
+setPreviewImages(item.images||[]);
+
+setIsBestSeller(item.isBestSeller||false);
+
+setIsOffer(item.isOffer||false);
+
+};
+
+
+
+return(
+
+<div>
+
+<div className="bg-gray-100 p-6 rounded-xl mb-10">
+
+<h2 className="text-xl font-bold mb-4">
+
+{editingId?"Edit Transport":"Add Transport"}
+
+</h2>
+
+
+<input
+value={company}
+placeholder="Company Name"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setCompany(e.target.value)}
+/>
+
+
+<input
+value={from}
+placeholder="From"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setFrom(e.target.value)}
+/>
+
+
+<input
+value={to}
+placeholder="To"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setTo(e.target.value)}
+/>
+
+
+<input
+value={type}
+placeholder="Type (Bus / Train / Car)"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setType(e.target.value)}
+/>
+
+
+<input
+value={price}
+placeholder="Price"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setPrice(e.target.value)}
+/>
+
+
+<input
+type="file"
+multiple
+accept="image/*"
+className="border p-2 w-full mb-3"
+onChange={handleImageUpload}
+/>
+
+
+{/* preview */}
+
+<div className="flex gap-2 flex-wrap mb-4">
+
+{previewImages.map((img,index)=>(
+
+<img
+key={index}
+src={img}
+alt="preview"
+className="w-20 h-20 object-cover rounded"
+/>
+
+))}
+
+</div>
+
+
+<label className="flex gap-2 mb-2">
 
 <input
 type="checkbox"
@@ -291,58 +410,91 @@ Special Offer
 </label>
 
 
-      {transport.map(item => (
+<button
+onClick={handleSubmit}
+className="bg-green-600 text-white px-6 py-2 rounded"
+>
 
-        <div
-          key={item.id}
-          className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
-        >
+{editingId?"Update Transport":"Add Transport"}
 
-          <div>
+</button>
 
-            <h3 className="font-bold">
-
-              {item.company}
-
-            </h3>
+</div>
 
 
-            <p className="text-gray-500">
 
-              {item.type} — ${item.price}
+{/* عرض البيانات */}
 
-            </p>
+{transport.map(item=>(
 
-          </div>
+<div
+key={item.id}
+className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
+>
+
+<div className="flex items-center gap-4">
+
+{item.images?.length>0&&(
+
+<img
+src={item.images[0]}
+className="w-16 h-16 object-cover rounded"
+alt=""
+/>
+
+)}
+
+<div>
+
+<h3 className="font-bold">
+
+{item.company}
+
+</h3>
+
+<p className="text-gray-500">
+
+{item.type} — ${item.price}
+
+</p>
+
+</div>
+
+</div>
 
 
-          <div className="flex gap-2">
+<div className="flex gap-2">
 
-            <button
-              onClick={() => handleEdit(item)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              Edit
-            </button>
+<button
+onClick={()=>handleEdit(item)}
+className="bg-yellow-500 text-white px-4 py-2 rounded"
+>
+
+Edit
+
+</button>
 
 
-            <button
-              onClick={() => handleDelete(item.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-              Delete
-            </button>
+<button
+onClick={()=>handleDelete(item.id)}
+className="bg-red-600 text-white px-4 py-2 rounded"
+>
 
-          </div>
+Delete
 
-        </div>
+</button>
 
-      ))}
+</div>
 
-    </div>
+</div>
 
-  );
+))}
+
+</div>
+
+);
 
 }
+
 
 export default AddTransport;

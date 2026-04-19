@@ -16,43 +16,36 @@ function Admin() {
 const navigate = useNavigate();
 
 const [tab, setTab] = useState("hotel");
-const [loading, setLoading] = useState(true); // مهم جدًا
+const [loading, setLoading] = useState(true);
 
 
-// حماية صفحة الأدمن بشكل صحيح
+// حماية صفحة الأدمن
 
 useEffect(() => {
 
 const unsubscribe = onAuthStateChanged(auth, (user) => {
 
 if (!user) {
-
 navigate("/customer-login");
 return;
-
 }
 
-
-// ضع هنا إيميل الأدمن الحقيقي فقط
-
+// ايميل الأدمن الوحيد
 if (user.email !== "cadeau200510@gmail.com") {
-
 navigate("/");
 return;
-
 }
 
-setLoading(false); // المستخدم صحيح
+setLoading(false);
 
 });
-
 
 return () => unsubscribe();
 
 }, [navigate]);
 
 
-// Logout function
+// تسجيل خروج الأدمن
 
 const handleLogout = async () => {
 
@@ -63,7 +56,7 @@ navigate("/customer-login");
 };
 
 
-// منع ظهور الصفحة قبل التحقق من المستخدم
+// منع تحميل الصفحة قبل التحقق
 
 if (loading) {
 
@@ -74,6 +67,17 @@ Loading Admin Dashboard...
 );
 
 }
+
+
+const tabs = [
+{ id: "hotel", label: "Add Hotel" },
+{ id: "transport", label: "Add Transport" },
+{ id: "trip", label: "Add Trip" },
+{ id: "package", label: "Add Package" },
+{ id: "temple", label: "Add Temple" },
+{ id: "bookings", label: "Bookings" },
+{ id: "users", label: "Users" }
+];
 
 
 return (
@@ -87,13 +91,6 @@ Admin Dashboard
 </h1>
 
 <button
-onClick={()=>setTab("users")}
-className="bg-purple-600 text-white px-4 py-2 rounded"
->
-Users
-</button>
-
-<button
 onClick={handleLogout}
 className="bg-red-600 text-white px-4 py-2 rounded"
 >
@@ -105,47 +102,23 @@ Logout
 
 <div className="flex gap-4 mb-8 flex-wrap">
 
-<button
-onClick={() => setTab("hotel")}
-className="bg-blue-900 text-white px-4 py-2 rounded"
->
-Add Hotel
-</button>
+{tabs.map((item) => (
 
 <button
-onClick={() => setTab("transport")}
-className="bg-blue-900 text-white px-4 py-2 rounded"
+key={item.id}
+onClick={() => setTab(item.id)}
+className={`px-4 py-2 rounded text-white ${
+tab === item.id
+? "bg-indigo-600"
+: "bg-blue-900"
+}`}
 >
-Add Transport
+
+{item.label}
+
 </button>
 
-<button
-onClick={() => setTab("trip")}
-className="bg-blue-900 text-white px-4 py-2 rounded"
->
-Add Trip
-</button>
-
-<button
-onClick={() => setTab("package")}
-className="bg-blue-900 text-white px-4 py-2 rounded"
->
-Add Package
-</button>
-
-<button
-onClick={() => setTab("temple")}
-className="bg-blue-900 text-white px-4 py-2 rounded"
->
-Add Temple
-</button>
-
-<button
-onClick={() => setTab("bookings")}
-className="bg-indigo-600 text-white px-4 py-2 rounded"
->
-Bookings
-</button>
+))}
 
 </div>
 
