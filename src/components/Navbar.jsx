@@ -99,46 +99,13 @@ setUser(null);
 const isHome = location.pathname === "/";
 
 
-// DROPDOWNS
-
-const dropdownMenus={
-
-hotels:[
-
-{label:"Luxury Hotels",link:"/hotels?type=luxury"},
-
-{label:"Budget Hotels",link:"/hotels?type=budget"},
-
-{label:"Nile View Hotels",link:"/hotels?view=nile"}
-
-],
-
-trips:[
-
-{label:"Daily Trips",link:"/trips?type=daily"},
-
-{label:"Nile Cruise",link:"/trips?type=cruise"},
-
-{label:"Historical Tours",link:"/trips?type=history"}
-
-],
-
-transport:[
-
-{label:"Airport Transfer",link:"/transport?type=airport"},
-
-{label:"Private Car",link:"/transport?type=private"},
-
-{label:"Bus Booking",link:"/transport?type=bus"}
-
-]
-
-};
-
-
 return(
 
-<nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isHome?"bg-transparent":"bg-white shadow"}`}>
+<nav className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
+isHome
+? "bg-transparent text-white"
+: "bg-white shadow text-gray-800"
+}`}>
 
 <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
@@ -228,7 +195,7 @@ activeDropdown==="user"
 
 activeDropdown==="user" && (
 
-<div className="absolute right-0 top-8 bg-white shadow-xl rounded-xl p-4 space-y-2 min-w-[150px]">
+<div className="absolute right-0 top-8 bg-white shadow-xl rounded-xl p-4 space-y-2 min-w-[150px] text-gray-800">
 
 {
 
@@ -238,17 +205,9 @@ user
 
 <>
 
-<Link to="/profile">
+<Link to="/profile">Profile</Link>
 
-Profile
-
-</Link>
-
-<Link to="/my-bookings">
-
-My Bookings
-
-</Link>
+<Link to="/my-bookings">My Bookings</Link>
 
 <div
 
@@ -268,17 +227,9 @@ Logout
 
 <>
 
-<Link to="/login">
+<Link to="/login">Login</Link>
 
-Login
-
-</Link>
-
-<Link to="/register">
-
-Register
-
-</Link>
+<Link to="/register">Register</Link>
 
 </>
 
@@ -299,32 +250,50 @@ Register
 
 {/* MOBILE RIGHT SIDE */}
 
-<div className="lg:hidden flex items-center justify-end gap-2 min-w-[140px]">
+<div className="lg:hidden flex items-center gap-2">
 
 
-{/* LOGIN REGISTER BUTTONS */}
+{/* LOGIN REGISTER */}
 
 {
 
 !user && (
+
 <div className="flex items-center gap-2">
 
 <Link
+
 to="/login"
-className="text-xs font-medium whitespace-nowrap"
+
+className={`text-xs font-semibold px-2 py-1 rounded ${
+isHome
+? "text-white bg-black/40"
+: "text-gray-800"
+}`}
+
 >
+
 Login
+
 </Link>
 
 <Link
+
 to="/register"
-className="bg-indigo-600 text-white px-2 py-1 rounded-md text-xs whitespace-nowrap"
+
+className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-md text-xs"
+
 >
+
 Register
+
 </Link>
 
 </div>
-)}
+
+)
+
+}
 
 
 {/* PROFILE ICON */}
@@ -351,7 +320,6 @@ activeDropdown==="user"
 
 )
 
-
 }
 
 
@@ -360,6 +328,8 @@ activeDropdown==="user"
 <button
 
 onClick={()=>setIsOpen(!isOpen)}
+
+className="ml-1"
 
 >
 
@@ -392,32 +362,32 @@ isOpen
 
 isOpen && (
 
-<div className="lg:hidden bg-white shadow-lg px-6 pb-6 space-y-4">
+<div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg px-6 py-4 space-y-4 text-gray-800">
 
-<Link to="/">Home</Link>
+<Link to="/" onClick={()=>setIsOpen(false)}>Home</Link>
 
-<Link to="/hotels">Hotels</Link>
+<Link to="/hotels" onClick={()=>setIsOpen(false)}>Hotels</Link>
 
-<Link to="/transport">Transport</Link>
+<Link to="/transport" onClick={()=>setIsOpen(false)}>Transport</Link>
 
-<Link to="/trips">Trips</Link>
+<Link to="/trips" onClick={()=>setIsOpen(false)}>Trips</Link>
 
-<Link to="/offers">Offers</Link>
+<Link to="/offers" onClick={()=>setIsOpen(false)}>Offers</Link>
 
-<Link to="/about">About Aswan</Link>
+<Link to="/about" onClick={()=>setIsOpen(false)}>About Aswan</Link>
 
-<Link to="/contact">Contact</Link>
+<Link to="/contact" onClick={()=>setIsOpen(false)}>Contact</Link>
 
-<Link to="/temples">Temples</Link>
+<Link to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
 
-<Link to="/flights">Flights</Link>
+<Link to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
 
 
 {
 
 isAdmin && (
 
-<Link to="/admin">
+<Link to="/admin" onClick={()=>setIsOpen(false)}>
 
 <button className="bg-indigo-600 text-white w-full py-2 rounded-xl">
 
