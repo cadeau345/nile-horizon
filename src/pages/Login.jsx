@@ -2,8 +2,10 @@ import { useState } from "react";
 
 import {
 signInWithEmailAndPassword,
-reload,
-sendEmailVerification
+GoogleAuthProvider,
+signInWithPopup,
+sendPasswordResetEmail,
+reload
 } from "firebase/auth";
 
 import { auth, db } from "../firebase";
@@ -20,79 +22,108 @@ const [password,setPassword]=useState("");
 
 const navigate = useNavigate();
 
+const provider = new GoogleAuthProvider();
+
+
+// LOGIN EMAIL + PASSWORD
 
 const handleLogin = async () => {
 
 try {
 
-const userCredential =
-
-await signInWithEmailAndPassword(
+const userCredential = await signInWithEmailAndPassword(
 auth,
 email,
 password
 );
 
-
-// تحديث بيانات المستخدم
-
 await reload(userCredential.user);
 
 
-// لو الحساب غير مفعل
+// CHECK EMAIL VERIFIED
 
 if(!userCredential.user.emailVerified){
 
-await sendEmailVerification(userCredential.user);
-
-alert("Verification email sent again 📩");
+alert("Please verify your email first 📩");
 
 return;
 
 }
 
 
-// التحقق من أنه Admin
+// CHECK ADMIN ROLE
 
-const docRef = doc(
-db,
-"users",
-userCredential.user.uid
-);
+const docRef = doc(db,"users",userCredential.user.uid);
 
 const docSnap = await getDoc(docRef);
 
 
-if(!docSnap.exists()){
-
-alert("User data not found");
-
-return;
-
-}
-
-
-if(docSnap.data().role !== "admin"){
-
-alert("Access denied. Admin only.");
-
-return;
-
-}
-
-
-// دخول لوحة التحكم
+if(docSnap.exists() && docSnap.data().role === "admin"){
 
 navigate("/admin");
 
+}else{
 
-} catch(error) {
+navigate("/");
 
-console.log(error);
+}
+
+}catch(error){
 
 alert("Wrong email or password");
 
 }
+
+};
+
+
+// LOGIN WITH GOOGLE
+
+const loginWithGoogle = async () => {
+
+try{
+
+const result = await signInWithPopup(auth,provider);
+
+const docRef = doc(db,"users",result.user.uid);
+
+const docSnap = await getDoc(docRef);
+
+
+if(docSnap.exists() && docSnap.data().role === "admin"){
+
+navigate("/admin");
+
+}else{
+
+navigate("/");
+
+}
+
+}catch(error){
+
+console.log(error);
+
+}
+
+};
+
+
+// FORGOT PASSWORD
+
+const forgotPassword = async () => {
+
+if(!email){
+
+alert("Enter your email first");
+
+return;
+
+}
+
+await sendPasswordResetEmail(auth,email);
+
+alert("Password reset email sent 📩");
 
 };
 
@@ -105,7 +136,7 @@ return(
 
 <h2 className="text-2xl font-bold mb-6 text-center">
 
-Admin Login
+Login
 
 </h2>
 
@@ -127,12 +158,33 @@ onChange={(e)=>setPassword(e.target.value)}
 
 <button
 onClick={handleLogin}
-className="bg-blue-900 hover:bg-blue-800 text-white w-full py-2 rounded transition"
+className="bg-blue-900 text-white w-full py-2 rounded mb-3"
 >
 
 Login
 
 </button>
+
+
+<button
+onClick={loginWithGoogle}
+className="bg-red-500 text-white w-full py-2 rounded mb-3"
+>
+
+Login with Google
+
+</button>
+
+
+<button
+onClick={forgotPassword}
+className="text-blue-600 underline text-sm"
+>
+
+Forgot Password?
+
+</button>
+
 
 </div>
 

@@ -1,13 +1,25 @@
 import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import { auth, db } from "../firebase";
 
 import {
+
 createUserWithEmailAndPassword,
-sendEmailVerification
+sendEmailVerification,
+GoogleAuthProvider,
+signInWithPopup
+
 } from "firebase/auth";
 
-import { doc, setDoc } from "firebase/firestore";
+import {
+
+doc,
+setDoc,
+getDoc
+
+} from "firebase/firestore";
 
 
 export default function Register(){
@@ -17,10 +29,10 @@ const [password,setPassword]=useState("");
 
 const navigate = useNavigate();
 
+const provider = new GoogleAuthProvider();
 
-/*
-إنشاء الحساب
-*/
+
+// REGISTER EMAIL + PASSWORD
 
 const registerUser = async(e)=>{
 
@@ -60,19 +72,17 @@ actionCodeSettings
 await setDoc(
 doc(db,"users",userCredential.user.uid),
 {
+
 email: userCredential.user.email,
+role: "user",
 verified: false,
 createdAt: new Date()
+
 }
 );
 
 
-// رسالة نجاح
-
-alert("Verification email sent. Please check your Gmail 📩");
-
-
-// تحويل المستخدم لصفحة التفعيل
+alert("Verification email sent. Check your Gmail 📩");
 
 navigate("/verify-email");
 
@@ -101,9 +111,59 @@ alert("Password should be at least 6 characters");
 
 else{
 
-alert("Registration failed. Please try again");
+alert("Registration failed. Try again");
 
 }
+
+}
+
+};
+
+
+// REGISTER WITH GOOGLE
+
+const registerWithGoogle = async()=>{
+
+try{
+
+const result = await signInWithPopup(
+auth,
+provider
+);
+
+
+// تأكد هل المستخدم موجود بالفعل
+
+const docRef = doc(db,"users",result.user.uid);
+
+const docSnap = await getDoc(docRef);
+
+
+if(!docSnap.exists()){
+
+await setDoc(
+docRef,
+{
+
+email: result.user.email,
+role: "user",
+verified: true,
+createdAt: new Date()
+
+}
+);
+
+}
+
+
+navigate("/");
+
+
+}catch(error){
+
+console.log(error);
+
+alert("Google sign up failed");
 
 }
 
@@ -119,7 +179,7 @@ onSubmit={registerUser}
 className="bg-white shadow-lg p-8 rounded-lg w-96"
 >
 
-<h2 className="text-2xl mb-6 font-semibold">
+<h2 className="text-2xl mb-6 font-semibold text-center">
 
 Create Account
 
@@ -145,12 +205,24 @@ required
 
 
 <button
-className="bg-green-500 hover:bg-green-600 transition text-white w-full p-2 rounded"
+className="bg-green-500 hover:bg-green-600 text-white w-full p-2 rounded transition"
 >
 
 Register
 
 </button>
+
+
+<button
+type="button"
+onClick={registerWithGoogle}
+className="bg-red-500 hover:bg-red-600 text-white w-full p-2 rounded transition mt-3"
+>
+
+Register with Google
+
+</button>
+
 
 </form>
 
