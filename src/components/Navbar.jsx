@@ -89,7 +89,7 @@ isHome
 : "bg-white shadow text-gray-800"
 }`}>
 
-<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
 
 
 {/* LOGO */}
@@ -147,8 +147,8 @@ activeDropdown==="user"
 {user ? (
 
 <>
-<Link to="/profile">Profile</Link>
-<Link to="/my-bookings">My Bookings</Link>
+<Link className="block" to="/profile">Profile</Link>
+<Link className="block" to="/my-bookings">My Bookings</Link>
 
 <div
 onClick={handleLogout}
@@ -162,8 +162,8 @@ Logout
 ) : (
 
 <>
-<Link to="/login">Login</Link>
-<Link to="/register">Register</Link>
+<Link className="block" to="/login">Login</Link>
+<Link className="block" to="/register">Register</Link>
 </>
 
 )}
@@ -230,8 +230,8 @@ activeDropdown==="user"
 
 <div className="absolute right-0 top-10 bg-white shadow-xl rounded-xl p-4 space-y-2 min-w-[150px] text-gray-800">
 
-<Link to="/profile">Profile</Link>
-<Link to="/my-bookings">My Bookings</Link>
+<Link className="block" to="/profile">Profile</Link>
+<Link className="block" to="/my-bookings">My Bookings</Link>
 
 <div
 onClick={handleLogout}
@@ -265,17 +265,25 @@ onClick={()=>setIsOpen(!isOpen)}
 {/* MOBILE MENU */}
 {isOpen && (
 
-<div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg px-6 py-4 space-y-4 text-gray-800">
+<div className="lg:hidden w-full bg-white shadow-lg px-6 py-5 flex flex-col gap-4 text-gray-800">
 
-<Link to="/" onClick={()=>setIsOpen(false)}>Home</Link>
-<Link to="/hotels" onClick={()=>setIsOpen(false)}>Hotels</Link>
-<Link to="/transport" onClick={()=>setIsOpen(false)}>Transport</Link>
-<Link to="/trips" onClick={()=>setIsOpen(false)}>Trips</Link>
-<Link to="/offers" onClick={()=>setIsOpen(false)}>Offers</Link>
-<Link to="/about" onClick={()=>setIsOpen(false)}>About Aswan</Link>
-<Link to="/contact" onClick={()=>setIsOpen(false)}>Contact</Link>
-<Link to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
-<Link to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
+<Link className="block" to="/" onClick={()=>setIsOpen(false)}>Home</Link>
+
+<Link className="block" to="/hotels" onClick={()=>setIsOpen(false)}>Hotels</Link>
+
+<Link className="block" to="/transport" onClick={()=>setIsOpen(false)}>Transport</Link>
+
+<Link className="block" to="/trips" onClick={()=>setIsOpen(false)}>Trips</Link>
+
+<Link className="block" to="/offers" onClick={()=>setIsOpen(false)}>Offers</Link>
+
+<Link className="block" to="/about" onClick={()=>setIsOpen(false)}>About Aswan</Link>
+
+<Link className="block" to="/contact" onClick={()=>setIsOpen(false)}>Contact</Link>
+
+<Link className="block" to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
+
+<Link className="block" to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
 
 
 {isAdmin && (
