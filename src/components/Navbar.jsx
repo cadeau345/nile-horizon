@@ -1,17 +1,49 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Menu, X, User, ChevronDown } from "lucide-react";
-import { auth } from "../firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+
+import { auth, db } from "../firebase";
+
+
+import {
+doc,
+getDoc
+} from "firebase/firestore";
+
 
 function Navbar() {
+
 const [isAdmin,setIsAdmin]=useState(false);
 const [isOpen,setIsOpen]=useState(false);
 const [isScrolled,setIsScrolled]=useState(false);
 const [activeDropdown,setActiveDropdown]=useState(null);
 const [user,setUser]=useState(null);
+
+const location=useLocation();
+
+
+// LOGOUT FUNCTION
+
+const handleLogout = async () => {
+
+try {
+
+await signOut(auth);
+
+setActiveDropdown(null);
+
+} catch (error) {
+
+console.log(error);
+
+}
+
+};
+
+
+// CHECK USER ROLE
+
 useEffect(()=>{
 
 const unsubscribe = onAuthStateChanged(auth, async(currentUser)=>{
@@ -24,13 +56,13 @@ const docRef = doc(db,"users",currentUser.uid);
 
 const docSnap = await getDoc(docRef);
 
-if(docSnap.exists()){
-
-if(docSnap.data().role==="admin"){
+if(docSnap.exists() && docSnap.data().role==="admin"){
 
 setIsAdmin(true);
 
-}
+}else{
+
+setIsAdmin(false);
 
 }
 
@@ -41,8 +73,6 @@ setIsAdmin(true);
 return ()=>unsubscribe();
 
 },[]);
-
-const location=useLocation();
 
 
 // SCROLL EFFECT
@@ -259,20 +289,14 @@ dropdownMenus.trips.map(item=>(
 </div>
 
 
-
 <Link to="/offers">Offers</Link>
-
 <Link to="/about">About Aswan</Link>
-
 <Link to="/contact">Contact</Link>
-
 <Link to="/temples">Temples</Link>
-
 <Link to="/flights">Flights</Link>
 
-<Link to="/bookings">My Bookings</Link>
 
-
+{/* ADMIN BUTTON */}
 
 {
 isAdmin && (
@@ -290,6 +314,8 @@ Admin Dashboard
 )
 }
 
+
+{/* USER DROPDOWN */}
 
 <div className="relative">
 
@@ -313,18 +339,23 @@ isAdmin && (
 
 <Link to="/bookings">
 
+<div className="hover:text-indigo-600">
+
 My Bookings
+
+</div>
 
 </Link>
 
 )
 }
 
-
 <Link to="/profile">
 
 <div className="hover:text-indigo-600">
+
 Profile
+
 </div>
 
 </Link>
@@ -348,16 +379,19 @@ Logout
 <Link to="/login">
 
 <div className="hover:text-indigo-600">
+
 Login
+
 </div>
 
 </Link>
 
-
 <Link to="/register">
 
 <div className="hover:text-indigo-600">
+
 Register
+
 </div>
 
 </Link>
@@ -376,34 +410,20 @@ Register
 
 </div>
 
-
-
-
 </div>
 
 
 
-{/* MOBILE ICON */}
+{/* MOBILE BUTTON */}
 
 <button
 onClick={()=>setIsOpen(!isOpen)}
 className="lg:hidden"
 >
 
-{
-isOpen
-?
-
-<X size={28}/>
-
-:
-
-<Menu size={28}/>
-
-}
+{isOpen ? <X size={28}/> : <Menu size={28}/>}
 
 </button>
-
 
 </div>
 
@@ -425,7 +445,9 @@ isOpen && (
 <Link to="/contact">Contact</Link>
 <Link to="/temples">Temples</Link>
 <Link to="/flights">Flights</Link>
-<Link to="/bookings">My Bookings</Link>
+
+{
+isAdmin && (
 
 <Link to="/admin">
 
@@ -437,12 +459,14 @@ Admin Dashboard
 
 </Link>
 
+)
+}
+
 </div>
 
 )
 
 }
-
 
 </nav>
 
