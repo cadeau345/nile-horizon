@@ -431,27 +431,48 @@ className="lg:hidden"
 
 {/* MOBILE MENU */}
 
+{isOpen && (
+
+<div className="lg:hidden bg-white shadow-xl px-6 pb-6 pt-4 space-y-3 text-gray-800 rounded-b-2xl">
+
+<Link to="/" className="block py-2 border-b">Home</Link>
+
+<Link to="/hotels" className="block py-2 border-b">Hotels</Link>
+
+<Link to="/transport" className="block py-2 border-b">Transport</Link>
+
+<Link to="/trips" className="block py-2 border-b">Trips</Link>
+
+<Link to="/offers" className="block py-2 border-b">Offers</Link>
+
+<Link to="/about" className="block py-2 border-b">About Aswan</Link>
+
+<Link to="/contact" className="block py-2 border-b">Contact</Link>
+
+<Link to="/temples" className="block py-2 border-b">Temples</Link>
+
+<Link to="/flights" className="block py-2 border-b">Flights</Link>
+
+
 {
-isOpen && (
+isAdmin && (
 
-<div className="lg:hidden bg-white shadow-lg px-6 pb-6 space-y-4 text-gray-800">
+<Link to="/bookings" className="block py-2 border-b">
 
-<Link to="/">Home</Link>
-<Link to="/hotels">Hotels</Link>
-<Link to="/transport">Transport</Link>
-<Link to="/trips">Trips</Link>
-<Link to="/offers">Offers</Link>
-<Link to="/about">About Aswan</Link>
-<Link to="/contact">Contact</Link>
-<Link to="/temples">Temples</Link>
-<Link to="/flights">Flights</Link>
+My Bookings
+
+</Link>
+
+)
+}
+
 
 {
 isAdmin && (
 
 <Link to="/admin">
 
-<button className="bg-indigo-600 text-white w-full py-2 rounded-xl">
+<button className="mt-3 bg-indigo-600 text-white w-full py-3 rounded-xl shadow-md">
 
 Admin Dashboard
 
@@ -464,9 +485,7 @@ Admin Dashboard
 
 </div>
 
-)
-
-}
+)}
 
 </nav>
 
