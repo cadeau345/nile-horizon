@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import {
 Menu,
 X,
-User,
-ChevronDown
+User
 } from "lucide-react";
 
 import {
@@ -107,7 +106,7 @@ isHome
 : "bg-white shadow text-gray-800"
 }`}>
 
-<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
 
 
 {/* LOGO */}
@@ -149,11 +148,7 @@ Horizon
 <Link to="/flights">Flights</Link>
 
 
-{/* ADMIN BUTTON */}
-
-{
-
-isAdmin && (
+{isAdmin && (
 
 <Link to="/admin">
 
@@ -165,9 +160,7 @@ Admin Dashboard
 
 </Link>
 
-)
-
-}
+)}
 
 
 {/* USER ICON */}
@@ -191,17 +184,11 @@ activeDropdown==="user"
 />
 
 
-{
-
-activeDropdown==="user" && (
+{activeDropdown==="user" && (
 
 <div className="absolute right-0 top-8 bg-white shadow-xl rounded-xl p-4 space-y-2 min-w-[150px] text-gray-800">
 
-{
-
-user
-
-?
+{user ? (
 
 <>
 
@@ -223,7 +210,7 @@ Logout
 
 </>
 
-:
+) : (
 
 <>
 
@@ -233,33 +220,26 @@ Logout
 
 </>
 
-}
+)}
 
 </div>
 
-)
-
-}
+)}
 
 </div>
-
 
 </div>
 
 
 
-{/* MOBILE RIGHT SIDE */}
+{/* MOBILE HEADER STRUCTURE */}
 
-<div className="lg:hidden flex items-center gap-2">
+<div className="lg:hidden absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
 
 
-{/* LOGIN REGISTER */}
+{!user && (
 
-{
-
-!user && (
-
-<div className="flex items-center gap-2">
+<>
 
 <Link
 
@@ -277,6 +257,7 @@ Login
 
 </Link>
 
+
 <Link
 
 to="/register"
@@ -289,18 +270,12 @@ Register
 
 </Link>
 
-</div>
+</>
 
-)
-
-}
+)}
 
 
-{/* PROFILE ICON */}
-
-{
-
-user && (
+{user && (
 
 <User
 
@@ -318,34 +293,23 @@ activeDropdown==="user"
 
 />
 
-)
+)}
 
-}
+</div>
 
 
-{/* MENU BUTTON */}
+
+{/* MOBILE MENU BUTTON */}
+
+<div className="lg:hidden ml-auto">
 
 <button
 
 onClick={()=>setIsOpen(!isOpen)}
 
-className="ml-1"
-
 >
 
-{
-
-isOpen
-
-?
-
-<X size={26}/>
-
-:
-
-<Menu size={26}/>
-
-}
+{isOpen ? <X size={26}/> : <Menu size={26}/>}
 
 </button>
 
@@ -358,9 +322,7 @@ isOpen
 
 {/* MOBILE MENU */}
 
-{
-
-isOpen && (
+{isOpen && (
 
 <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg px-6 py-4 space-y-4 text-gray-800">
 
@@ -383,9 +345,7 @@ isOpen && (
 <Link to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
 
 
-{
-
-isAdmin && (
+{isAdmin && (
 
 <Link to="/admin" onClick={()=>setIsOpen(false)}>
 
@@ -397,14 +357,10 @@ Admin Dashboard
 
 </Link>
 
-)
-
-}
+)}
 
 
-{
-
-user && (
+{user && (
 
 <div
 
@@ -418,16 +374,11 @@ Logout
 
 </div>
 
-)
-
-}
+)}
 
 </div>
 
-)
-
-}
-
+)}
 
 </nav>
 
