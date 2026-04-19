@@ -140,12 +140,12 @@ return(
 
 <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isHome?"bg-transparent":"bg-white shadow"}`}>
 
-<div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
 
 {/* LOGO */}
 
-<Link to="/" className="text-2xl font-bold">
+<Link to="/" className="text-xl font-bold whitespace-nowrap">
 
 <span className="text-indigo-600">
 
@@ -299,7 +299,7 @@ Register
 
 {/* MOBILE RIGHT SIDE */}
 
-<div className="flex items-center gap-3 lg:hidden">
+<div className="lg:hidden flex items-center justify-end gap-2 min-w-[140px]">
 
 
 {/* LOGIN REGISTER BUTTONS */}
@@ -307,38 +307,24 @@ Register
 {
 
 !user && (
-
-<>
+<div className="flex items-center gap-2">
 
 <Link
-
 to="/login"
-
-className="text-sm font-medium"
-
+className="text-xs font-medium whitespace-nowrap"
 >
-
 Login
-
 </Link>
 
 <Link
-
 to="/register"
-
-className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm"
-
+className="bg-indigo-600 text-white px-2 py-1 rounded-md text-xs whitespace-nowrap"
 >
-
 Register
-
 </Link>
 
-</>
-
-)
-
-}
+</div>
+)}
 
 
 {/* PROFILE ICON */}
