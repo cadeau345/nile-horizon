@@ -37,26 +37,50 @@ fetchTrips();
 },[]);
 
 
-// تحميل Travelpayouts widget
+// widget رقم 1
 
 useEffect(()=>{
 
+if(document.getElementById("tp-widget-1-script")) return;
+
 const script=document.createElement("script");
 
+script.id="tp-widget-1-script";
+
 script.src=
-"https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&product=1020186%2C1091294%2C1102460%2C1107020&language=en&layout=horizontal&powered_by=true&campaign_id=89&promo_id=3948";
+"https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&locale=en&city_id=365308&category=4&amount=3&powered_by=true&campaign_id=137&promo_id=4497";
 
 script.async=true;
 
 script.charset="utf-8";
 
-const container=document.getElementById("travelpayouts-widget");
+document
+.getElementById("travelpayouts-widget-1")
+?.appendChild(script);
 
-if(container){
+},[]);
 
-container.appendChild(script);
 
-}
+// widget رقم 2
+
+useEffect(()=>{
+
+if(document.getElementById("tp-widget-2-script")) return;
+
+const script=document.createElement("script");
+
+script.id="tp-widget-2-script";
+
+script.src=
+"https://tpemd.com/content?currency=USD&trs=519404&shmarker=719849&product=1020186%2C1115262%2C1091294%2C1110632%2C1104412%2C1107615%2C1095488%2C1107619%2C1095248%2C1102719&language=en&layout=horizontal&powered_by=true&campaign_id=89&promo_id=3948";
+
+script.async=true;
+
+script.charset="utf-8";
+
+document
+.getElementById("travelpayouts-widget-2")
+?.appendChild(script);
 
 },[]);
 
@@ -68,9 +92,7 @@ return(
 <Helmet>
 
 <title>
-
 Trips in Aswan | Abu Simbel & Nubian Village Tours
-
 </title>
 
 <meta
@@ -88,7 +110,7 @@ Trips in Aswan
 </h1>
 
 
-{/* الرحلات اليدوية من Firebase */}
+{/* الرحلات من Firebase */}
 
 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -115,37 +137,27 @@ className="h-52 w-full object-cover"
 <div className="p-4">
 
 <h2 className="text-xl font-bold">
-
 {trip.name}
-
 </h2>
 
 
 <p className="text-gray-500">
-
 Duration: {trip.duration}
-
 </p>
 
 
 <p className="mt-2 text-gray-600 line-clamp-2">
-
 {trip.description}
-
 </p>
 
 
 <p className="text-orange-500 font-bold mt-3">
-
 ${trip.price}
-
 </p>
 
 
 <button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
-
 View Details
-
 </button>
 
 </div>
@@ -159,17 +171,32 @@ View Details
 </div>
 
 
-{/* Travelpayouts Tours Widget */}
+{/* widget الأول */}
 
 <div className="mt-16">
 
 <h2 className="text-2xl font-bold text-blue-900 mb-6">
 
-Recommended Egypt Tours
+Recommended Aswan Experiences
 
 </h2>
 
-<div id="travelpayouts-widget"></div>
+<div id="travelpayouts-widget-1"></div>
+
+</div>
+
+
+{/* widget الثاني */}
+
+<div className="mt-16">
+
+<h2 className="text-2xl font-bold text-blue-900 mb-6">
+
+Top Egypt Tours
+
+</h2>
+
+<div id="travelpayouts-widget-2"></div>
 
 </div>
 
