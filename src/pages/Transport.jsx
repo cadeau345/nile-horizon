@@ -27,7 +27,7 @@ const [searchClicked,setSearchClicked]=useState(true);
 
 const [tripType,setTripType]=useState("oneway");
 
-const [direction,setDirection]=useState("aswan-cairo");
+const [direction,setDirection]=useState("all");
 
 
 
@@ -91,7 +91,7 @@ fetchTransport();
 
 /*
 ============================
-فلترة حسب النوع
+فلترة حسب الاتجاه
 ============================
 */
 
@@ -116,6 +116,16 @@ item.to?.toLowerCase() === "aswan"
 
 }
 
+/* الاتجاهات الجديدة */
+
+if(direction !== "all"){
+
+return (
+`${item.from}-${item.to}`.toLowerCase() === direction.toLowerCase()
+);
+
+}
+
 return true;
 
 })
@@ -131,6 +141,30 @@ return item.type
 
 
 
+/*
+============================
+جلب الاتجاهات تلقائي من Firebase
+============================
+*/
+
+const uniqueDirections = [
+
+"all",
+
+...new Set(
+
+transport.map(item =>
+
+`${item.from}-${item.to}`.toLowerCase()
+
+)
+
+)
+
+];
+
+
+
 return(
 
 <div className="p-10">
@@ -139,7 +173,7 @@ return(
 
 <title>
 
-Transport Booking | Aswan ⇄ Cairo Bus Train Private Car
+Transport Booking | Egypt City to City Transport
 
 </title>
 
@@ -147,7 +181,7 @@ Transport Booking | Aswan ⇄ Cairo Bus Train Private Car
 
 name="description"
 
-content="Book transport between Aswan and Cairo by bus, train or private car with flexible one-way or round-trip options."
+content="Book transport between Egyptian cities by bus, train or private car with flexible one-way or round-trip options."
 
 />
 
@@ -157,11 +191,7 @@ content="Book transport between Aswan and Cairo by bus, train or private car wit
 
 <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-{direction==="aswan-cairo"
-
-?"Aswan → Cairo Transport"
-
-:"Cairo → Aswan Transport"}
+Egypt Transport Booking
 
 </h1>
 
@@ -171,36 +201,29 @@ content="Book transport between Aswan and Cairo by bus, train or private car wit
 
 <div className="flex gap-3 mb-6 flex-wrap">
 
-<button
-
-onClick={()=>setDirection("aswan-cairo")}
-
-className={`px-4 py-2 rounded ${
-direction==="aswan-cairo"
-?"bg-blue-900 text-white"
-:"bg-gray-200"
-}`}
->
-
-Aswan → Cairo
-
-</button>
-
+{uniqueDirections.map(dir => (
 
 <button
 
-onClick={()=>setDirection("cairo-aswan")}
+key={dir}
+
+onClick={()=>setDirection(dir)}
 
 className={`px-4 py-2 rounded ${
-direction==="cairo-aswan"
+direction===dir
 ?"bg-blue-900 text-white"
 :"bg-gray-200"
 }`}
+
 >
 
-Cairo → Aswan
+{dir==="all"
+?"All Routes"
+:dir.replace("-", " → ")}
 
 </button>
+
+))}
 
 </div>
 
@@ -219,6 +242,7 @@ tripType==="oneway"
 ?"bg-orange-500 text-white"
 :"bg-gray-200"
 }`}
+
 >
 
 One Way
@@ -235,6 +259,7 @@ tripType==="roundtrip"
 ?"bg-orange-500 text-white"
 :"bg-gray-200"
 }`}
+
 >
 
 Round Trip
@@ -327,6 +352,7 @@ filter===type
 ?"bg-blue-900 text-white"
 :"bg-gray-200"
 }`}
+
 >
 
 {type==="Car"?"Private Car":type}
@@ -385,11 +411,7 @@ className="h-52 w-full object-cover"
 
 <p className="text-gray-500">
 
-{direction==="aswan-cairo"
-
-?"Aswan → Cairo"
-
-:"Cairo → Aswan"}
+{item.from} → {item.to}
 
 </p>
 
