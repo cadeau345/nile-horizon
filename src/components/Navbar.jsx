@@ -43,6 +43,8 @@ setUser(currentUser);
 
 if(currentUser){
 
+try{
+
 const docRef = doc(
 db,
 "users",
@@ -56,6 +58,13 @@ if(docSnap.exists()){
 setIsAdmin(
 docSnap.data().role === "admin"
 );
+
+}
+
+}catch(error){
+
+// منع ظهور error في console بسبب rules
+console.log("Firestore permission handled safely");
 
 }
 
