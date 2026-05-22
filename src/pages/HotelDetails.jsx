@@ -1,22 +1,40 @@
 import { useEffect, useState, useContext } from "react";
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
+import {
+doc,
+getDoc,
+collection,
+addDoc,
+getDocs
+} from "firebase/firestore";
+
 import { useParams, useNavigate } from "react-router-dom";
+
 import { db } from "../firebase";
+
 import WhatsAppButton from "../components/WhatsAppButton";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+
 import { convertUSDToEGP } from "../utils/currencyConverter";
+
 import ImageGallery from "../components/ImageGallery";
 
+import { usePrice } from "../utils/price";
 function HotelDetails() {
 
+    const price = usePrice();
 const { user } = useContext(AuthContext);
 const navigate = useNavigate();
 const { id } = useParams();
 const { addToCart } = useContext(CartContext);
 
 const [hotel, setHotel] = useState(null);
-const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+const [reviews, setReviews] = useState([]);
+const [rating, setRating] = useState(5);
+const [comment, setComment] = useState("");
+
+const [averageRating, setAverageRating] = useState(null);
 
 const [name, setName] = useState("");
 const [phone, setPhone] = useState("");
@@ -40,12 +58,46 @@ const docRef = doc(db, "hotels", id);
 const docSnap = await getDoc(docRef);
 
 if (docSnap.exists()) {
+
 setHotel(docSnap.data());
+
 }
 
 };
 
 fetchHotel();
+
+}, [id]);
+
+
+// تحميل التقييمات
+
+useEffect(() => {
+
+const fetchReviews = async () => {
+
+const snapshot = await getDocs(collection(db, "reviews"));
+
+const filtered = snapshot.docs
+.map(doc => doc.data())
+.filter(r => r.hotelId === id);
+
+setReviews(filtered);
+
+if (filtered.length > 0) {
+
+const avg =
+filtered.reduce((a, b) => a + Number(b.rating), 0)
+/
+filtered.length;
+
+setAverageRating(avg.toFixed(1));
+
+}
+
+};
+
+fetchReviews();
 
 }, [id]);
 
@@ -59,13 +111,15 @@ if (checkIn && checkOut && hotel) {
 const start = new Date(checkIn);
 const end = new Date(checkOut);
 
-const diffTime = end - start;
-const diffDays = diffTime / (1000 * 60 * 60 * 24);
+const diff =
+(end - start) /
+(1000 * 60 * 60 * 24);
 
-if (diffDays > 0) {
+if (diff > 0) {
 
-setNights(diffDays);
-setTotalPrice(diffDays * hotel.price);
+setNights(diff);
+
+setTotalPrice(diff * hotel.price);
 
 }
 
@@ -104,14 +158,17 @@ const checkAuthBeforeBooking = () => {
 if (!user) {
 
 alert("يجب تسجيل الدخول أولاً");
+
 navigate("/customer-login");
+
 return false;
 
 }
 
 if (!user.emailVerified) {
 
-alert("يجب تأكيد البريد الإلكتروني أولاً");
+alert("يجب تأكيد البريد الإلكتروني");
+
 return false;
 
 }
@@ -121,7 +178,40 @@ return true;
 };
 
 
-// إرسال الحجز بدون دفع
+// إضافة تقييم
+
+const handleAddReview = async () => {
+
+if (!user) {
+
+alert("سجل الدخول أولاً");
+
+return;
+
+}
+
+await addDoc(collection(db, "reviews"), {
+
+hotelId: id,
+
+userId: user.uid,
+
+rating,
+
+comment,
+
+date: new Date()
+
+});
+
+alert("تم إضافة تقييمك");
+
+setComment("");
+
+};
+
+
+// إرسال الحجز
 
 const handleBooking = async () => {
 
@@ -129,7 +219,8 @@ if (!checkAuthBeforeBooking()) return;
 
 if (!name || !phone || !checkIn || !checkOut || !guests) {
 
-alert("Please fill all booking details");
+alert("املأ بيانات الحجز");
+
 return;
 
 }
@@ -137,18 +228,25 @@ return;
 await addDoc(collection(db, "bookings"), {
 
 userId: user.uid,
+
 userEmail: user.email,
+
 name,
+
 phone,
 
 serviceName: hotel.name,
+
 serviceType: "hotel",
 
 price: totalPrice || hotel.price,
 
 checkIn,
+
 checkOut,
+
 guests,
+
 nights,
 
 status: "pending",
@@ -157,15 +255,7 @@ createdAt: new Date()
 
 });
 
-alert("Booking request sent successfully");
-
-setName("");
-setPhone("");
-setCheckIn("");
-setCheckOut("");
-setGuests("");
-setTotalPrice(0);
-setNights(0);
+alert("تم إرسال طلب الحجز");
 
 };
 
@@ -179,11 +269,12 @@ if (!checkAuthBeforeBooking()) return;
 addToCart({
 
 name: hotel.name,
+
 price: totalPrice || hotel.price
 
 });
 
-alert("Added to cart");
+alert("تمت الإضافة للكارت");
 
 };
 
@@ -192,92 +283,94 @@ alert("Added to cart");
 
 const handleWhatsAppBooking = () => {
 
-const phoneNumber = "201034022992";
-
 const message = `
+
 عايز احجز الفندق:
 
-اسم الفندق: ${hotel.name}
-عدد الليالي: ${nights || 1}
-السعر: ${totalPrice || hotel.price} دولار
+${hotel.name}
+
+عدد الليالي:
+
+${nights || 1}
+
+السعر:
+
+${totalPrice || hotel.price}
+
 `;
 
 window.open(
-`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
+
+`https://wa.me/201034022992?text=${encodeURIComponent(message)}`,
+
 "_blank"
+
 );
 
 };
 
 
-// الدفع Paymob
+// الدفع
 
 const handlePayment = async () => {
 
-
 if (!checkAuthBeforeBooking()) return;
 
-// ✅ منع الدفع بدون إدخال البيانات
-
-if (!name || !phone || !checkIn || !checkOut || !guests) {
-
-alert("Please fill booking details first");
-
-return;
-
-}
-
-// تحويل السعر تلقائي للمصري
-
 const priceConverted = await convertUSDToEGP(
+
 totalPrice || hotel.price
+
 );
 
-
-// حفظ بيانات الحجز مؤقتًا
-
 localStorage.setItem(
+
 "pendingBooking",
+
 JSON.stringify({
 
 userId: user.uid,
-userEmail: user.email,
 
 serviceType: "hotel",
+
 serviceName: hotel.name,
 
-name,
-phone,
-
-checkIn,
-checkOut,
-guests,
-nights,
-
 price: priceConverted
 
 })
+
 );
 
-
-// إرسال السعر للسيرفر
 
 const response = await fetch(
+
 "http://localhost:5000/pay",
+
 {
+
 method: "POST",
+
 headers: {
+
 "Content-Type": "application/json"
+
 },
+
 body: JSON.stringify({
+
 price: priceConverted
+
 })
+
 }
+
 );
+
 
 const data = await response.json();
 
+
 window.location.href =
+
 `https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=${data.payment_token}`;
 
 };
@@ -285,146 +378,382 @@ window.location.href =
 
 if (!hotel) return <p>Loading...</p>;
 
+const rooms = hotel.rooms || [];
+
 
 return (
 
-<div className="p-10 max-w-5xl mx-auto">
+<div className="max-w-7xl mx-auto px-6 py-10">
 
-<ImageGallery
-images={hotel.images}
-fallback={hotel.image}
-/>
 
-<h1 className="text-3xl font-bold mt-6">
+{/* HEADER */}
+
+<h1 className="text-4xl font-bold">
+
 {hotel.name}
-</h1>
 
-<p className="mt-2 text-gray-600">
-{hotel.location}
-</p>
+{averageRating && (
 
-<p className="mt-4">
-{hotel.description}
-</p>
+<span className="ml-3 text-yellow-500">
 
+⭐ {averageRating}
 
-<p className="text-orange-500 text-xl mt-4">
-${hotel.price} / night
-</p>
-
-
-{priceEGP && (
-
-<p className="text-green-600 text-sm">
-
-≈ {priceEGP} جنيه مصري
-
-</p>
+</span>
 
 )}
 
+</h1>
 
-<div className="mt-10 bg-gray-100 p-6 rounded-xl">
+
+<p className="text-gray-500 mb-6">
+
+{hotel.location}
+
+</p>
+
+
+
+{/* GALLERY + SIDEBAR */}
+
+<div className="grid lg:grid-cols-3 gap-8">
+
+
+<div className="lg:col-span-2">
+
+
+<ImageGallery
+
+images={hotel.images}
+
+fallback={hotel.image}
+
+/>
+
+
+<p className="mt-6 text-gray-700">
+
+{hotel.description}
+
+</p>
+
+
+
+
+{/* ROOMS TABLE */}
+
+
+{hotel.locationMap && (
+
+<div className="mt-10">
 
 <h2 className="text-2xl font-bold mb-4">
-Book this hotel
+Location on map
 </h2>
 
-
-<input
-placeholder="Your name"
-value={name}
-className="border p-2 rounded w-full mb-3"
-onChange={(e) => setName(e.target.value)}
+<iframe
+src={hotel.locationMap}
+width="100%"
+height="400"
+loading="lazy"
+className="rounded-xl border"
 />
 
+</div>
 
-<input
-placeholder="Phone number"
-value={phone}
-className="border p-2 rounded w-full mb-3"
-onChange={(e) => setPhone(e.target.value)}
-/>
+)}
+{rooms.length > 0 && (
 
-
-<input
-type="date"
-className="border p-2 rounded w-full mb-3"
-onChange={(e) => setCheckIn(e.target.value)}
-/>
+<div className="mt-10 border rounded-xl">
 
 
-<input
-type="date"
-className="border p-2 rounded w-full mb-3"
-onChange={(e) => setCheckOut(e.target.value)}
-/>
+<div className="grid grid-cols-5 bg-blue-600 text-white p-3">
+
+نوع الغرفة
+
+عدد الضيوف
+
+السعر
+
+المميزات
+
+اختيار
+
+</div>
 
 
-<input
-placeholder="Guests number"
-value={guests}
-className="border p-2 rounded w-full mb-3"
-onChange={(e) => setGuests(e.target.value)}
-/>
+
+{rooms.map((room, i) => (
+
+<div
+
+key={i}
+
+className="grid grid-cols-5 p-3 border-t"
+
+>
 
 
-{nights > 0 && (
+<span>{room.name}</span>
 
-<div className="bg-white p-4 rounded-lg mb-3">
+<span>{room.guests}</span>
 
-<p className="text-gray-600">
-Nights: {nights}
-</p>
+<span>{price(room.price)}</span>
 
-<p className="text-green-600 font-bold text-xl">
-Total Price: ${totalPrice}
-</p>
+<span>
+
+{room.features?.join(" + ")}
+
+</span>
+
 
 <button
-onClick={handleAddToCart}
-className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
+
+onClick={() =>
+
+setTotalPrice(room.price * (nights || 1))
+
+}
+
+className="bg-blue-600 text-white rounded"
+
 >
-Add to Cart
+
+اختيار
+
 </button>
+
+</div>
+
+))}
 
 </div>
 
 )}
 
 
+
+{/* REVIEWS */}
+
+
+<div className="mt-12">
+
+
+<h2 className="text-2xl font-bold mb-4">
+
+تقييمات الضيوف
+
+</h2>
+
+
+{reviews.map((r, i) => (
+
+<div
+
+key={i}
+
+className="bg-gray-100 p-3 rounded mb-2"
+
+>
+
+⭐ {r.rating}
+
+<p>{r.comment}</p>
+
+</div>
+
+))}
+
+
+
+<select
+
+value={rating}
+
+onChange={(e) => setRating(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+>
+
+<option>5</option>
+
+<option>4</option>
+
+<option>3</option>
+
+<option>2</option>
+
+<option>1</option>
+
+</select>
+
+
+<textarea
+
+placeholder="اكتب رأيك"
+
+value={comment}
+
+onChange={(e) => setComment(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
 <button
+
+onClick={handleAddReview}
+
+className="bg-blue-600 text-white px-4 py-2 rounded"
+
+>
+
+إضافة تقييم
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+{/* SIDEBAR */}
+
+
+<div className="bg-yellow-400 p-6 rounded-xl sticky top-20">
+
+
+<input
+
+placeholder="الاسم"
+
+value={name}
+
+onChange={(e) => setName(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
+<input
+
+placeholder="الهاتف"
+
+value={phone}
+
+onChange={(e) => setPhone(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
+<input
+
+type="date"
+
+onChange={(e) => setCheckIn(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
+<input
+
+type="date"
+
+onChange={(e) => setCheckOut(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
+<input
+
+placeholder="عدد الأشخاص"
+
+value={guests}
+
+onChange={(e) => setGuests(e.target.value)}
+
+className="border p-2 w-full mb-2"
+
+/>
+
+
+<button
+
+onClick={handleAddToCart}
+
+className="bg-green-600 text-white w-full p-2 mb-2"
+
+>
+
+Add to cart
+
+</button>
+
+
+<button
+
 onClick={handleBooking}
-className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
+
+className="bg-blue-900 text-white w-full p-2 mb-2"
+
 >
-Send booking request
+
+Send booking
+
 </button>
 
 
 <button
+
 onClick={handleWhatsAppBooking}
-className="mt-3 bg-green-500 text-white px-6 py-3 rounded-xl w-full"
+
+className="bg-green-500 text-white w-full p-2 mb-2"
+
 >
-Book via WhatsApp
+
+WhatsApp booking
+
 </button>
 
 
 <button
+
 onClick={handlePayment}
-className="mt-3 bg-orange-600 text-white px-6 py-3 rounded-xl w-full"
+
+className="bg-orange-600 text-white w-full p-2"
+
 >
-Pay Online Now
+
+Pay now
+
 </button>
 
 
 <WhatsAppButton serviceName={hotel.name} />
 
+
 </div>
+
+
+</div>
+
 
 </div>
 
 );
 
 }
+
 
 export default HotelDetails;

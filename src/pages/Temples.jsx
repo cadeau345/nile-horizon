@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { Link } from "react-router-dom";
-
+import { usePrice } from "../utils/price";
 function Temples() {
 
+    const price = usePrice();
 const [temples,setTemples]=useState([]);
 
 useEffect(()=>{

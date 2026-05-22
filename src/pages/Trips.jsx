@@ -6,10 +6,13 @@ import { db } from "../firebase";
 
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-
+import { useCurrency } from "../context/CurrencyContext";
+import { usePrice } from "../utils/price";
 
 function Trips() {
 
+    const price = usePrice();
+const { currency, convertPrice } = useCurrency();
 const [trips,setTrips]=useState([]);
 
 
@@ -152,7 +155,7 @@ Duration: {trip.duration}
 
 
 <p className="text-orange-500 font-bold mt-3">
-${trip.price}
+{price(trip.price)}
 </p>
 
 

@@ -10,9 +10,10 @@ import { AuthContext } from "../context/AuthContext";
 
 import { convertUSDToEGP } from "../utils/currencyConverter";
 import ImageGallery from "../components/ImageGallery";
-
+import { usePrice } from "../utils/price";
 function PackageDetails() {
 
+    const price = usePrice();
 const { id } = useParams();
 const navigate = useNavigate();
 
@@ -304,7 +305,7 @@ Duration: {offer.duration}
 {/* السعر بالدولار */}
 
 <p className="text-orange-500 text-xl mt-4">
-${offer.price}
+{price(offer.price)}
 </p>
 
 

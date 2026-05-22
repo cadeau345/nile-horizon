@@ -7,9 +7,9 @@ import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import { convertUSDToEGP } from "../utils/currencyConverter";
 import ImageGallery from "../components/ImageGallery";
-
+import { usePrice } from "../utils/price";
 function TempleDetails() {
-
+const price = usePrice();
 const { id } = useParams();
 const navigate = useNavigate();
 

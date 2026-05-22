@@ -6,12 +6,12 @@ import WhatsAppButton from "../components/WhatsAppButton";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import ImageGallery from "../components/ImageGallery";
-
+import { usePrice } from "../utils/price";
 // ✅ استدعاء محول العملة المركزي
 import { convertUSDToEGP } from "../utils/currencyConverter";
 
 function TripDetails() {
-
+const price = usePrice();
 const { id } = useParams();
 const navigate = useNavigate();
 
@@ -281,7 +281,7 @@ Duration: {trip.duration}
 {/* ✅ عرض السعر بالدولار والمصري */}
 
 <p className="text-orange-500 text-xl mt-4">
-${trip.price}
+{price(trip.price)}
 </p>
 
 {priceEGP && (

@@ -54,10 +54,14 @@ import PaymentCancel from "./pages/PaymentCancel";
 import Flights from "./pages/Flights";
 import ResetPassword from "./pages/ResetPassword";
 
+import { CurrencyProvider } from "./context/CurrencyContext";
+
 
 function App() {
 
 return (
+
+<CurrencyProvider>
 
 <Router>
 
@@ -79,20 +83,16 @@ return (
 <Route path="/trips" element={<Trips />} />
 <Route path="/trip/:id" element={<TripDetails />} />
 
-
 {/* ADMIN ROUTE PROTECTED */}
 
 <Route
 path="/admin"
 element={
 <AdminRoute>
-
 <Admin />
-
 </AdminRoute>
 }
 />
-
 
 <Route path="/login" element={<Login />} />
 
@@ -118,15 +118,12 @@ element={
 <Route path="/register" element={<Register />} />
 
 <Route path="/my-bookings" element={<MyBookings />} />
-
 <Route path="/profile" element={<Profile />} />
 
 <Route path="/verify-email" element={<VerifyEmail />} />
-
 <Route path="/forgot-password" element={<ForgotPassword />} />
 
 <Route path="/payment-success" element={<PaymentSuccess />} />
-
 <Route path="/payment-cancel" element={<PaymentCancel />} />
 
 <Route path="/flights" element={<Flights />} />
@@ -139,6 +136,8 @@ element={
 <MobileBottomNav />
 
 </Router>
+
+</CurrencyProvider>
 
 );
 

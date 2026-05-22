@@ -36,6 +36,21 @@ const [isOffer, setIsOffer] = useState(false);
 const [discountPrice,setDiscountPrice]=useState("");
 
 
+// ✅ rooms states الجديدة
+
+const [rooms,setRooms]=useState([]);
+
+const [roomName,setRoomName]=useState("");
+
+const [roomGuests,setRoomGuests]=useState("");
+
+const [roomPrice,setRoomPrice]=useState("");
+
+const [roomFeatures,setRoomFeatures]=useState("");
+const [locationMap,setLocationMap]=useState("");
+
+
+
 /*
 ============================
 ضغط الصور تلقائيًا
@@ -72,7 +87,6 @@ const ctx = canvas.getContext("2d");
 
 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-// ضغط الجودة
 const compressedBase64 =
 canvas.toDataURL("image/jpeg", 0.6);
 
@@ -85,6 +99,7 @@ resolve(compressedBase64);
 });
 
 };
+
 
 
 /*
@@ -117,6 +132,7 @@ fetchHotels();
 },[]);
 
 
+
 /*
 ============================
 رفع الصور
@@ -127,8 +143,6 @@ const handleImageUpload = async (e) => {
 
 const files = Array.from(e.target.files);
 
-
-// حد أقصى 10 صور
 
 if(images.length + files.length > 10){
 
@@ -151,6 +165,48 @@ setImages(prev=>[...prev,...compressedImages]);
 setPreviewImages(prev=>[...prev,...compressedImages]);
 
 };
+
+
+
+/*
+============================
+إضافة غرفة
+============================
+*/
+
+const handleAddRoom=()=>{
+
+if(!roomName || !roomGuests || !roomPrice){
+
+alert("Fill room data");
+
+return;
+
+}
+
+setRooms(prev=>[
+
+...prev,
+
+{
+name:roomName,
+guests:Number(roomGuests),
+price:Number(roomPrice),
+features:roomFeatures.split(",")
+}
+
+]);
+
+setRoomName("");
+
+setRoomGuests("");
+
+setRoomPrice("");
+
+setRoomFeatures("");
+
+};
+
 
 
 /*
@@ -184,7 +240,8 @@ discountPrice,
 description,
 images,
 isBestSeller,
-isOffer
+isOffer,
+rooms
 }
 
 );
@@ -207,7 +264,8 @@ discountPrice,
 description,
 images,
 isBestSeller,
-isOffer
+isOffer,
+rooms
 }
 
 );
@@ -233,10 +291,13 @@ setIsBestSeller(false);
 
 setIsOffer(false);
 
+setRooms([]);
+
 
 fetchHotels();
 
 };
+
 
 
 /*
@@ -252,6 +313,7 @@ await deleteDoc(doc(db,"hotels",id));
 fetchHotels();
 
 };
+
 
 
 /*
@@ -282,7 +344,10 @@ setIsBestSeller(hotel.isBestSeller || false);
 
 setIsOffer(hotel.isOffer || false);
 
+setRooms(hotel.rooms || []);
+
 };
+
 
 
 return(
@@ -321,6 +386,12 @@ className="border p-2 w-full mb-3"
 onChange={(e)=>setPrice(e.target.value)}
 />
 
+<input
+value={locationMap}
+placeholder="Google Map Embed URL"
+className="border p-2 w-full mb-3"
+onChange={(e)=>setLocationMap(e.target.value)}
+/>
 
 <input
 value={discountPrice}
@@ -328,6 +399,75 @@ placeholder="Discount Price (optional)"
 className="border p-2 w-full mb-3"
 onChange={(e)=>setDiscountPrice(e.target.value)}
 />
+
+
+
+{/* إضافة غرفة */}
+
+
+<div className="bg-white p-4 rounded mb-4">
+
+<h3 className="font-bold mb-2">
+
+Add Room Type
+
+</h3>
+
+
+<input
+placeholder="Room Name"
+value={roomName}
+className="border p-2 w-full mb-2"
+onChange={(e)=>setRoomName(e.target.value)}
+/>
+
+
+<input
+placeholder="Guests"
+value={roomGuests}
+className="border p-2 w-full mb-2"
+onChange={(e)=>setRoomGuests(e.target.value)}
+/>
+
+
+<input
+placeholder="Room Price"
+value={roomPrice}
+className="border p-2 w-full mb-2"
+onChange={(e)=>setRoomPrice(e.target.value)}
+/>
+
+
+<input
+placeholder="Features (comma separated)"
+value={roomFeatures}
+className="border p-2 w-full mb-2"
+onChange={(e)=>setRoomFeatures(e.target.value)}
+/>
+
+
+<button
+onClick={handleAddRoom}
+className="bg-blue-600 text-white px-4 py-2 rounded"
+>
+
+Add Room
+
+</button>
+
+
+{rooms.map((room,index)=>(
+
+<p key={index}>
+
+{room.name} — ${room.price}
+
+</p>
+
+))}
+
+</div>
+
 
 
 <input

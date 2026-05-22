@@ -7,9 +7,9 @@ import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import { convertUSDToEGP } from "../utils/currencyConverter";
 import ImageGallery from "../components/ImageGallery";
-
+import { usePrice } from "../utils/price";
 function TransportDetails() {
-
+const price = usePrice();
 const { id } = useParams();
 const navigate = useNavigate();
 
@@ -301,7 +301,7 @@ Type: {transport.type}
 {/* السعر بالدولار */}
 
 <p className="text-orange-500 text-xl mt-4">
-${transport.price} / seat
+{price(transport.price)} / seat
 </p>
 
 

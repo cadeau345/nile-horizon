@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import { useCurrency } from "../context/CurrencyContext";
 import {
 Menu,
 X,
@@ -21,6 +21,9 @@ getDoc
 
 import { db } from "../firebase";
 
+/* Currency Context */
+
+
 
 function Navbar(){
 
@@ -30,6 +33,9 @@ const [isOpen,setIsOpen]=useState(false);
 const [activeDropdown,setActiveDropdown]=useState(null);
 
 const location = useLocation();
+
+/* currency */
+const { currency, setCurrency } = useCurrency();
 
 
 // CHECK USER AUTH
@@ -63,7 +69,6 @@ docSnap.data().role === "admin"
 
 }catch(error){
 
-// منع ظهور error في console بسبب rules
 console.log("Firestore permission handled safely");
 
 }
@@ -123,6 +128,22 @@ Horizon
 <Link to="/contact">Contact</Link>
 <Link to="/temples">Temples</Link>
 <Link to="/flights">Flights</Link>
+
+
+{/* Currency Selector */}
+<select
+value={currency}
+onChange={(e)=>setCurrency(e.target.value)}
+className="border px-2 py-1 rounded text-black"
+>
+
+<option value="USD">USD</option>
+<option value="EGP">EGP</option>
+<option value="EUR">EUR</option>
+<option value="SAR">SAR</option>
+<option value="AED">AED</option>
+
+</select>
 
 
 {isAdmin && (
@@ -293,6 +314,22 @@ onClick={()=>setIsOpen(!isOpen)}
 <Link className="block" to="/temples" onClick={()=>setIsOpen(false)}>Temples</Link>
 
 <Link className="block" to="/flights" onClick={()=>setIsOpen(false)}>Flights</Link>
+
+
+{/* Currency Selector Mobile */}
+<select
+value={currency}
+onChange={(e)=>setCurrency(e.target.value)}
+className="border px-2 py-1 rounded"
+>
+
+<option value="USD">USD</option>
+<option value="EGP">EGP</option>
+<option value="EUR">EUR</option>
+<option value="SAR">SAR</option>
+<option value="AED">AED</option>
+
+</select>
 
 
 {isAdmin && (

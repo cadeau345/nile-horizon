@@ -7,10 +7,12 @@ import { db } from "../firebase";
 import { Link } from "react-router-dom";
 
 import { Helmet } from "react-helmet-async";
-
+import { useCurrency } from "../context/CurrencyContext";
+import { usePrice } from "../utils/price";
 
 function Hotels() {
-
+const price = usePrice();
+    const { currency, convertPrice } = useCurrency();
 const [hotels, setHotels] = useState([]);
 
 
@@ -98,7 +100,7 @@ className="h-52 w-full object-cover"
 <div>
 
 <p className="text-gray-400 line-through">
-${hotel.price}
+{price(hotel.price)}
 </p>
 
 <p className="text-red-500 font-bold">

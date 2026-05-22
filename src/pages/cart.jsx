@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
 import { CartContext } from "../context/CartContext";
-
+import { usePrice } from "../utils/price";
 function Cart() {
-
+const price = usePrice();
   const {
 
     cartItems,
@@ -62,7 +62,7 @@ function Cart() {
 
       <h2 className="text-xl font-bold mt-6">
 
-        Total: ${totalPrice}
+        Total: {price(item.price)}
 
       </h2>
 

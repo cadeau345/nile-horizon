@@ -6,10 +6,13 @@ import { db } from "../firebase";
 
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-
+import { useCurrency } from "../context/CurrencyContext";
+import { usePrice } from "../utils/price";
 
 function Offers() {
 
+    const price = usePrice();
+const { currency, convertPrice } = useCurrency();
 const [offers,setOffers]=useState([]);
 
 
@@ -119,7 +122,7 @@ Food: {item.food}
 
 <p className="text-orange-500 font-bold mt-2">
 
-${item.price}
+{price(offer.price)}
 
 </p>
 

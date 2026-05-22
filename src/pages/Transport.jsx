@@ -7,9 +7,14 @@ import { db } from "../firebase";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { Helmet } from "react-helmet-async";
-
+import { useCurrency } from "../context/CurrencyContext";
+import { usePrice } from "../utils/price";
 
 function Transport() {
+
+const price = usePrice();
+
+const { currency, convertPrice } = useCurrency();
 
 const [searchParams]=useSearchParams();
 
@@ -30,7 +35,6 @@ const [tripType,setTripType]=useState("oneway");
 const [direction,setDirection]=useState("all");
 
 
-
 /*
 ============================
 قراءة بيانات البحث من الرابط
@@ -47,7 +51,6 @@ const urlReturnDate=searchParams.get("returnDate");
 
 const urlPassengers=searchParams.get("passengers");
 
-
 if(urlDirection)setDirection(urlDirection);
 
 if(urlDate)setDate(urlDate);
@@ -57,7 +60,6 @@ if(urlReturnDate)setReturnDate(urlReturnDate);
 if(urlPassengers)setPassengers(urlPassengers);
 
 },[searchParams]);
-
 
 
 /*
@@ -86,7 +88,6 @@ setTransport(data);
 fetchTransport();
 
 },[]);
-
 
 
 /*
@@ -140,7 +141,6 @@ return item.type
 });
 
 
-
 /*
 ============================
 جلب الاتجاهات تلقائي من Firebase
@@ -162,7 +162,6 @@ transport.map(item =>
 )
 
 ];
-
 
 
 return(
@@ -188,13 +187,11 @@ content="Book transport between Egyptian cities by bus, train or private car wit
 </Helmet>
 
 
-
 <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
 Egypt Transport Booking
 
 </h1>
-
 
 
 {/* Direction Buttons */}
@@ -226,7 +223,6 @@ direction===dir
 ))}
 
 </div>
-
 
 
 {/* Trip Type */}
@@ -267,7 +263,6 @@ Round Trip
 </button>
 
 </div>
-
 
 
 {/* Search Box */}
@@ -334,7 +329,6 @@ Search
 </div>
 
 
-
 {/* Filters */}
 
 <div className="flex gap-3 mb-8 flex-wrap">
@@ -362,7 +356,6 @@ filter===type
 ))}
 
 </div>
-
 
 
 {/* Results */}
@@ -425,7 +418,7 @@ className="h-52 w-full object-cover"
 
 <p className="text-orange-500 font-bold mt-2">
 
-${item.price} / seat
+{price(item.price)}
 
 </p>
 
