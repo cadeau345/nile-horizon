@@ -93,7 +93,7 @@ setLocations(uniqueLocations);
 
 const tripsSnapshot=await getDocs(
 
-collection(db,"trips")
+collection(db,"tours")
 
 );
 
@@ -104,12 +104,9 @@ id:doc.id,
 ...doc.data()
 
 }));
+console.log("Trips:", tripsData);
 
-setBestTrips(
-
-tripsData.filter(item=>item.isBestSeller)
-
-);
+setBestTrips(tripsData);
 
 
 // TRANSPORT
@@ -127,12 +124,10 @@ id:doc.id,
 ...doc.data()
 
 }));
+console.log("Transport:", transportData);
 
-setBestTransport(
 
-transportData.filter(item=>item.isBestSeller)
-
-);
+setBestTransport(transportData);
 
 };
 
@@ -381,6 +376,7 @@ Featured Hotels
 <div className="grid md:grid-cols-3 gap-6">
 
 {hotels.map(hotel=>(
+    
 
 <Link key={hotel.id} to={`/hotel/${hotel.id}`}>
 
@@ -411,9 +407,14 @@ className="h-56 w-full object-cover"
 
 
 <p className="text-orange-500 font-bold">
-
-${hotel.discountPrice||hotel.price}
-
+{
+price(
+Number(
+hotel.discountPrice ||
+hotel.price
+) / 50
+)
+}
 </p>
 
 </div>
@@ -444,15 +445,20 @@ Best Trips
 
 <div className="grid md:grid-cols-3 gap-6">
 
-{bestTrips.slice(0,3).map(trip=>(
+{bestTrips?.length > 0 &&
+bestTrips.slice(0,3).map(trip=>(
 
-<Link key={trip.id} to={`/trip/${trip.id}`}>
+<Link key={trip.id} to={`/tour/${trip.id}`}>
 
 <div className="shadow-lg rounded-xl overflow-hidden">
 
 <img
 
-src={trip.images?.[0]||trip.image}
+src={
+trip.images?.[0] ||
+trip.image ||
+"https://via.placeholder.com/600x400"
+}
 
 className="h-56 w-full object-cover"
 
@@ -462,16 +468,19 @@ className="h-56 w-full object-cover"
 <div className="p-4">
 
 <h3 className="font-bold">
-
-{trip.name}
-
+{trip.title || trip.name || "Trip"}
 </h3>
 
+<p className="text-gray-500">
+{trip.duration}
+</p>
 
-<p className="text-orange-500">
-
-${trip.price}
-
+<p className="text-orange-500 font-bold">
+{
+price(
+Number(trip.price)
+)
+}
 </p>
 
 </div>
@@ -520,15 +529,20 @@ className="h-56 w-full object-cover"
 <div className="p-4">
 
 <h3 className="font-bold">
-
-{item.name}
-
+{item.company}
 </h3>
+<p className="text-gray-500">
+{item.from} → {item.to}
+</p>
 
 
 <p className="text-orange-500">
 
-${item.price}
+{
+price(
+Number(item.price)
+)
+}
 
 </p>
 
@@ -586,7 +600,9 @@ className="h-56 w-full object-cover"
 
 <p className="text-red-500 font-bold">
 
-${item.discountPrice}
+{
+price(item.discountPrice)
+}
 
 </p>
 

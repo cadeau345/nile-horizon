@@ -159,7 +159,11 @@ setImage(compressedImages[0]||image);
 
 };
 
-
+/*
+============================
+Sync Egypt Transport
+============================
+*/
 
 /*
 ============================
@@ -259,6 +263,285 @@ fetchTransport();
 حذف
 ============================
 */
+const syncTransportations = async () => {
+  try {
+    alert(
+      "Syncing transportations..."
+    );
+
+  const baseRoutes = [
+      {
+        company:
+          "VIP Bus Egypt",
+        from:
+          "Cairo",
+        to:
+          "Aswan",
+        type:
+          "Bus",
+        price: 45,
+        image:
+          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+      },
+
+      {
+        company:
+          "Talgo Express",
+        from:
+          "Cairo",
+        to:
+          "Aswan",
+        type:
+          "Train",
+        price: 40,
+        image:
+          "https://images.unsplash.com/photo-1474487548417-781cb71495f3",
+      },
+
+      {
+        company:
+          "Private VIP Transfer",
+        from:
+          "Cairo",
+        to:
+          "Aswan",
+        type:
+          "Car",
+        price: 190,
+        image:
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+      },
+
+      {
+        company:
+          "Go Bus VIP",
+        from:
+          "Cairo",
+        to:
+          "Luxor",
+        type:
+          "Bus",
+        price: 30,
+        image:
+          "https://images.unsplash.com/photo-1570125909232-eb263c188f7e",
+      },
+
+      {
+        company:
+          "Talgo Luxor",
+        from:
+          "Cairo",
+        to:
+          "Luxor",
+        type:
+          "Train",
+        price: 42,
+        image:
+          "https://images.unsplash.com/photo-1474487548417-781cb71495f3",
+      },
+
+      {
+        company:
+          "Luxury SUV",
+        from:
+          "Cairo",
+        to:
+          "Luxor",
+        type:
+          "Car",
+        price: 240,
+        image:
+          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
+      },
+
+      {
+        company:
+          "Go Bus Economy",
+        from:
+          "Cairo",
+        to:
+          "Hurghada",
+        type:
+          "Bus",
+        price: 18,
+        image:
+          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+      },
+
+      {
+        company:
+          "Blue Bus Premium",
+        from:
+          "Cairo",
+        to:
+          "Hurghada",
+        type:
+          "VIP Bus",
+        price: 35,
+        image:
+          "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7",
+      },
+
+      {
+        company:
+          "Luxury Transfer",
+        from:
+          "Cairo",
+        to:
+          "Hurghada",
+        type:
+          "Car",
+        price: 170,
+        image:
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+      },
+
+      {
+        company:
+          "Sinai VIP Bus",
+        from:
+          "Cairo",
+        to:
+          "Sharm El Sheikh",
+        type:
+          "Bus",
+        price: 42,
+        image:
+          "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7",
+      },
+
+      {
+        company:
+          "Private Sinai Transfer",
+        from:
+          "Cairo",
+        to:
+          "Sharm El Sheikh",
+        type:
+          "Car",
+        price: 190,
+        image:
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+      },
+
+      {
+        company:
+          "Dahab Express",
+        from:
+          "Cairo",
+        to:
+          "Dahab",
+        type:
+          "Bus",
+        price: 24,
+        image:
+          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+      },
+
+      {
+        company:
+          "Private Transfer Dahab",
+        from:
+          "Cairo",
+        to:
+          "Dahab",
+        type:
+          "Car",
+        price: 210,
+        image:
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+      },
+
+      {
+        company:
+          "Marsa Alam Shuttle",
+        from:
+          "Cairo",
+        to:
+          "Marsa Alam",
+        type:
+          "Bus",
+        price: 40,
+        image:
+          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+      },
+
+      {
+        company:
+          "Luxury Marsa Transfer",
+        from:
+          "Cairo",
+        to:
+          "Marsa Alam",
+        type:
+          "Car",
+        price: 240,
+        image:
+          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
+      },
+    ];
+    const transportRoutes =
+baseRoutes.flatMap(
+(route) => [
+
+route,
+
+{
+...route,
+
+from: route.to,
+
+to: route.from,
+},
+]
+);
+
+    let addedCount = 0;
+
+    for (const item of transportRoutes) {
+
+      console.log(item);
+
+      await addDoc(
+        collection(
+          db,
+          "transport"
+        ),
+        {
+          ...item,
+
+          images: [
+            item.image,
+          ],
+
+          isBestSeller:
+            false,
+
+          isOffer:
+            false,
+
+          createdAt:
+            new Date(),
+        }
+      );
+
+      addedCount++;
+    }
+
+    fetchTransport();
+
+    alert(
+      `Done! Added ${addedCount} transport routes ✅`
+    );
+
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      "Transport Sync Failed ❌"
+    );
+  }
+};
 
 const handleDelete=async(id)=>{
 
@@ -418,6 +701,14 @@ className="bg-green-600 text-white px-6 py-2 rounded"
 {editingId?"Update Transport":"Add Transport"}
 
 </button>
+<button
+  onClick={
+    syncTransportations
+  }
+  className="bg-blue-600 text-white px-6 py-2 rounded ml-2"
+>
+  Sync Transportations
+</button>
 
 </div>
 
@@ -437,7 +728,11 @@ className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
 {item.images?.length>0&&(
 
 <img
-src={item.images[0]}
+src={
+item.images?.[0] ||
+item.image ||
+"/placeholder.jpg"
+}
 className="w-16 h-16 object-cover rounded"
 alt=""
 />

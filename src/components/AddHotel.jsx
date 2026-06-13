@@ -10,6 +10,7 @@ updateDoc
 } from "firebase/firestore";
 
 import { db } from "../firebase";
+import axios from "axios";
 
 function AddHotel() {
 
@@ -306,6 +307,213 @@ fetchHotels();
 ============================
 */
 
+const syncHotelsFromAPI = async () => {
+  try {
+    alert("Fetching Egypt hotels...");
+
+    const egyptCities = [
+      { name: "Cairo", id: "-290692" },
+      { name: "Giza", id: "-290029" },
+      { name: "Alexandria", id: "-290263" },
+      { name: "Sharm El Sheikh", id: "-302053" },
+      { name: "Hurghada", id: "-290900" },
+      { name: "Luxor", id: "-290340" },
+      { name: "Aswan", id: "-290157" },
+      { name: "Marsa Alam", id: "-293825" },
+      { name: "Dahab", id: "-290757" },
+      { name: "El Gouna", id: "-291822" },
+    ];
+
+    // Delay function
+    const sleep = (ms) =>
+      new Promise((resolve) =>
+        setTimeout(resolve, ms)
+      );
+
+    const existingHotels = new Set();
+
+    const existingSnapshot =
+      await getDocs(
+        collection(db, "hotels")
+      );
+
+    existingSnapshot.forEach((doc) => {
+      existingHotels.add(
+        doc.data().name
+      );
+    });
+
+    for (const city of egyptCities) {
+
+      console.log(
+        `Starting ${city.name}`
+      );
+
+      // قللتها لـ 8 صفحات علشان الـ free plan
+      for (let page = 1; page <= 8; page++) {
+
+        console.log(
+          `Fetching ${city.name} page ${page}`
+        );
+
+        try {
+
+          const response =
+            await axios.get(
+              "https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels",
+              {
+                params: {
+                  dest_id: city.id,
+                  search_type: "CITY",
+                  arrival_date:
+                    "2026-06-15",
+                  departure_date:
+                    "2026-06-18",
+                  adults: "2",
+                  room_qty: "1",
+                  page_number:
+                    page.toString(),
+                  currency_code:
+                    "EGP",
+                  languagecode:
+                    "en-us",
+                },
+
+                headers: {
+                  "x-rapidapi-key":
+                    "fb51683203mshf0c81a04e5359adp14a1c8jsn67caa812920d",
+
+                  "x-rapidapi-host":
+                    "booking-com15.p.rapidapi.com",
+                },
+              }
+            );
+
+          const hotels =
+            response.data?.data
+              ?.hotels || [];
+
+          if (!hotels.length) {
+            console.log(
+              `No hotels in ${city.name} page ${page}`
+            );
+            break;
+          }
+
+          for (const hotel of hotels) {
+
+            const hotelName =
+              hotel.property?.name;
+
+            if (
+              !hotelName ||
+              existingHotels.has(
+                hotelName
+              )
+            ) {
+              continue;
+            }
+
+            await addDoc(
+              collection(
+                db,
+                "hotels"
+              ),
+              {
+                name:
+                  hotelName ||
+                  "Unknown Hotel",
+
+                location:
+                  city.name,
+
+                price:
+                  Math.round(
+                    Number(
+                      hotel.property
+                        ?.priceBreakdown
+                        ?.grossPrice
+                        ?.value || 0
+                    )
+                  ),
+
+                description:
+                  hotel.accessibilityLabel ||
+                  "",
+
+                images:
+                  hotel.property
+                    ?.photoUrls ||
+                  [],
+
+                rating:
+                  hotel.property
+                    ?.reviewScore ||
+                  0,
+
+                isBestSeller:
+                  false,
+
+                isOffer:
+                  false,
+
+                discountPrice:
+                  "",
+
+                rooms: [],
+              }
+            );
+
+            existingHotels.add(
+              hotelName
+            );
+          }
+
+          // Delay 2 sec
+          await sleep(2000);
+
+        } catch (error) {
+
+          // لو API وقفك
+          if (
+            error.response?.status ===
+            429
+          ) {
+            console.log(
+              "Too many requests. Waiting 20 seconds..."
+            );
+
+            await sleep(
+              20000
+            );
+
+            page--; // يعيد نفس الصفحة
+            continue;
+          }
+
+          console.error(
+            `Error in ${city.name} page ${page}`,
+            error
+          );
+        }
+      }
+    }
+
+    alert(
+      "Thousands of Egypt hotels added ✅"
+    );
+
+    fetchHotels();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error fetching hotels ❌"
+    );
+  }
+};
 const handleDelete = async (id) => {
 
 await deleteDoc(doc(db,"hotels",id));
@@ -454,6 +662,12 @@ className="bg-blue-600 text-white px-4 py-2 rounded"
 Add Room
 
 </button>
+<button
+  onClick={syncHotelsFromAPI}
+  className="bg-blue-600 text-white px-6 py-2 rounded ml-3"
+>
+  Sync Hotels From API
+</button>
 
 
 {rooms.map((room,index)=>(
@@ -546,6 +760,7 @@ className="bg-green-600 text-white px-6 py-2 rounded"
 
 
 {hotels.map(hotel=>(
+  
 
 <div
 key={hotel.id}

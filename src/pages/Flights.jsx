@@ -9,7 +9,7 @@ const script = document.createElement("script");
 
 script.src =
 "https://tpemd.com/content?currency=usd&trs=519404&shmarker=719849&target_host=www.aviasales.com%2Fsearch&locale=en&limit=6&powered_by=true&primary=%230085FF&promo_id=4044&campaign_id=100";
-"https://tpemd.com/content?currency=usd&trs=519404&shmarker=719849&locale=en&powered_by=true&limit=4&primary_color=00AE98&results_background_color=FFFFFF&form_background_color=FFFFFF&campaign_id=111&promo_id=3411" 
+
 script.async = true;
 
 script.charset = "utf-8";

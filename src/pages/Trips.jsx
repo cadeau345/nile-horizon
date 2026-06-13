@@ -23,7 +23,7 @@ useEffect(()=>{
 const fetchTrips=async()=>{
 
 const querySnapshot=await getDocs(
-collection(db,"trips")
+collection(db,"tours")
 );
 
 const data=querySnapshot.docs.map(doc=>({
@@ -132,7 +132,7 @@ trip.images?.[0] ||
 trip.image ||
 "/placeholder.jpg"
 }
-alt={trip.name}
+alt={trip.title}
 className="h-52 w-full object-cover"
 />
 
@@ -140,7 +140,7 @@ className="h-52 w-full object-cover"
 <div className="p-4">
 
 <h2 className="text-xl font-bold">
-{trip.name}
+{trip.title}
 </h2>
 
 

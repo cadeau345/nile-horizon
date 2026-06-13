@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import axios from "axios";
 import {
 collection,
 addDoc,
@@ -97,7 +97,7 @@ resolve(compressed);
 const fetchTrips=async()=>{
 
 const snapshot=await getDocs(
-collection(db,"trips")
+collection(db,"tours")
 );
 
 setTrips(
@@ -180,7 +180,7 @@ if(editingId){
 
 await updateDoc(
 
-doc(db,"trips",editingId),
+doc(db,"tours",editingId),
 
 {
 name,
@@ -246,17 +246,277 @@ fetchTrips();
 
 };
 
+const syncToursFromAPI = async () => {
+  try {
+    alert("Fetching Egypt tours...");
 
+    const cities = [
+      {
+        name: "Cairo",
+        geoId: 294201,
+      },
+      {
+        name: "Luxor",
+        geoId: 294205,
+      },
+      {
+        name: "Aswan",
+        geoId: 294204,
+      },
+      {
+        name: "Hurghada",
+        geoId: 297549,
+      },
+      {
+        name: "Sharm El Sheikh",
+        geoId: 297555,
+      },
+      {
+        name: "Dahab",
+        geoId: 297546,
+      },
+      {
+        name: "Marsa Alam",
+        geoId: 297548,
+      },
+    ];
 
-/*
-============================
-حذف
-============================
-*/
+    let addedCount = 0;
 
+    for (const city of cities) {
+      try {
+        console.log(
+          `Fetching ${city.name}...`
+        );
+
+        const response =
+          await axios.post(
+            "https://travel-advisor.p.rapidapi.com/attraction-products/v2/list?currency=USD&units=km&lang=en_US",
+            {
+              geoId:
+                city.geoId,
+
+              startDate:
+                "2026-07-01",
+
+              endDate:
+                "2026-07-10",
+
+              pax: [
+                {
+                  ageBand:
+                    "ADULT",
+                  count: 1,
+                },
+              ],
+
+              sort:
+                "TRAVELER_FAVORITE_V2",
+
+              sortOrder:
+                "desc",
+
+              updateToken:
+                "",
+            },
+            {
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                "x-rapidapi-key":
+                  "c1250ddc30msh756e3f241204ba0p100fb8jsna436fe9c0f91",
+
+                "x-rapidapi-host":
+                  "travel-advisor.p.rapidapi.com",
+              },
+            }
+          );
+
+        const sections =
+          response?.data
+            ?.data
+            ?.AppPresentation_queryAppListV2?.[0]
+            ?.sections ||
+          [];
+
+        console.log(
+          `${city.name}:`,
+          sections.length
+        );
+
+        for (const section of sections) {
+          try {
+            const card =
+              section?.listSingleCardContent;
+
+            if (!card)
+              continue;
+
+            const title =
+              card?.cardTitle
+                ?.string ||
+              card
+                ?.primaryInfo
+                ?.text ||
+              "Unknown Tour";
+
+            const image =
+              card?.cardPhoto
+                ?.sizes
+                ?.urlTemplate
+                ?.replace(
+                  "{width}",
+                  "800"
+                )
+                ?.replace(
+                  "{height}",
+                  "600"
+                ) || "";
+
+            const description =
+              card
+                ?.secondaryInfo
+                ?.text ||
+              card
+                ?.descriptiveText
+                ?.htmlString ||
+              "No description available";
+
+            const rating =
+              Number(
+                card
+                  ?.bubbleRating
+                  ?.rating ||
+                  0
+              );
+
+            const reviews =
+              card
+                ?.bubbleRating
+                ?.reviewCount ||
+              0;
+
+    let price = 0;
+
+const apiPriceText =
+  card?.commerceButtons?.[0]
+    ?.price?.displayPrice ||
+  card?.merchandisingText
+    ?.htmlString ||
+  "";
+
+const match =
+  apiPriceText.match(
+    /[\d,.]+/
+  );
+
+if (match) {
+  price = parseFloat(
+    match[0].replace(
+      /,/g,
+      ""
+    )
+  );
+}
+
+// تنظيف الأسعار المبالغ فيها
+if (
+  price > 500 ||
+  !price ||
+  isNaN(price)
+) {
+  if (
+    city.name ===
+      "Hurghada" ||
+    city.name ===
+      "Sharm El Sheikh" ||
+    city.name ===
+      "Dahab" ||
+    city.name ===
+      "Marsa Alam"
+  ) {
+    // مدن البحر
+    price =
+      Math.floor(
+        Math.random() *
+          (250 - 35) +
+          35
+      );
+  } else {
+    // القاهرة والأقصر وأسوان
+    price =
+      Math.floor(
+        Math.random() *
+          (150 - 20) +
+          20
+      );
+  }
+}
+
+            await addDoc(
+              collection(
+                db,
+                "tours"
+              ),
+              {
+                title,
+                city:
+                  city.name,
+                category:
+                  "Tour",
+                description,
+                image,
+                rating,
+                reviews,
+                duration:
+                  "Full Day",
+                price,
+                isBestSeller:
+                  false,
+                isOffer:
+                  false,
+                discountPrice:
+                  "",
+                createdAt:
+                  new Date(),
+              }
+            );
+
+            addedCount++;
+
+            console.log(
+              `Added ${addedCount}: ${title}`
+            );
+          } catch (err) {
+            console.log(
+              "Skipped:",
+              err
+            );
+          }
+        }
+      } catch (err) {
+        console.log(
+          `Error in ${city.name}`,
+          err
+        );
+      }
+    }
+
+    alert(
+      `Done! Added ${addedCount} tours ✅`
+    );
+  } catch (error) {
+    console.error(
+      error
+    );
+
+    alert("Error ❌");
+  }
+};
 const handleDelete=async(id)=>{
 
-await deleteDoc(doc(db,"trips",id));
+await deleteDoc(doc(db,"tours",id));
 
 fetchTrips();
 
@@ -402,6 +662,12 @@ className="bg-green-600 text-white px-6 py-2 rounded"
 {editingId?"Update Trip":"Add Trip"}
 
 </button>
+<button
+  onClick={syncToursFromAPI}
+  className="bg-blue-600 text-white px-4 py-2 rounded"
+>
+  Sync Egypt Tours
+</button>
 
 </div>
 
@@ -418,22 +684,20 @@ className="flex justify-between items-center bg-white shadow p-4 mb-3 rounded"
 
 <div className="flex items-center gap-4">
 
-{trip.images?.length>0&&(
-
 <img
-src={trip.images[0]}
+src={
+  trip.images?.[0] ||
+  trip.image ||
+  "/placeholder.jpg"
+}
 className="w-16 h-16 object-cover rounded"
 alt=""
 />
 
-)}
-
 <div>
 
 <h3 className="font-bold">
-
-{trip.name}
-
+  {trip.title || trip.name}
 </h3>
 
 <p className="text-gray-500">
