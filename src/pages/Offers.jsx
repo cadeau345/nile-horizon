@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-
 import { collection, getDocs } from "firebase/firestore";
-
 import { db } from "../firebase";
-
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useCurrency } from "../context/CurrencyContext";
@@ -11,141 +8,137 @@ import { usePrice } from "../utils/price";
 
 function Offers() {
 
-    const price = usePrice();
-const { currency, convertPrice } = useCurrency();
-const [offers,setOffers]=useState([]);
+  const price = usePrice();
+  const { currency, convertPrice } = useCurrency();
+  const [offers, setOffers] = useState([]);
 
+  useEffect(() => {
 
-useEffect(()=>{
+    const fetchOffers = async () => {
 
-const fetchOffers=async()=>{
+      try {
 
-const querySnapshot=await getDocs(
-collection(db,"offers")
-);
+        const querySnapshot = await getDocs(
+          collection(db, "offers")
+        );
 
-const data=querySnapshot.docs.map(doc=>({
-id:doc.id,
-...doc.data()
-}));
+        const data = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
 
-setOffers(data);
+        setOffers(data);
 
-};
+      } catch (error) {
 
-fetchOffers();
+        console.error("Error fetching offers:", error);
 
-},[]);
+      }
 
+    };
 
-return(
+    fetchOffers();
 
-<div className="p-10">
+  }, []);
 
-<Helmet>
+  return (
 
-<title>
-Aswan Travel Packages | Nile Horizon Offers
-</title>
+    <div className="p-10">
 
-<meta
-name="description"
-content="Exclusive Aswan travel packages including hotels, transport and guided tours at affordable prices."
-/>
+      <Helmet>
 
-</Helmet>
+        <title>
+          Aswan Travel Packages | Nile Horizon Offers
+        </title>
 
+        <meta
+          name="description"
+          content="Exclusive Aswan travel packages including hotels, transport and guided tours at affordable prices."
+        />
 
-<h1 className="text-3xl font-bold text-blue-900 mb-6">
+      </Helmet>
 
-Special Offers in Aswan
+      <h1 className="text-3xl font-bold text-blue-900 mb-6">
 
-</h1>
+        Special Offers in Aswan
 
+      </h1>
 
-<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-{offers.map(item=>(
+        {offers.map(item => (
 
-<Link key={item.id} to={`/offer/${item.id}`}>
+          <Link key={item.id} to={`/offer/${item.id}`}>
 
-<div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
+            <div className="shadow-lg rounded-xl overflow-hidden hover:scale-105 transition">
 
+              <img
+                src={
+                  item.images?.[0] ||
+                  item.image ||
+                  "/placeholder.jpg"
+                }
+                className="h-52 w-full object-cover"
+                alt={item.title}
+              />
 
-<img
-src={
-item.images?.[0] ||
-item.image ||
-"/placeholder.jpg"
-}
-className="h-52 w-full object-cover"
-alt={item.title}
-/>
+              <div className="p-4">
 
+                <h2 className="text-xl font-bold">
 
-<div className="p-4">
+                  {item.title}
 
-<h2 className="text-xl font-bold">
+                </h2>
 
-{item.title}
+                <p className="text-gray-500">
 
-</h2>
+                  {item.duration}
 
+                </p>
 
-<p className="text-gray-500">
+                <p className="mt-2">
 
-{item.duration}
+                  Hotel: {item.hotel}
 
-</p>
+                </p>
 
+                <p>
 
-<p className="mt-2">
+                  Trips: {item.trips}
 
-Hotel: {item.hotel}
+                </p>
 
-</p>
+                <p>
 
+                  Food: {item.food}
 
-<p>
+                </p>
 
-Trips: {item.trips}
+                <p className="text-orange-500 font-bold mt-2">
 
-</p>
+           {Number(item.price).toFixed(2)} EGP
 
+                </p>
 
-<p>
+                <button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
 
-Food: {item.food}
+                  View Details
 
-</p>
+                </button>
 
+              </div>
 
-<p className="text-orange-500 font-bold mt-2">
+            </div>
 
-{price(offer.price)}
+          </Link>
 
-</p>
+        ))}
 
+      </div>
 
-<button className="mt-3 bg-blue-900 text-white px-4 py-2 rounded">
+    </div>
 
-View Details
-
-</button>
-
-</div>
-
-</div>
-
-</Link>
-
-))}
-
-</div>
-
-</div>
-
-);
+  );
 
 }
 
