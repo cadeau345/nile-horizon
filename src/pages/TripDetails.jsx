@@ -1,585 +1,730 @@
 import { useEffect, useState, useContext } from "react";
-import {
-  doc,
-  getDoc,
-  collection,
-  addDoc
-} from "firebase/firestore";
 
 import {
-  useParams,
-  useNavigate
-} from "react-router-dom";
+  doc,
+  getDoc
+} from "firebase/firestore";
+
+import { useParams } from "react-router-dom";
 
 import { db } from "../firebase";
 
 import WhatsAppButton from "../components/WhatsAppButton";
 
 import { CartContext } from "../context/CartContext";
-import { AuthContext } from "../context/AuthContext";
 
 import ImageGallery from "../components/ImageGallery";
 
 import { usePrice } from "../utils/price";
-import { convertUSDToEGP } from "../utils/currencyConverter";
+
 
 function TripDetails() {
-  const price = usePrice();
 
   const { id } = useParams();
-  const navigate = useNavigate();
-
-  const { user } =
-    useContext(AuthContext);
 
   const { addToCart } =
     useContext(CartContext);
 
-  const [trip, setTrip] =
-    useState(null);
+  const price = usePrice();
 
-  const [name, setName] =
-    useState("");
 
-  const [phone, setPhone] =
-    useState("");
+  /* =========================
+     TRIP
+  ========================= */
 
-  const [date, setDate] =
-    useState("");
+  const [trip, setTrip] = useState(null);
 
-  const [guests, setGuests] =
-    useState("");
 
-  const [priceEGP, setPriceEGP] =
-    useState(null);
+  /* =========================
+     BOOKING DATA
+  ========================= */
 
-  /*
-  ============================
-  تحميل الرحلة
-  ============================
-  */
+  const [name, setName] = useState("");
+
+  const [phone, setPhone] = useState("");
+
+  const [date, setDate] = useState("");
+
+  const [guests, setGuests] = useState("");
+
+
+  /* =========================
+     LOAD TRIP
+  ========================= */
 
   useEffect(() => {
-    const fetchTrip =
-      async () => {
-        try {
-          // ✅ tours بدل trips
-          const docRef = doc(
-            db,
-            "tours",
-            id
+
+    const fetchTrip = async () => {
+
+      try {
+
+        /*
+          Your current project stores
+          trips inside "tours".
+        */
+
+        const docRef = doc(
+          db,
+          "tours",
+          id
+        );
+
+
+        const docSnap =
+          await getDoc(docRef);
+
+
+        if (docSnap.exists()) {
+
+          setTrip({
+
+            id: docSnap.id,
+
+            ...docSnap.data()
+
+          });
+
+        } else {
+
+          console.log(
+            "Trip not found"
           );
 
-          const docSnap =
-            await getDoc(
-              docRef
-            );
-
-          if (
-            docSnap.exists()
-          ) {
-            setTrip({
-              id:
-                docSnap.id,
-              ...docSnap.data(),
-            });
-          } else {
-            console.log(
-              "Trip not found"
-            );
-          }
-        } catch (err) {
-          console.error(
-            err
-          );
         }
-      };
+
+      } catch (error) {
+
+        console.error(
+          "Error loading trip:",
+          error
+        );
+
+      }
+
+    };
+
 
     fetchTrip();
+
   }, [id]);
 
-  /*
-  ============================
-  تحويل السعر للمصري
-  ============================
-  */
 
-  useEffect(() => {
-    const convertPrice =
-      async () => {
-        if (
-          trip?.price
-        ) {
-          try {
-            const egp =
-              await convertUSDToEGP(
-                trip.price
-              );
 
-            setPriceEGP(
-              egp
-            );
-          } catch (
-            error
-          ) {
-            console.log(
-              error
-            );
-          }
-        }
-      };
+  /* =========================
+     ADD TO BOOKING CART
+  ========================= */
 
-    convertPrice();
-  }, [trip]);
+  const handleAddToCart = () => {
 
-  /*
-  ============================
-  حماية العمليات
-  ============================
-  */
+    if (!name.trim()) {
 
-  const checkAuthBeforeBooking =
-    () => {
-      if (!user) {
-        alert(
-          "يجب تسجيل الدخول أولاً"
-        );
+      alert(
+        "اكتب اسمك أولاً"
+      );
 
-        navigate(
-          "/customer-login"
-        );
+      return;
 
-        return false;
-      }
+    }
 
-      if (
-        !user.emailVerified
-      ) {
-        alert(
-          "يجب تأكيد البريد الإلكتروني أولاً"
-        );
 
-        return false;
-      }
+    if (!phone.trim()) {
 
-      return true;
-    };
+      alert(
+        "اكتب رقم الهاتف"
+      );
 
-  /*
-  ============================
-  الحجز العادي
-  ============================
-  */
+      return;
 
-  const handleBooking =
-    async () => {
-      if (
-        !checkAuthBeforeBooking()
-      )
-        return;
+    }
 
-      if (
-        !name ||
-        !phone
-      ) {
-        alert(
-          "Please fill required fields"
-        );
 
-        return;
-      }
+    if (!date) {
 
-      await addDoc(
-        collection(
-          db,
-          "bookings"
+      alert(
+        "اختار تاريخ الرحلة"
+      );
+
+      return;
+
+    }
+
+
+    if (!guests) {
+
+      alert(
+        "اكتب عدد الأشخاص"
+      );
+
+      return;
+
+    }
+
+
+    addToCart({
+
+      name:
+        trip.title ||
+        trip.name ||
+        "Trip",
+
+
+      price:
+        Number(
+          trip.price || 0
         ),
-        {
-          userId:
-            user.uid,
 
-          userEmail:
-            user.email,
 
-          serviceType:
-            "trip",
+      serviceType:
+        "trip",
 
-          serviceName:
-            trip.title ||
-            trip.name,
 
-          name,
-          phone,
+      tripId:
+        id,
 
-          date,
-          guests,
 
-          price:
-            trip.price,
+      city:
+        trip.city || "",
 
-          status:
-            "pending",
 
-          createdAt:
-            new Date(),
-        }
-      );
+      duration:
+        trip.duration || "",
 
-      alert(
-        "Trip booked successfully"
-      );
 
-      setName("");
-      setPhone("");
-      setDate("");
-      setGuests("");
-    };
+      date:
 
-  /*
-  ============================
-  إضافة للكارت
-  ============================
-  */
 
-  const handleAddToCart =
-    () => {
-      if (
-        !checkAuthBeforeBooking()
-      )
-        return;
+        date,
 
-      addToCart({
-        name:
-          trip.title ||
-          trip.name,
 
-        price:
-          trip.price,
+      guests:
 
-        type:
-          "trip",
-      });
 
-      alert(
-        "Added to cart"
-      );
-    };
+        guests,
 
-  /*
-  ============================
-  واتساب
-  ============================
-  */
 
-  const handleWhatsAppBooking =
-    () => {
-      const phoneNumber =
-        "201034022992";
+      customerName:
+        name.trim(),
 
-      const message = `
-عايز احجز رحلة:
+
+      customerPhone:
+        phone.trim()
+
+    });
+
+
+    alert(
+      "تمت إضافة الرحلة إلى الحجز بنجاح"
+    );
+
+  };
+
+
+
+  /* =========================
+     WHATSAPP
+  ========================= */
+
+  const handleWhatsAppBooking = () => {
+
+    if (!trip) return;
+
+
+    const phoneNumber =
+      "201034022992";
+
+
+    const message = `عايز أحجز رحلة:
 
 اسم الرحلة:
 ${trip.title || trip.name}
 
+الاسم:
+${name || "غير محدد"}
+
+رقم الهاتف:
+${phone || "غير محدد"}
+
 عدد الأشخاص:
-${guests || 1}
+${guests || "غير محدد"}
 
 التاريخ:
 ${date || "غير محدد"}
 
 السعر:
-${trip.price}
-`;
+${trip.price || 0}`;
 
-      window.open(
-        `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-          message
-        )}`,
-        "_blank"
-      );
-    };
 
-  /*
-  ============================
-  الدفع
-  ============================
-  */
+    window.open(
 
-  const handlePayment =
-    async () => {
-      if (
-        !checkAuthBeforeBooking()
-      )
-        return;
+      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+        message
+      )}`,
 
-      // ✅ fix bug
-      if (
-        !name ||
-        !phone ||
-        !date ||
-        !guests
-      ) {
-        alert(
-          "Please fill booking details first"
-        );
+      "_blank"
 
-        return;
-      }
-
-      const convertedPrice =
-        await convertUSDToEGP(
-          trip.price
-        );
-
-      localStorage.setItem(
-        "pendingBooking",
-        JSON.stringify(
-          {
-            userId:
-              user.uid,
-
-            userEmail:
-              user.email,
-
-            serviceType:
-              "trip",
-
-            serviceName:
-              trip.title ||
-              trip.name,
-
-            name,
-            phone,
-            date,
-            guests,
-
-            price:
-              convertedPrice,
-          }
-        )
-      );
-
-      const response =
-        await fetch(
-          "http://localhost:5000/pay",
-          {
-            method:
-              "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body:
-              JSON.stringify(
-                {
-                  price:
-                    convertedPrice,
-                }
-              ),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      window.location.href =
-        `https://accept.paymob.com/api/acceptance/iframes/1029284?payment_token=${data.payment_token}`;
-    };
-
-  if (!trip)
-    return (
-      <p>
-        Loading...
-      </p>
     );
 
-  return (
-    <div className="p-10 max-w-5xl mx-auto">
+  };
 
-      {/* صور الرحلة */}
+
+
+  /* =========================
+     LOADING
+  ========================= */
+
+  if (!trip) {
+
+    return (
+
+      <div className="
+        min-h-screen
+        flex
+        items-center
+        justify-center
+      ">
+
+        <p className="text-xl">
+          Loading...
+        </p>
+
+      </div>
+
+    );
+
+  }
+
+
+
+  /* =========================
+     PAGE
+  ========================= */
+
+  return (
+
+    <div className="
+      p-6
+      md:p-10
+      max-w-6xl
+      mx-auto
+      pt-32
+    ">
+
+
+      {/* =====================
+          IMAGE
+      ===================== */}
+
       <ImageGallery
+
         images={
-          trip.images ||
-          []
+          trip.images || []
         }
+
         fallback={
           trip.image
         }
+
       />
 
-      {/* عنوان الرحلة */}
-      <h1 className="text-3xl font-bold mt-6">
+
+
+      {/* =====================
+          TITLE
+      ===================== */}
+
+      <h1 className="
+        text-3xl
+        md:text-4xl
+        font-bold
+        mt-6
+      ">
+
         {trip.title ||
           trip.name}
+
       </h1>
 
-      {/* المدينة */}
+
+
+      {/* =====================
+          CITY
+      ===================== */}
+
       {trip.city && (
-        <p className="text-sm text-blue-700 mt-2">
-          {trip.city}
+
+        <p className="
+          text-sm
+          text-blue-700
+          mt-2
+        ">
+
+          📍 {trip.city}
+
         </p>
+
       )}
 
-      {/* المدة */}
-      <p className="text-gray-500 mt-2">
-        Duration:
-        {" "}
-        {trip.duration}
-      </p>
 
-      {/* الوصف */}
-      <p className="mt-4">
-        {
-          trip.description
-        }
-      </p>
 
-      {/* التقييم */}
+      {/* =====================
+          DURATION
+      ===================== */}
+
+      {trip.duration && (
+
+        <p className="
+          text-gray-500
+          mt-2
+        ">
+
+          Duration:
+          {" "}
+          {trip.duration}
+
+        </p>
+
+      )}
+
+
+
+      {/* =====================
+          DESCRIPTION
+      ===================== */}
+
+      {trip.description && (
+
+        <p className="
+          mt-4
+          text-gray-700
+          leading-7
+        ">
+
+          {trip.description}
+
+        </p>
+
+      )}
+
+
+
+      {/* =====================
+          RATING
+      ===================== */}
+
       {trip.rating && (
-        <p className="mt-2 text-yellow-600">
-          ⭐
-          {" "}
-          {trip.rating}
-          {" "}
-          (
-          {
-            trip.reviews
-          }
-          {" "}
-          reviews)
+
+        <p className="
+          mt-3
+          text-yellow-600
+        ">
+
+          ⭐ {trip.rating}
+
+          {trip.reviews && (
+
+            <>
+              {" "}
+              ({trip.reviews} reviews)
+            </>
+
+          )}
+
         </p>
+
       )}
 
-      {/* السعر */}
-      <p className="text-orange-500 text-xl mt-4">
-        {price(
-          trip.price
-        )}
-      </p>
 
-      {/* سعر بالمصري */}
-      {priceEGP && (
-        <p className="text-green-600 text-sm">
-          ≈
-          {" "}
-          {priceEGP}
-          {" "}
-          جنيه مصري
+
+      {/* =====================
+          PRICE
+      ===================== */}
+
+      <div className="mt-5">
+
+        <p className="
+          text-orange-500
+          text-2xl
+          font-bold
+        ">
+
+          {price(
+            Number(
+              trip.price || 0
+            )
+          )}
+
         </p>
-      )}
 
-      {/* كارت */}
-      <button
-        onClick={
-          handleAddToCart
-        }
-        className="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl w-full"
-      >
-        Add to Cart
-      </button>
+      </div>
 
-      {/* الحجز */}
-      <div className="mt-10 bg-gray-100 p-6 rounded-xl">
 
-        <h2 className="text-2xl font-bold mb-4">
+
+      {/* =====================
+          BOOKING SECTION
+      ===================== */}
+
+      <div className="
+        mt-10
+        bg-gray-100
+        p-6
+        rounded-2xl
+        shadow
+      ">
+
+
+        <h2 className="
+          text-2xl
+          font-bold
+          mb-5
+        ">
+
           Book this trip
+
         </h2>
 
+
+
+        {/* NAME */}
+
         <input
+
           placeholder="Your name"
+
           value={name}
-          className="border p-2 rounded w-full mb-3"
-          onChange={(
-            e
-          ) =>
+
+          onChange={(e) =>
             setName(
-              e.target
-                .value
+              e.target.value
             )
           }
+
+          className="
+            border
+            p-3
+            rounded-xl
+            w-full
+            mb-3
+            bg-white
+          "
+
         />
 
+
+
+        {/* PHONE */}
+
         <input
+
+          type="tel"
+
           placeholder="Phone number"
+
           value={phone}
-          className="border p-2 rounded w-full mb-3"
-          onChange={(
-            e
-          ) =>
+
+          onChange={(e) =>
             setPhone(
-              e.target
-                .value
+              e.target.value
             )
           }
+
+          className="
+            border
+            p-3
+            rounded-xl
+            w-full
+            mb-3
+            bg-white
+          "
+
         />
 
+
+
+        {/* DATE */}
+
+        <label className="
+          block
+          text-sm
+          font-semibold
+          mb-1
+        ">
+
+          Trip Date
+
+        </label>
+
+
         <input
+
           type="date"
+
           value={date}
-          className="border p-2 rounded w-full mb-3"
-          onChange={(
-            e
-          ) =>
+
+          onChange={(e) =>
             setDate(
-              e.target
-                .value
+              e.target.value
             )
           }
+
+          className="
+            border
+            p-3
+            rounded-xl
+            w-full
+            mb-3
+            bg-white
+          "
+
         />
 
+
+
+        {/* GUESTS */}
+
         <input
+
+          type="number"
+
+          min="1"
+
           placeholder="Guests number"
+
           value={guests}
-          className="border p-2 rounded w-full mb-3"
-          onChange={(
-            e
-          ) =>
+
+          onChange={(e) =>
             setGuests(
-              e.target
-                .value
+              e.target.value
             )
           }
+
+          className="
+            border
+            p-3
+            rounded-xl
+            w-full
+            mb-5
+            bg-white
+          "
+
         />
+
+
+
+        {/* PAYMENT INFO */}
+
+        <div className="
+          bg-green-50
+          border
+          border-green-200
+          rounded-xl
+          p-4
+          mb-4
+        ">
+
+          <p className="
+            font-bold
+            text-green-700
+          ">
+
+            Payment Method
+
+          </p>
+
+
+          <p className="
+            text-green-700
+            mt-1
+          ">
+
+            💵 Cash on Arrival
+
+          </p>
+
+
+          <p className="
+            text-gray-600
+            text-sm
+            mt-1
+          ">
+
+            No online payment is required.
+
+          </p>
+
+        </div>
+
+
+
+        {/* ADD TO BOOKING */}
 
         <button
+
           onClick={
-            handleBooking
+            handleAddToCart
           }
-          className="bg-blue-900 text-white px-6 py-3 rounded-xl w-full"
+
+          className="
+            bg-green-600
+            hover:bg-green-700
+            text-white
+            px-6
+            py-3
+            rounded-xl
+            w-full
+            font-semibold
+          "
+
         >
-          Send booking request
+
+          Add to Booking
+
         </button>
 
+
+
+        {/* WHATSAPP */}
+
         <button
+
           onClick={
             handleWhatsAppBooking
           }
-          className="mt-3 bg-green-500 text-white px-6 py-3 rounded-xl w-full"
+
+          className="
+            mt-3
+            bg-green-500
+            hover:bg-green-600
+            text-white
+            px-6
+            py-3
+            rounded-xl
+            w-full
+            font-semibold
+          "
+
         >
+
           Book via WhatsApp
+
         </button>
 
-        <button
-          onClick={
-            handlePayment
-          }
-          className="mt-3 bg-orange-600 text-white px-6 py-3 rounded-xl w-full"
-        >
-          Pay Online Now
-        </button>
 
         <WhatsAppButton
+
           serviceName={
             trip.title ||
             trip.name
           }
+
         />
+
       </div>
+
     </div>
+
   );
+
 }
+
 
 export default TripDetails;

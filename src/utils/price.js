@@ -2,8 +2,21 @@ import { useCurrency } from "../context/CurrencyContext";
 
 export const usePrice = () => {
 
-const { formatPrice } = useCurrency();
+  const {
+    formatPrice
+  } = useCurrency();
 
-return formatPrice;
+
+  return (
+    amount,
+    sourceCurrency = "USD"
+  ) => {
+
+    return formatPrice(
+      amount,
+      sourceCurrency
+    );
+
+  };
 
 };

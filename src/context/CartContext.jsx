@@ -8,9 +8,13 @@ export function CartProvider({ children }) {
 
   const addToCart = (item) => {
 
-    setCartItems(prev => [...prev, item]);
+    setCartItems(prev => [
+      ...prev,
+      item
+    ]);
 
   };
+
 
   const removeFromCart = (index) => {
 
@@ -20,16 +24,20 @@ export function CartProvider({ children }) {
 
   };
 
+
   const clearCart = () => {
 
     setCartItems([]);
 
   };
 
+
   const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price,
+    (sum, item) =>
+      sum + Number(item.price || 0),
     0
   );
+
 
   return (
 
