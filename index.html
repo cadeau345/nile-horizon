@@ -1,129 +1,101 @@
 
 <!doctype html>
 <html lang="ar">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Nile Horizon | Egypt Tours, Hotels & Travel Packages</title>
+    <!-- SEO metadata is managed by React Helmet -->
 
-  <meta
-    name="description"
-    content="Explore Egypt with Nile Horizon. Discover tours, hotels, Nile cruises, cultural attractions and travel packages across Egypt. اكتشف أفضل الرحلات والفنادق والبرامج السياحية في مصر."
-  />
+    <meta name="author" content="Nile Horizon Tourism Egypt" />
+    <meta name="robots" content="index, follow" />
 
-  <meta name="author" content="Nile Horizon Tourism Egypt" />
-  <meta name="robots" content="index, follow" />
+    <!-- Open Graph defaults -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:site_name"
+      content="Nile Horizon Tourism Egypt"
+    />
+    <meta
+      property="og:image"
+      content="https://www.nilehorizon.org/logo.png"
+    />
 
-  <link
-    rel="canonical"
-    href="https://www.nilehorizon.org/"
-  />
+    <!-- Twitter defaults -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://www.nilehorizon.org/logo.png"
+    />
 
-  <meta property="og:type" content="website" />
-  <meta
-    property="og:title"
-    content="Nile Horizon | Explore Egypt"
-  />
-  <meta
-    property="og:description"
-    content="Discover Egypt with tours, hotels, Nile cruises and travel packages across the country."
-  />
-  <meta
-    property="og:url"
-    content="https://www.nilehorizon.org/"
-  />
-  <meta
-    property="og:site_name"
-    content="Nile Horizon Tourism Egypt"
-  />
-  <meta
-    property="og:image"
-    content="https://www.nilehorizon.org/logo.png"
-  />
+    <link rel="icon" type="image/png" href="/logo.png" />
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta
-    name="twitter:title"
-    content="Nile Horizon | Explore Egypt"
-  />
-  <meta
-    name="twitter:description"
-    content="Discover tours, hotels and travel packages across Egypt."
-  />
-  <meta
-    name="twitter:image"
-    content="https://www.nilehorizon.org/logo.png"
-  />
+    <!-- Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-R5HCPFYS4G"
+    ></script>
 
-  <link rel="icon" type="image/png" href="/logo.png" />
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-R5HCPFYS4G");
+    </script>
 
-  <!-- Google Analytics: existing measurement ID -->
-  <script
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=G-R5HCPFYS4G"
-  ></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      window.dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
-    gtag("config", "G-R5HCPFYS4G");
-  </script>
+    <!-- Organization structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TravelAgency",
+        "name": "Nile Horizon Tourism Egypt",
+        "url": "https://www.nilehorizon.org/",
+        "logo": "https://www.nilehorizon.org/logo.png",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Egypt"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Aswan",
+          "addressCountry": "EG"
+        }
+      }
+    </script>
 
-  <!-- Organization structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "TravelAgency",
-    "name": "Nile Horizon Tourism Egypt",
-    "url": "https://www.nilehorizon.org/",
-    "logo": "https://www.nilehorizon.org/logo.png",
-    "areaServed": {
-      "@type": "Country",
-      "name": "Egypt"
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Aswan",
-      "addressCountry": "EG"
-    }
-  }
-  </script>
+    <!-- Website structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Nile Horizon Tourism Egypt",
+        "alternateName": "Nile Horizon",
+        "url": "https://www.nilehorizon.org/"
+      }
+    </script>
 
-  <!-- Website structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Nile Horizon Tourism Egypt",
-    "alternateName": "Nile Horizon",
-    "url": "https://www.nilehorizon.org/"
-  }
-  </script>
+    <!-- Existing external script: preserved -->
+    <script
+      nowprocket
+      data-noptimize="1"
+      data-cfasync="false"
+      data-wpfc-render="false"
+      seraph-accel-crit="1"
+      data-no-defer="1"
+    >
+      (function () {
+        var script = document.createElement("script");
+        script.async = true;
+        script.src = "https://tp-em.com/NTE5NDA0.js?t=519404";
+        document.head.appendChild(script);
+      })();
+    </script>
+  </head>
 
-  <!-- Keep one copy of the existing external script.
-       Confirm its purpose before removing or changing it. -->
-  <script
-    nowprocket
-    data-noptimize="1"
-    data-cfasync="false"
-    data-wpfc-render="false"
-    seraph-accel-crit="1"
-    data-no-defer="1"
-  >
-    (function () {
-      var script = document.createElement("script");
-      script.async = true;
-      script.src = "https://tp-em.com/NTE5NDA0.js?t=519404";
-      document.head.appendChild(script);
-    })();
-  </script>
-</head>
-
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
