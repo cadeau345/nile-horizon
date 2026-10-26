@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState, useContext } from "react";
 
 import {
@@ -616,6 +617,56 @@ function HotelDetails() {
   return (
 
     <div className="max-w-7xl mx-auto px-6 py-32">
+      
+<Helmet>
+  <title>
+    {hotel.name} in {hotel.location || "Egypt"} | Nile Horizon
+  </title>
+
+  <meta
+    name="description"
+    content={
+      hotel.description
+        ? `${hotel.description.slice(0, 140)} | Explore ${hotel.name} with Nile Horizon.`
+        : `Discover ${hotel.name} in ${hotel.location || "Egypt"}. View hotel details, room options, prices, and booking information with Nile Horizon.`
+    }
+  />
+
+  <link
+    rel="canonical"
+    href={`https://www.nilehorizon.org/hotel/${id}`}
+  />
+
+  <meta property="og:type" content="website" />
+
+  <meta
+    property="og:title"
+    content={`${hotel.name} | Nile Horizon`}
+  />
+
+  <meta
+    property="og:description"
+    content={
+      hotel.description ||
+      `Explore ${hotel.name} in ${hotel.location || "Egypt"} with Nile Horizon.`
+    }
+  />
+
+  <meta
+    property="og:url"
+    content={`https://www.nilehorizon.org/hotel/${id}`}
+  />
+
+  {(hotel.images?.[0] || hotel.image) && (
+    <meta
+      property="og:image"
+      content={
+        hotel.images?.[0] || hotel.image
+      }
+    />
+  )}
+</Helmet>
+
 
 
       {/* HEADER */}

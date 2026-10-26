@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run generate:sitemap && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+   "preview": "vite preview",
+"generate:sitemap": "node generate-sitemap.js"
+    
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.2.0",

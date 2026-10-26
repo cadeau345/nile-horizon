@@ -92,25 +92,52 @@ return(
 
 <div className="p-10">
 
+
 <Helmet>
+  <title>Egypt Tours & Excursions | Nile Horizon</title>
 
-<title>
-Trips in Aswan | Abu Simbel & Nubian Village Tours
-</title>
+  <meta
+    name="description"
+    content="Explore Egypt tours and excursions with Nile Horizon. Discover historical sites, cultural experiences, Nile cruises, guided trips, and holiday activities across Egypt."
+  />
 
-<meta
-name="description"
-content="Discover top tours in Aswan including Abu Simbel temples, Nubian Village visits and Nile felucca rides."
-/>
+  <link
+    rel="canonical"
+    href="https://www.nilehorizon.org/trips"
+  />
 
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <meta
+    property="og:title"
+    content="Egypt Tours & Excursions | Nile Horizon"
+  />
+
+  <meta
+    property="og:description"
+    content="Discover tours, cultural experiences, Nile cruises, and excursions across Egypt with Nile Horizon."
+  />
+
+  <meta
+    property="og:url"
+    content="https://www.nilehorizon.org/trips"
+  />
 </Helmet>
 
 
+
 <h1 className="text-3xl font-bold text-blue-900 mb-6">
-
-Trips in Aswan
-
+  Explore Tours & Trips Across Egypt
 </h1>
+<p className="text-gray-600 max-w-3xl mb-8 leading-7">
+  Discover Egypt through historical landmarks, cultural experiences,
+  Nile cruises, guided excursions, and local activities. Explore
+  available trips and choose the experience that best fits your
+  Egyptian holiday.
+</p>
 
 
 {/* الرحلات من Firebase */}

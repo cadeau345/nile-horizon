@@ -34,19 +34,48 @@ function Hotels() {
 
   return (
     <div className="p-10">
-      <Helmet>
-        <title>Hotels in Aswan | Nile Horizon</title>
+   
+<Helmet>
+  <title>Hotels in Egypt | Find Hotels & Places to Stay | Nile Horizon</title>
 
-        <meta
-          name="description"
-          content="Explore the best hotels in Aswan with competitive prices and easy booking options."
-        />
-      </Helmet>
+  <meta
+    name="description"
+    content="Explore hotels and places to stay across Egypt with Nile Horizon. Discover accommodation options in Cairo, Giza, Luxor, Aswan, Alexandria and other destinations. Compare available options and plan your stay."
+  />
 
-      <h1 className="text-3xl font-bold mb-6 text-blue-900">
-        Hotels in Egypt
-      </h1>
+  <link
+    rel="canonical"
+    href="https://www.nilehorizon.org/hotels"
+  />
 
+  <meta property="og:type" content="website" />
+
+  <meta
+    property="og:title"
+    content="Hotels in Egypt | Nile Horizon"
+  />
+
+  <meta
+    property="og:description"
+    content="Discover hotel options across Egypt and find accommodation for your next trip."
+  />
+
+  <meta
+    property="og:url"
+    content="https://www.nilehorizon.org/hotels"
+  />
+</Helmet>
+
+
+   <h1 className="text-3xl font-bold mb-4 text-blue-900">
+  Hotels Across Egypt
+</h1>
+
+<p className="text-gray-600 leading-7 max-w-3xl mb-8">
+  Explore available hotels and accommodation options in Egypt.
+  Browse properties by destination, compare prices, and discover
+  places to stay for your next Egyptian holiday.
+</p>
       {loading ? (
         <p className="text-center text-lg">
           Loading hotels...
@@ -81,7 +110,7 @@ function Hotels() {
                   </h2>
 
                   <p className="text-gray-500 mt-1">
-                    📍 {hotel.location || "Aswan"}
+                    {hotel.location || "Location unavailable"}
                   </p>
 
                   {hotel.rating && (

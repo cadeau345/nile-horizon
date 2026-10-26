@@ -341,22 +341,43 @@ function Home() {
     ">
 
 
-      <Helmet>
 
-        <title>
-          Nile Horizon | Travel Egypt
-        </title>
+<Helmet>
+  <title>
+    Egypt Tours, Hotels & Travel Packages | Nile Horizon
+  </title>
 
-        <meta
-          name="description"
-          content="
-            Explore Egypt with Nile Horizon.
-            Discover hotels, trips,
-            transportation and travel packages.
-          "
-        />
+  <meta
+    name="description"
+    content="Discover Egypt with Nile Horizon. Explore hotels, guided tours, Nile cruises, transportation and travel packages across Egypt. Plan your Egyptian holiday with us."
+  />
 
-      </Helmet>
+  <link
+    rel="canonical"
+    href="https://www.nilehorizon.org/"
+  />
+
+  <meta
+    property="og:title"
+    content="Egypt Tours, Hotels & Travel Packages | Nile Horizon"
+  />
+
+  <meta
+    property="og:description"
+    content="Explore Egypt with Nile Horizon. Discover hotels, tours, Nile cruises and travel packages across Egypt."
+  />
+
+  <meta
+    property="og:url"
+    content="https://www.nilehorizon.org/"
+  />
+
+  <meta
+    property="og:type"
+    content="website"
+  />
+</Helmet>
+
 
 
       {/* =========================

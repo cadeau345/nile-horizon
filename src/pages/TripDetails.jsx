@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState, useContext } from "react";
 
 import {
@@ -308,7 +309,61 @@ ${trip.price || 0}`;
       mx-auto
       pt-32
     ">
+<Helmet>
+  <title>
+    {`${trip.title || trip.name || "Egypt Tour"}${
+      trip.city ? ` in ${trip.city}` : " in Egypt"
+    } | Nile Horizon`}
+  </title>
 
+  <meta
+    name="description"
+    content={
+      trip.description
+        ? `${trip.description.slice(0, 140)} | Discover tours across Egypt with Nile Horizon.`
+        : `Discover ${trip.title || trip.name || "this tour"}${
+            trip.city ? ` in ${trip.city}` : " in Egypt"
+          }. View trip details, duration, prices, and booking options.`
+    }
+  />
+
+  <link
+    rel="canonical"
+    href={`https://www.nilehorizon.org/trip/${id}`}
+  />
+
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <meta
+    property="og:title"
+    content={`${trip.title || trip.name || "Egypt Tour"} | Nile Horizon`}
+  />
+
+  <meta
+    property="og:description"
+    content={
+      trip.description ||
+      `Explore ${trip.title || trip.name || "this tour"}${
+        trip.city ? ` in ${trip.city}` : " in Egypt"
+      } with Nile Horizon.`
+    }
+  />
+
+  <meta
+    property="og:url"
+    content={`https://www.nilehorizon.org/trip/${id}`}
+  />
+
+  {(trip.images?.[0] || trip.image) && (
+    <meta
+      property="og:image"
+      content={trip.images?.[0] || trip.image}
+    />
+  )}
+</Helmet>
 
       {/* =====================
           IMAGE
